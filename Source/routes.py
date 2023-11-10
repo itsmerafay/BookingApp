@@ -1,14 +1,12 @@
-import re
 import random
-from sqlalchemy import func
+from sqlalchemy import func, or_, and_
 from validations import Validations
 from app import app, db, mail
 from flask import request, jsonify, url_for, current_app, send_file, send_from_directory
-from datetime import datetime
+from datetime import datetime, timedelta
 from models import User, PasswordResetToken, Vendor, Event, Booking 
 import secrets
 import io
-import colorama
 import uuid
 import base64
 from flask_mail import Message
@@ -16,7 +14,6 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 from models import bcrypt   
 from werkzeug.utils import secure_filename
 import os
-import math
 
 import sys
 sys.dont_write_bytecode = True
@@ -57,13 +54,7 @@ def signup():
     return jsonify({"message": "Registered Successfully !!"})
 
 
-
-
-
-
 ###############################     Route For SignIn      ######################################
-
-
 
 
 @app.route('/signin', methods=['POST'])
@@ -77,7 +68,7 @@ def signin():
     if not user or not user.check_password(password):
         return jsonify({'message': 'Invalid credentials'}), 401
 
-    if not user.role:
+    if not user.role:  # This line is not necessary, as 'role' should always be present due to your database model
         return jsonify({"message": "Please specify if you are signing in as a user or a vendor"}), 400
 
     # Generate the access token
@@ -94,15 +85,7 @@ def signin():
 
 
 
-
-
-
-
-
-
 ###############################     Function For Getting The Current User      ######################################
-
-
 
 
 def get_current_user():
@@ -189,104 +172,7 @@ app.config["VENDOR_IMAGES_FOLDER"] = VENDOR_IMAGES_FOLDER
 
 ###############################     Route For Event Management      ######################################
 
-
-
-# @app.route('/complete_vendor_profile_2', methods=["POST"])
-# @jwt_required()
-# def complete_vendor_profile_2():
-    # data = request.get_json()
-    # user = get_current_user()
-
-    # if not user:
-    #     return jsonify({"message": "User not found"}), 401
-
-    # if user.role != "vendor":
-    #     return jsonify({"message": "User Auth Error, not a vendor"}), 401
-
-    # full_name = data.get("full_name")
-    # phone_number = data.get("phone_number")
-    # location = data.get("location")
-    # biography = data.get("biography")
-    # thumbnail = data.get("thumbnail")
-    # other_images = data.get("other_images")
-    # video_showcase = data.get("video_showcase")
-    # location_name = data.get("location_name")
-    # address = data.get("address")
-    # rate = data.get("rate")
-    # fixed_price = data.get("fixed_price")
-
-    # if not all([full_name, phone_number, location, biography, thumbnail, video_showcase, address, location_name, fixed_price, rate]):
-    #     return jsonify({"message": "All required fields are necessary for the vendor profile"}), 400
-
-
-    # # check for vendor profile is already created or not so that it can be added else updated
-    # # relation
-    # vendor = user.vendor
-
-    # # If not already present(vendor) then create profile part 2 for it
-
-    # if not vendor:
-    #     vendor = Vendor(
-    #         full_name=full_name,
-    #         phone_number=phone_number,
-    #         location=location,
-    #         biography=biography,
-    #         video_showcase=video_showcase,
-    #         location_name=location_name,
-    #         address=address,
-    #         rate=rate,
-    #         fixed_price=fixed_price
-    #     )
-
-    #     # Handle thumbnail image
-    #     if thumbnail:
-    #         thumbnail_filename = f"{uuid.uuid4()}.png"
-    #         thumbnail_path = os.path.join(app.config['VENDOR_IMAGES_FOLDER'], thumbnail_filename)
-
-    #         # Thumbnail contains the base64 data and on func we passed filename so that main image can be accessed and can be conveted to bytes
-    #         save_image_from_base64(thumbnail, thumbnail_path)
-
-    #         # make the image name in thumbnail column
-    #         vendor.thumbnail = thumbnail_filename
-
-    #     # Handle other images
-    #     if other_images:
-    #         vendor.other_images = save_multiple_images_from_base64(other_images)
-
-    #     user.vendor = vendor
-    #     db.session.commit()
-    #     return jsonify({"message": "Successfully completed the part of the profile"})
-
-    # else:
-    #     vendor.full_name = full_name
-    #     vendor.phone_number = phone_number
-    #     vendor.location = location
-    #     vendor.biography = biography
-    #     vendor.video_showcase = video_showcase
-    #     vendor.location_name = location_name
-    #     vendor.address = address
-    #     vendor.rate = rate
-    #     vendor.fixed_price = fixed_price
-
-    #     # Handle thumbnail image if provided
-    #     if thumbnail:
-    #         thumbnail_filename = f"{uuid.uuid4()}.png"
-    #         thumbnail_path = os.path.join(app.config['VENDOR_IMAGES_FOLDER'], thumbnail_filename)
-    #         save_image_from_base64(thumbnail, thumbnail_path)
-    #         vendor.thumbnail = thumbnail_filename
-
-    #     # Handle other images if provided
-    #     if other_images:
-    #         # here other images contains base64 images
-    #         # so after calling the function the other images will return multiple base 64 images
-    #         vendor.other_images = save_multiple_images_from_base64(other_images)
-
-    #     db.session.commit()
-    #     return jsonify({"message": "Successfully completed the 2nd part of the profile"})
-
 ###############################     Create Event       ######################################
-
-
 
 # First vendor will be registered or complete his profile then can create event
 
@@ -303,7 +189,7 @@ def create_event():
         return jsonify({"message": "User Auth Error, not a vendor"}), 401
 
     # Ensure the user is associated with a vendor profile
-    if not user.is_vendor or not user.vendor:
+    if not user.vendor:
         return jsonify({"message": "User is not associated with a vendor profile"}), 400
 
     vendor = user.vendor
@@ -319,12 +205,16 @@ def create_event():
 
     # Additional fields
     details = data.get("details")
+    print("Request Data:", request.get_json())
     services = data.get("services")
+    print("Services:", services)
+
     facilities = data.get("facilities")
     description = data.get("description")
     event_type = data.get("event_type")
 
     # Create an event for the vendor
+    print(services)
     event = Event(
         thumbnail=thumbnail,
         other_images=other_images,
@@ -474,13 +364,47 @@ def delete_event(event_id):
         return jsonify({
             "message":"User Not Found !!"
         })
-    
+
     db.session.delete(event)
     db.session.commit()
 
     return jsonify({
         "message":"Event Deleted Successfully !!!"
     })
+
+
+
+###############################     Get Event     ######################################
+
+@app.route("/get_event/<int:event_id>", methods = ["GET"])
+def get_event(event_id):
+    
+    event = Event.query.get(event_id) 
+    
+    if event:
+        event_details = {
+            # "id": event.id,
+            "thumbnail": event.thumbnail,
+            "other_images": event.other_images,
+            "video_showcase": event.video_showcase,
+            "location_name": event.location_name,
+            "address": event.address,
+            "rate": event.rate,
+            "fixed_price": event.fixed_price,
+            "details": event.details,
+            "services": event.services,
+            "facilities": event.facilities,
+            "description": event.description,
+            "event_type": event.event_type,
+            "vendor_id": event.vendor_id  # You can include vendor details if needed
+        }
+
+        return jsonify({"Event Details":event_details})
+
+    else:
+        return jsonify({
+            "message":"Event not Found !!"
+        })
 
 # decoding image
 
@@ -611,106 +535,228 @@ def search_event():
     }), 200
 
 
-# @app.route("/custom_event_search")
-# @jwt_required()
-# def custom_event_search():
-#     data =  request.get_json()
-#     event_type = data.get("event_type")
-#     location_name = data.get("location_name")
-#     min_price = 
-#     max_price = 
-#     start_date = 
+@app.route("/custom_event_search", methods=["POST"])
+@jwt_required()
+def custom_event_search():
+    data = request.get_json()
+    event_type = data.get("event_type")
+    location_name = data.get("location_name")
+    min_price = data.get("min_price")
+    max_price = data.get("max_price")
+    start_date = data.get("start_date")
+    end_date = data.get("end_date")
+    start_time = data.get("start_time")
+    end_time = data.get("end_time")
+    all_day = data.get("all_day")
+
+    query = db.session.query(Event)
+
+    # Apply filters based on search criteria
+    if event_type:
+        query = query.filter(func.lower(Event.event_type) == event_type.lower())
+
+    if location_name:
+        query = query.filter(func.lower(Event.location_name) == location_name.lower())
+
+    if min_price is not None and max_price is not None:
+        # Both min_price and max_price are provided, filter based on the range
+        query = query.filter(Event.rate.between(min_price, max_price))
+
+    elif min_price is not None or max_price is not None:
+        # Either min_price or max_price is provided, filter based on the provided value
+        if min_price is not None:
+            query = query.filter(Event.rate >= min_price)
+        elif max_price is not None:
+            query = query.filter(Event.rate <= max_price)
+
+    if not all_day and start_date and end_date and start_time and end_time:
+    # Subquery to select overlapping event IDs
+        subquery = db.session.query(Booking.event_id).filter(
+                (Booking.start_date <= end_date)   &
+                (Booking.end_date >= start_date)   &
+                (Booking.start_time <= end_time)   &
+                (Booking.end_time >= start_time)   
+        
+        ).distinct()
+
+        # Filter events that do not have overlapping bookings
+        query = query.filter(~Event.id.in_(subquery))
+
+    results = query.all()
+
+    # Serialize Event objects to a list of dictionaries
+    serialized_results = []
+
+    print(str(query))
+
+    for event in results:
+        serialized_event = {
+            "id": event.id,
+            "event_type": event.event_type,
+            "location_name": event.location_name,
+            # Add other fields you want to include
+        }
+        serialized_results.append(serialized_event)
+
+    return jsonify({
+        "Search Result Found": f"{len(serialized_results)} vendors found in {location_name}",
+        "Search results": serialized_results
+    })
 
 
-
-
-#     # Building the base query to use for customize one .
-#     query = db.session.query(Event)
-
-
-
+    
 ###############################   Create Booking      ######################################
 
 @app.route('/create_booking', methods=["POST"])
 @jwt_required()
 def create_booking():
-    data = request.get_json()
-    user = get_current_user()
+    try:
+        data = request.get_json()
+        user = get_current_user()
 
-    if not user:
+        if not user:
+            return jsonify({
+                "message": "User not authenticated !!"
+            })
+
+        full_name = data.get('full_name')
+        email = data.get('email')
+        guest_count = data.get('guest_count')
+        additional_notes = data.get('additional_notes', '')
+        start_date = data.get('start_date')
+        end_date = data.get('end_date')
+        all_day = data.get('all_day')
+        event_id = data.get('event_id')
+
+        if not all([full_name, email, guest_count, start_date, end_date, event_id]):
+            return jsonify({
+                "message": "All necessary fields must be set !!"
+            })
+
+        # If it's an all-day event, set start_time and end_time accordingly
+        if all_day:
+            start_time = "00:00:00"
+            end_time = "23:59:59"
+        else:
+            start_time = data.get('start_time', "00:00:00")
+            end_time = data.get('end_time', "23:59:59")
+
+        # Calculate total event hours
+        event_hours = calculate_event_hours(start_date, end_date, start_time, end_time, all_day)
+
+        overlapping_booking = Booking.query.filter(
+            (Booking.event_id == event_id) &
+            (Booking.start_date <= start_date) &
+            (Booking.end_date >= end_date) &
+            (Booking.start_time <= start_time) &
+            (Booking.end_time == end_time)
+        ).first()
+
+        if overlapping_booking:
+            return jsonify({
+                "message": "Event Is already booked !!"
+            })
+
+        # Calculate the rate and other values
+        event = Event.query.filter_by(id=event_id).first()
+        subtotal = event_hours * event.rate
+        tax_percentage = 0.15
+        total_price = subtotal + (subtotal * tax_percentage)
+
+        # Create and save the booking
+        booking = Booking(
+            user_id=user.id,
+            full_name=full_name,
+            email=email,
+            guest_count=guest_count,
+            additional_notes=additional_notes,
+            start_date=start_date,
+            end_date=end_date,
+            start_time=start_time,
+            end_time=end_time,
+            all_day=all_day,
+            event_id=event_id
+        )
+
+        db.session.add(booking)
+        db.session.commit()
+
         return jsonify({
-            "message": "User not authenticated !!"
+            "Summary": {
+                "Event Hours": f"{event_hours} Hours",
+                "Guests": f"{guest_count}",
+                "Vendor Rate": f"{event.rate}$",
+                "Subtotal": f"{subtotal}$",
+                "Taxes (15%)": "15%",
+                "Total Price": f"{total_price} $"
+            }
         })
 
-    full_name = data.get('full_name')
-    email = data.get('email')
-    guest_count = data.get('guest_count')
-    additional_notes = data.get('additional_notes', '')
-    start_date = data.get('start_date')
-    end_date = data.get('end_date')
-    all_day = data.get('all_day')
-    event_id = data.get('event_id')
+    except Exception as e:
+        return jsonify({
+            "Error message": str(e)
+        }), 500
 
-    
+def calculate_event_hours(start_date, end_date, start_time, end_time, all_day):
+    # If it's an all-day event, set start_time and end_time accordingly
     if all_day:
         start_time = "00:00:00"
         end_time = "23:59:59"
 
-    else:
-        start_time = data.get('start_time')
-        end_time = data.get('end_time')
-    
+    # Convert start and end dates/times to datetime objects
+    start_datetime = convert_to_datetime(start_date, start_time)
+    end_datetime = convert_to_datetime(end_date, end_time)
+
+    # If it's an all-day event, set end_datetime to 23:59:59 of the end_date
+    if all_day:
+        end_datetime = datetime.combine(end_datetime.date(), datetime.max.time())
+
+    # Calculate total event hours for the specified time duration
+    total_hours_for_duration = calculate_hours_for_duration(start_datetime, end_datetime)
+
+    # Calculate the number of days involved
+    total_days_involved = calculate_days_involved(start_datetime, end_datetime)
+
+    # Use the minimum of total_hours_for_duration and total_days_involved as event_hours
+    event_hours = max(total_hours_for_duration, total_days_involved * 24)
+
+    return event_hours
 
 
-    if not all([full_name, email, guest_count, additional_notes, start_date, end_date, start_time, end_time, event_id]):
-        return jsonify({
-            "message": "All fields must be set !!"
-        })
+def convert_to_datetime(date_str, time_str):
+    return datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %H:%M:%S")
 
-    print(full_name, email, guest_count, additional_notes, start_date, end_date, start_time, end_time, all_day, event_id)
 
-    booking = Booking(  
-        user_id=user.id,
-        full_name=full_name,
-        email=email,
-        guest_count=guest_count,
-        additional_notes=additional_notes,
-        start_date=start_date,
-        end_date=end_date,
-        start_time=start_time,
-        end_time=end_time,
-        all_day=all_day,
-        event_id=event_id
-    )
+def calculate_hours_for_duration(start_datetime, end_datetime):
+    return (end_datetime - start_datetime).total_seconds() / 3600
 
-    db.session.add(booking)
-    db.session.commit()
 
-    return jsonify({
-        "message": "Event booked successfully !!"
-    })
+def calculate_days_involved(start_datetime, end_datetime):
+    return (end_datetime.date() - start_datetime.date()).days + 1
+
 
 
 
 ###############################     Upload Profile Image      ######################################
 
 
-
 # remaining work : don't ask for email 
 
-@app.route('/upload_image', methods=["POST"])
+@app.route('/upload_profile_image', methods=["POST"])
 @jwt_required()
-def upload_image():
+def upload_profile_image():
     UPLOAD_FOLDER = 'images'
     app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
     data = request.get_json()
     profile_image = data.get("profile_image")
 
-    if not profile_image:
-        return jsonify({"message": "No profile image provided!!"}), 400
+    try:    
+        user_email = get_jwt_identity()
 
-    try:
+        if not profile_image:
+            return jsonify({"message": "No profile image provided!!"}), 400
+
         image_bytes = base64.b64decode(profile_image)
 
         # If images directory dont exist then make it !!
@@ -733,7 +779,7 @@ def upload_image():
 
         # Assuming you have a User model and a database connection
         # Update the user's profile_image field with the new file path
-        user = User.query.filter_by(email=data["email"]).first()
+        user = User.query.filter_by(email=user_email).first()
         if user:
             user.profile_image = filename_path
             db.session.commit()
@@ -742,6 +788,75 @@ def upload_image():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500 
+    
+###############################     Update Profile Image      ######################################
+
+
+@app.route('/update_profile_image', methods=["POST"])
+@jwt_required()
+def update_profile_image():
+    UPLOAD_FOLDER = 'images'
+    app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+    data = request.get_json()
+    profile_image = data.get("profile_image")
+    
+    try:
+        user_email = get_jwt_identity()
+        user = User.query.filter_by(email=user_email).first()
+
+        if not profile_image:
+            return jsonify({"message": "No profile image provided!!"}), 400
+
+        if user.profile_image:
+            # Delete the old image file if it exists
+            old_image_path = os.path.join(app.config['UPLOAD_FOLDER'], user.profile_image)
+            if os.path.exists(old_image_path):
+                os.remove(old_image_path)
+
+        image_bytes = base64.b64decode(profile_image)
+
+        if not os.path.exists(UPLOAD_FOLDER):
+            os.makedirs(UPLOAD_FOLDER)
+
+        original_extension = data.get("extension", "png")
+
+        filename = str(uuid.uuid4())
+        output_file_name = os.path.join(app.config['UPLOAD_FOLDER'], f"{filename}.{original_extension}")
+        filename_path = f"{filename}.{original_extension}"
+
+        with open(output_file_name, "wb") as output_file:
+            output_file.write(image_bytes)
+
+        user.profile_image = filename_path
+        db.session.commit()
+
+        return jsonify({"message": "Profile image updated successfully", "file_path": filename_path}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+
+###############################     Delete Profile Image      ######################################
+
+# No need for delete profile as while updating the image with the new one it will automatically delete the new one
+
+###############################     Get Profile Image      ######################################
+
+@app.route('/get_profile_image', methods=["GET"])
+@jwt_required()
+def get_profile_image():
+    user_email = get_jwt_identity()
+    user = User.query.filter_by(email=user_email).first()
+
+    if user and user.profile_image:
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], user.profile_image)
+        if os.path.exists(file_path):
+            return send_file(file_path, as_attachment=True)
+    
+    return jsonify({"message": "Profile image not found"}), 404
+
+
 
 # getting the image
 
@@ -750,36 +865,7 @@ def serve_image(image_name):
     return send_from_directory('images', image_name)
 
 
-
-
-
-
-###############################     Get Profile Image      ######################################
-
-
-
-
-# @app.route('/get_profile_image', methods = ['GET'])
-# @jwt_required()
-# def get_profile_image():
-#     user = get_current_user
-
-#     if user and user.profile_image:
-#         return send_file(io.BytesIO(user.profile_image), mimetype = 'image/png')
-
-#     if not user or user.profile_image:
-#         return jsonify({
-#             "message": " Profile Image Not Available !!"
-#         }) , 404
-
-
-
-
 ###############################     Route For Reset Password      ######################################
-
-
-
-
 
 
 @app.route('/reset_password', methods=['POST'])
@@ -806,8 +892,6 @@ def reset_password_request():
     except Exception as e:
         return jsonify({"message": f"Email sending failed: {str(e)}"}), 500
     
-
-
 
 
 ###############################     Route For Reset Password After Getting Token      ######################################

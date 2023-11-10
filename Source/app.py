@@ -6,31 +6,27 @@ from flask_mail import Message, Mail
 from flask_migrate import Migrate
 from config import Config
 from json import JSONEncoder
-import os
-
-import sys
-sys.dont_write_bytecode = True
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)  # Add this line to enable CORS for all routes
 app.json_encoder = JSONEncoder
-
-app.config.from_object(Config)  # Use Config class directly
+app.config.from_object(Config)
 jwt = JWTManager(app)
-
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
+mail = Mail(app)
 
-
-with open('config.json','r') as c:
+with open('config.json', 'r') as c:
     params = json.load(c)["params"]
 
-
-app.config['MAIL_SERVER']='smtp.gmail.com'
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
 app.config['MAIL_USERNAME'] = 'abdulrafayatiq.03@gmail.com'
 app.config['MAIL_PASSWORD'] = 'todp ilxm pjdf wdwa'
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
+
 # app.config['WKHTMLTOPDF_PATH'] = 'C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe' # specify the path to wkhtmltopdf here
 # )
 

@@ -8,7 +8,6 @@ sys.dont_write_bytecode = True
 
 bcrypt = Bcrypt()
 
-
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(255), unique=True, nullable=False)
@@ -16,7 +15,7 @@ class User(db.Model):
     access_token = db.Column(db.String(255), unique=True, nullable=True)
     role = db.Column(db.String(50), nullable=False)
     profile_image = db.Column(db.String(255))
-    is_vendor = db.Column(db.Boolean, default=False)
+    # is_vendor = db.Column(db.Boolean, default=False)
 
     # Define the relationship between User and Vendor (one-to-one)
     vendor_id = db.Column(db.Integer, db.ForeignKey('vendor.id'), unique=True, nullable=True)
@@ -27,7 +26,6 @@ class User(db.Model):
         self.password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
         self.access_token = None
         self.role = role
-        self.is_vendor = role == "vendor"
 
     def check_password(self, password):
         return bcrypt.check_password_hash(self.password_hash, password)
@@ -53,7 +51,7 @@ class Event(db.Model):
     video_showcase = db.Column(db.String(255), nullable=True)
     location_name = db.Column(db.String(255), nullable=False)
     address = db.Column(db.String(255), nullable=False)
-    rate = db.Column(db.String(255), nullable=False)
+    rate = db.Column(db.Float, nullable=False)
     fixed_price = db.Column(db.Boolean, nullable=True)
 
     details = db.Column(db.String(1024), nullable=True)
@@ -63,7 +61,6 @@ class Event(db.Model):
     facilities = db.Column(db.JSON, nullable=True)
     description = db.Column(db.String(1024), nullable=True)
     event_type = db.Column(db.String(255), nullable =  True)
-
     vendor = db.relationship("Vendor", back_populates="event")
 
     vendor_id = db.Column(db.Integer, db.ForeignKey("vendor.id"), nullable = False)
