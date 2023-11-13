@@ -33,8 +33,6 @@ app.config['MAIL_USE_SSL'] = True
 mail = Mail(app)
 
 
-
-
 from routes import *
 
 if __name__ == '__main__':

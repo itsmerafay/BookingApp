@@ -383,7 +383,7 @@ def get_event(event_id):
     
     if event:
         event_details = {
-            # "id": event.id,
+            "id": event.id,
             "thumbnail": event.thumbnail,
             "other_images": event.other_images,
             "video_showcase": event.video_showcase,
@@ -396,7 +396,8 @@ def get_event(event_id):
             "facilities": event.facilities,
             "description": event.description,
             "event_type": event.event_type,
-            "vendor_id": event.vendor_id  # You can include vendor details if needed
+            "vendor_id": event.vendor_id,  # You can include vendor details if needed
+            "custom event name":event.custom_event_name
         }
 
         return jsonify({"Event Details":event_details})
@@ -519,12 +520,21 @@ def search_event():
 
     event_list = []
     for event in events:
+        vendor_details = []
+        for vendor_user in event.vendor.user:
+        # vendor = event.vendor
+            vendor_details.append({
+                "vendor_profile_image": vendor_user.profile_image
+            })
+
         event_info = {
-            # "id": event.id,
+            "id": event.id,
             "thumbnail": event.thumbnail,
             "event_type": event.event_type,
+            "custom event name":event.custom_event_name,
             "rate": event.rate,
             "fixed_price": event.fixed_price,
+            "vendor details": vendor_details
         }
 
         event_list.append(event_info)
@@ -548,7 +558,6 @@ def custom_event_search():
     start_time = data.get("start_time")
     end_time = data.get("end_time")
     all_day = data.get("all_day")
-
     query = db.session.query(Event)
 
     # Apply filters based on search criteria
@@ -587,14 +596,25 @@ def custom_event_search():
     # Serialize Event objects to a list of dictionaries
     serialized_results = []
 
+
     print(str(query))
 
+    # First loop is for one event and other is for each vendor specific details 
     for event in results:
+        vendor_details = []
+        for vendor_user in event.vendor.user:
+        # vendor = event.vendor
+            vendor_details.append({
+                "vendor_profile_image": vendor_user.profile_image
+            })
+
         serialized_event = {
             "id": event.id,
             "event_type": event.event_type,
             "location_name": event.location_name,
-            # Add other fields you want to include
+            "rate" : event.rate,
+            "thumbnail":event.thumbnail,
+            "vendor_details": vendor_details
         }
         serialized_results.append(serialized_event)
 
@@ -604,7 +624,6 @@ def custom_event_search():
     })
 
 
-    
 ###############################   Create Booking      ######################################
 
 @app.route('/create_booking', methods=["POST"])

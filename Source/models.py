@@ -55,6 +55,7 @@ class Event(db.Model):
     fixed_price = db.Column(db.Boolean, nullable=True)
 
     details = db.Column(db.String(1024), nullable=True)
+    custom_event_name = db.Column(db.String(255), nullable = True)
     services = db.Column(db.String(1024), nullable=True)
 
     # For services and facilities, use a JSON field for multiple images
