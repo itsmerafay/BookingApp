@@ -1,17 +1,20 @@
 import random
 from sqlalchemy import func, or_, and_
 from validations import Validations
+from geopy.distance import geodesic
 from app import app, db, mail
 from flask import request, jsonify, url_for, current_app, send_file, send_from_directory
 from datetime import datetime, timedelta
-from models import User, PasswordResetToken, Vendor, Event, Booking 
+from model import User, PasswordResetToken, Vendor, Event, Booking , Review
 import secrets
+from sqlalchemy.exc import IntegrityError
 import io
 import uuid
+import json
 import base64
 from flask_mail import Message
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, decode_token
-from models import bcrypt   
+from model import bcrypt   
 from werkzeug.utils import secure_filename
 import os
 
@@ -23,35 +26,53 @@ sys.dont_write_bytecode = True
 
 @app.route('/signup', methods=['POST'])  # Updated route
 def signup():
-    data = request.get_json()
-    email = data.get('email')
-    password = data.get('password')
-    role = data.get('role')  # Get the user's role from the request
+    try:
+        data = request.get_json()
+        email = data.get('email')
+        password = data.get('password')
+        role = data.get('role')  # Get the user's role from the request
 
-    # Validate email and password using your Validations class
-    email_validation_result = Validations.is_valid_email(email)
-    password_validation_result = Validations.is_valid_password(password)
+        # Validate email and password using your Validations class
+        email_validation_result = Validations.is_valid_email(email)
+        password_validation_result = Validations.is_valid_password(password)
 
-    if email_validation_result is None:
-        return jsonify({"message": "Invalid Email Address"}), 400
+        if email_validation_result is None:
+            return jsonify({"message": "Invalid Email Address","status":False}), 400
 
-    if password_validation_result is not None:
-        return password_validation_result, 400 # json response result according to the error
+        if password_validation_result is not None:
+            return password_validation_result, 400 # json response result according to the error
 
-    if not email or not password or not role:
-        return jsonify({'message': 'Email, password, and role are required'}), 400
+        if not email or not password or not role:
+            return jsonify({'message': 'Email, password, and role are required',"status":False}), 400
 
-    if User.query.filter_by(email=email).first():
-        return jsonify({'message': 'Email already exists'}), 400
+        if User.query.filter_by(email=email).first():
+            return jsonify({'message': 'Email already exists',"status":False}), 400
 
-    if role not in ['user', 'vendor']:
-        return jsonify({"message": "Invalid Role"}), 400
+        if role not in ['user', 'vendor']:
+            return jsonify({"message": "Invalid Role","status":False}), 400
 
-    user = User(email=email, password=password, role=role)  # Pass the role during user creation
-    db.session.add(user)
-    db.session.commit()
+        user = User(email=email, password=password, role=role)  # Pass the role during user creation
 
-    return jsonify({"message": "Registered Successfully !!"})
+        if role == "vendor":
+                vendor = user.vendor
+                # If vendor profile doesn't exist then create a new one
+                if not vendor:
+                    vendor_data = {
+                        'full_name': "",
+                        'phone_number': "",
+                        'location': "",
+                        'biography': ""
+                    }
+                    vendor = Vendor(**vendor_data)
+                    user.vendor = vendor
+                    #db.session.commit()
+        db.session.add(user)
+        db.session.commit()
+        return jsonify({"status":True, "message": "Registered Successfully !!"})
+    except Exception as e:
+        print(e)
+        return jsonify({"status":False,"message":"errro"})
+
 
 
 ###############################     Route For SignIn      ######################################
@@ -64,12 +85,11 @@ def signin():
     password = data.get('password')
 
     user = User.query.filter_by(email=email).first()
-
     if not user or not user.check_password(password):
-        return jsonify({'message': 'Invalid credentials'}), 401
+        return jsonify({"status":False,'message': 'Invalid credentials'}), 401
 
     if not user.role:  # This line is not necessary, as 'role' should always be present due to your database model
-        return jsonify({"message": "Please specify if you are signing in as a user or a vendor"}), 400
+        return jsonify({"status":False,"message": "Please specify if you are signing in as a user or a vendor"}), 400
 
     # Generate the access token
     access_token = create_access_token(identity=email)
@@ -79,8 +99,12 @@ def signin():
     db.session.commit()
 
     return jsonify({
+        "status":True,
         "access_token": access_token,
-        "message": "Successfully Logged In !!"
+        "message": "Successfully Logged In !!",
+        "role":user.role,
+        "id":user.id,
+        "profile_image":user.profile_image
     })
 
 
@@ -106,7 +130,7 @@ def get_current_user():
 def protected_route():
     user = get_current_user()
     if user:
-        return jsonify({"message": "This route is protected and accessible to authenticated users"})
+        return jsonify({ "message": "This route is protected and accessible to authenticated users"})
     else:
         return jsonify({"message": "Authentication failed"}), 401
 
@@ -116,6 +140,15 @@ def protected_route():
 
 ###############################     Route For Vendor Profile Complete       ######################################
 
+@app.route("/profile", methods=["GET"])
+@jwt_required()
+def profile():
+    try:
+        user = get_current_user()
+        return jsonify({"status": True, "user": user.as_vendor()})
+    except Exception as e:
+        print(e)  # Log the error for debugging
+        return jsonify({"status": False, "error": str(e)})
 
 @app.route('/complete_vendor_profile', methods=["POST"])
 @jwt_required()
@@ -124,10 +157,10 @@ def complete_vendor_profile():
     user = get_current_user()
 
     if not user:
-        return jsonify({"message": "User not found"}), 401
+        return jsonify({ "status":False,"message": "User not found"}), 401
 
     if user.role != "vendor":
-        return jsonify({"message": "User Auth Error, not a vendor"}), 401
+        return jsonify({"status":False,"message": "User Auth Error, not a vendor"}), 401
 
     full_name = data.get("full_name")
     phone_number = data.get("phone_number")
@@ -135,7 +168,7 @@ def complete_vendor_profile():
     biography = data.get("biography")
 
     if not all([full_name, phone_number, location, biography]):
-        return jsonify({"message": "All fields are required for the vendor profile"}), 400
+        return jsonify({"status":False,"message": "All fields are required for the vendor profile"}), 400
 
     vendor = user.vendor
 
@@ -150,7 +183,7 @@ def complete_vendor_profile():
         vendor = Vendor(**vendor_data)
         user.vendor = vendor
         db.session.commit()
-        return jsonify({"message": "Vendor profile created successfully"})
+        return jsonify({"status":True,"message": "Vendor profile created successfully"})
     
     # else update the existing
     else:
@@ -159,7 +192,7 @@ def complete_vendor_profile():
         vendor.location = location
         vendor.biography = biography
         db.session.commit()
-        return jsonify({"message": "Vendor profile completed successfully"})
+        return jsonify({"status":True,"message": "Vendor profile completed successfully"})
     
 
 
@@ -183,14 +216,14 @@ def create_event():
     user = get_current_user()
 
     if not user:
-        return jsonify({"message": "User not found"}), 401
+        return jsonify({"status":False, "message": "User not found"}), 401
 
     if user.role != "vendor":
-        return jsonify({"message": "User Auth Error, not a vendor"}), 401
+        return jsonify({"status":False,"message": "User Auth Error, not a vendor"}), 401
 
     # Ensure the user is associated with a vendor profile
     if not user.vendor:
-        return jsonify({"message": "User is not associated with a vendor profile"}), 400
+        return jsonify({"status":False,"message": "User is not associated with a vendor profile"}), 400
 
     vendor = user.vendor
 
@@ -212,9 +245,12 @@ def create_event():
     facilities = data.get("facilities")
     description = data.get("description")
     event_type = data.get("event_type")
+    latitude=data.get("latitude")
+    longitude = data.get("longitude")
 
     # Create an event for the vendor
     print(services)
+    print(rate,"this was rate")
     event = Event(
         thumbnail=thumbnail,
         other_images=other_images,
@@ -227,7 +263,9 @@ def create_event():
         services=services,
         facilities=facilities,
         description=description,
-        event_type =  event_type,
+        event_type=event_type,
+        latitude=latitude,
+        longitude=longitude,
         vendor=vendor  # Associate the event with the vendor
     )
 
@@ -248,11 +286,31 @@ def create_event():
     db.session.add(event)  # Add the event to the session
     db.session.commit()  # Commit the transaction
 
-    return jsonify({"message": "Event created successfully"})
+    return jsonify({"status":True,"message": "Event created successfully"})
 
 
 ###############################     Update Event     ######################################
 
+@app.route("/get_my_events", methods=["GET"])
+@jwt_required()
+def getmyevents():
+    try:
+        user = get_current_user()
+        vendor = user.vendor
+        events = Event.query.filter_by(vendor=vendor).all()
+        print(events,"ll")
+        events_data = []
+
+        for event in events:
+            event_dict = event.as_dict()
+            event_dict['total_bookings'] = event.get_total_bookings()
+            event_dict['total_bookings_value'] = event.earnings_per_month()  # Total earnings for the current month
+            events_data.append(event_dict)
+
+        return jsonify({"status": True, "events": events_data})
+    except Exception as e:
+        print(e)
+        return jsonify({"status": False, "events": []})
 
 
 @app.route("/update_event/<int:event_id>", methods = ["PUT"])
@@ -263,17 +321,20 @@ def update_event(event_id):
 
     if not user:
         return jsonify({
+            "status":False,
             "message":"User Not Found !!"
         })
 
     if user.role != "vendor":
         return jsonify({
+            "status":False,
             "message":"User Authentication Error !!!"
         })
 
     # Ensuring that user is associated with a vendor profile
     if not user.vendor:
         return jsonify({
+            "status":False,
             "message":"User is not associated with a vendor profile make sure to complete the vendor profile first !!! "
         })
 
@@ -287,6 +348,7 @@ def update_event(event_id):
     event = Event.query.filter_by(id = event_id, vendor = vendor).first()
     if not event:   
         return jsonify({
+            "status":False,
             "message":"Event Doesn't Exist !!"
         })
 
@@ -304,6 +366,8 @@ def update_event(event_id):
     event.facilities = data.get("facilities", event.facilities)
     event.description = data.get("description", event.description)
     event.event_type = data.get("event_type", event.event_type)
+    event.longitude = data.get("longitude", event.event_type)
+    event.latitude = data.get("latitude", event.event_type)
 
     # Getting the byte codes for the images to be updated
     if data.get("thumbnail"):
@@ -331,6 +395,7 @@ def update_event(event_id):
     db.session.commit()
 
     return jsonify({
+        "status":True,
         "message":"Event Updated Successfully !!!"
     })
 
@@ -346,35 +411,61 @@ def delete_event(event_id):
     
     if not user:
         return jsonify({
+            "status":False,
             "message":"User Not Found !!"
         })
 
     if user.role != "vendor":
         return jsonify({
+            "status":False,
             "message":"User Auth Error, Not a vendor !!"
         })
 
-    
-    # Basically used this here so that we should know that the user is associated with a vendor profile or not
-    # Here we are actually retrieving the vendor profile associated with a user
-    vendor = user.vendor
-    
-    event = Event.query.filter_by(id = event_id , vendor=vendor).first()
-    if not event:
+    try:
+        # Basically used this here so that we should know that the user is associated with a vendor profile or not
+        # Here we are actually retrieving the vendor profile associated with a user
+        vendor = user.vendor
+        event = Event.query.filter_by(id = event_id , vendor=vendor).first()
+        if not event:
+          return jsonify({
+             "status":False,
+             "message":"User Not Found !!"
+          })
+
+        db.session.delete(event)
+        db.session.commit()
         return jsonify({
-            "message":"User Not Found !!"
+           "status":True,
+           "message":"Event Deleted Successfully !!!"
+        })
+    except Exception as e:
+        print(e)
+        return jsonify({
+           "status":False,
+           "message":"booking"
         })
 
-    db.session.delete(event)
-    db.session.commit()
 
-    return jsonify({
-        "message":"Event Deleted Successfully !!!"
-    })
+ 
 
 
 
 ###############################     Get Event     ######################################
+
+@app.route("/booking_details/<int:booking_id>", methods=["GET"])
+@jwt_required()
+def booking_details(booking_id):
+    try:
+        booking = Booking.query.get(booking_id)
+        if not booking:
+            return jsonify({"status": False, "error": "Booking not found"})
+
+        booking_data = booking.get_booking_with_event_details()
+        return jsonify({"status": True, "booking_details": booking_data})
+    except Exception as e:
+        print(e)
+        return jsonify({"status": False, "error": str(e)})
+
 
 @app.route("/get_event/<int:event_id>", methods = ["GET"])
 def get_event(event_id):
@@ -397,13 +488,32 @@ def get_event(event_id):
             "description": event.description,
             "event_type": event.event_type,
             "vendor_id": event.vendor_id,  # You can include vendor details if needed
-            "custom event name":event.custom_event_name
+            "custom event name":event.custom_event_name,
+            "longitude":event.longitude,
+            "latitude":event.latitude
         }
+         # Fetch vendor details
+        if event.vendor:
+            vendor = event.vendor
+            vendor_details = {
+                "id": vendor.id,
+                "full_name": vendor.full_name,
+                "phone_number": vendor.phone_number,
+                "location": vendor.location,
+                "biography": vendor.biography,
+                "email":vendor.user[0].email,
+                  "profile_image": vendor.user[0].profile_image
+                # Include other vendor fields as necessary
+            }
 
-        return jsonify({"Event Details":event_details})
+     
+
+            event_details['vendor_details'] = vendor_details
+        return jsonify({"status":True,"Event Details":event_details})
 
     else:
         return jsonify({
+            "status":False,
             "message":"Event not Found !!"
         })
 
@@ -444,12 +554,71 @@ def refresh_token():
         new_access_token = create_access_token(identity=current_user)
         return jsonify(access_token=new_access_token)
     else:
-        return jsonify({'message': 'Invalid refresh token'}), 401
+        return jsonify({"status":False,'message': 'Invalid refresh token'}), 401
 
 
 
 ###############################     Search Events API        ######################################
 
+@app.route("/top_venues/<int:vendor_id>", methods=["GET"])
+def top_venues(vendor_id):
+    try:
+        # Get the total number of bookings for the vendor
+        total_bookings = (db.session.query(func.count(Booking.id))
+                          .join(Event)
+                          .filter(Event.vendor_id == vendor_id)
+                          .scalar())
+
+        # Get booking count per venue (using location_name as the venue identifier)
+        # venue_bookings = (db.session.query(Event.location_name, func.count(Booking.id).label('booking_count'))
+        #                   .join(Event)
+        #                   .filter(Event.vendor_id == vendor_id)
+        #                   .group_by(Event.location_name)
+        #                   .order_by(func.count(Booking.id).desc())
+        #                   .all())
+        venue_bookings = (db.session.query(Event.location_name, Event.thumbnail, func.count(Booking.id).label('booking_count'))
+                          .join(Event)
+                          .filter(Event.vendor_id == vendor_id)
+                          .group_by(Event.location_name, Event.thumbnail)
+                          .order_by(func.count(Booking.id).desc())
+                          .all())
+
+        # Calculate the percentage for each venue
+        venues_list = []
+        # for venue, count in venue_bookings:
+        #     percentage = (count / total_bookings) * 100 if total_bookings > 0 else 0
+        #     venues_list.append({"venue": venue, "bookings": count, "percentage": round(percentage, 2)})
+        for location_name, thumbnail, count in venue_bookings:
+            percentage = (count / total_bookings) * 100 if total_bookings > 0 else 0
+            venues_list.append({
+                "venue": location_name,
+                "thumbnail": thumbnail,
+                "bookings": count,
+                "percentage": round(percentage, 2)
+            })
+
+
+        return jsonify({"status": True, "top_venues": venues_list})
+    except Exception as e:
+        print(e)
+        return jsonify({"status": False, "error": str(e)})
+
+
+@app.route("/bookings_today/<int:vendor_id>", methods=["GET"])
+@jwt_required()
+def bookings_today(vendor_id):
+    try:
+        today = datetime.now().date()
+        bookings = Booking.query.join(Event, Booking.event_id == Event.id)\
+                                .filter(Event.vendor_id == vendor_id)\
+                                .filter(Booking.start_date <= today, Booking.end_date >= today)\
+                                .all()
+
+        bookings_data = [booking.booking_today() for booking in bookings]
+        return jsonify({"status": True, "bookings": bookings_data})
+    except Exception as e:
+        print(e)
+        return jsonify({"status": False, "error": str(e)})
 
 @app.route('/search_event', methods=["POST"])
 @jwt_required()
@@ -506,6 +675,7 @@ def search_event():
                 event_list.append(event_info)
 
             return jsonify({
+                "status":True,
                 "Total Random Events":"",
                 "Event Information":event_list
             }), 200
@@ -513,6 +683,7 @@ def search_event():
 
     if not events:
         return jsonify({
+            "status":False,
             "message": "Events Not Found !!"
         })
     
@@ -540,6 +711,7 @@ def search_event():
         event_list.append(event_info)
 
     return jsonify({
+        "status":True,
         "Total Events": total_events_found ,
         "Events":event_list
     }), 200
@@ -558,6 +730,8 @@ def custom_event_search():
     start_time = data.get("start_time")
     end_time = data.get("end_time")
     all_day = data.get("all_day")
+    latitude = data.get("event_latitude")
+    longitude = data.get("event_longitude")
     query = db.session.query(Event)
 
     # Apply filters based on search criteria
@@ -593,6 +767,13 @@ def custom_event_search():
 
     results = query.all()
 
+    user_location = (latitude, longitude)
+    nearby_events = [
+        event for event in results 
+        if event.latitude and event.longitude and geodesic ((event.latitude , event.longitude), user_location).kilometers <3
+    ]
+
+
     # Serialize Event objects to a list of dictionaries
     serialized_results = []
 
@@ -600,12 +781,11 @@ def custom_event_search():
     print(str(query))
 
     # First loop is for one event and other is for each vendor specific details 
-    for event in results:
+    for event in nearby_events:
         vendor_details = []
         for vendor_user in event.vendor.user:
-        # vendor = event.vendor
             vendor_details.append({
-                "vendor_profile_image": vendor_user.profile_image
+                "vendor_profile_image":vendor_user.profile_image
             })
 
         serialized_event = {
@@ -619,6 +799,7 @@ def custom_event_search():
         serialized_results.append(serialized_event)
 
     return jsonify({
+        "status":True,
         "Search Result Found": f"{len(serialized_results)} vendors found in {location_name}",
         "Search results": serialized_results
     })
@@ -635,6 +816,7 @@ def create_booking():
 
         if not user:
             return jsonify({
+                "status":False,
                 "message": "User not authenticated !!"
             })
 
@@ -646,9 +828,10 @@ def create_booking():
         end_date = data.get('end_date')
         all_day = data.get('all_day')
         event_id = data.get('event_id')
-
+        event_type = data.get("event_type")
         if not all([full_name, email, guest_count, start_date, end_date, event_id]):
             return jsonify({
+                "status":False,
                 "message": "All necessary fields must be set !!"
             })
 
@@ -673,6 +856,7 @@ def create_booking():
 
         if overlapping_booking:
             return jsonify({
+                "status":False,
                 "message": "Event Is already booked !!"
             })
 
@@ -694,13 +878,15 @@ def create_booking():
             start_time=start_time,
             end_time=end_time,
             all_day=all_day,
-            event_id=event_id
+            event_id=event_id,
+            event_type=event_type
         )
 
         db.session.add(booking)
         db.session.commit()
 
         return jsonify({
+            "status":True,
             "Summary": {
                 "Event Hours": f"{event_hours} Hours",
                 "Guests": f"{guest_count}",
@@ -713,7 +899,8 @@ def create_booking():
 
     except Exception as e:
         return jsonify({
-            "Error message": str(e)
+            "status":False,
+            "message": str(e)
         }), 500
 
 def calculate_event_hours(start_date, end_date, start_time, end_time, all_day):
@@ -754,6 +941,77 @@ def calculate_days_involved(start_datetime, end_datetime):
     return (end_datetime.date() - start_datetime.date()).days + 1
 
 
+##############################     Submit Review      ####################################
+
+
+@app.route("/submit_review", methods=["POST"])
+@jwt_required()
+def submit_review():
+    data = request.get_json()
+
+    booking_id = data.get("booking_id")
+    cleanliness_rating = data.get("cleanliness_rating")
+    price_value_rating = data.get("price_value_rating")
+    service_value_rating = data.get("service_value_rating")
+    location_rating = data.get("location_rating")
+    user_review = data.get("user_review")
+
+    # Check if the booking exists or not
+    booking = Booking.query.filter_by(id=booking_id).first()
+    if not booking:
+        return jsonify({"message": "Booking Does Not Exist!"}), 400
+
+    booking_end_time = datetime.combine(booking.end_date, booking.end_time)
+
+    if datetime.utcnow() >= booking_end_time:
+        user_email = get_jwt_identity()  # Assuming get_jwt_identity() returns email
+        user = User.query.filter_by(email=user_email).first()
+
+        if not user:
+            return jsonify({"message": "User not found!"}), 400
+
+        existing_review = Review.query.filter_by(booking_id=booking_id, user_id=user.id).first()
+
+        if existing_review:
+            return jsonify({"message": "You have already reviewed this event!"}), 400
+
+        new_review = Review(
+            booking_id=booking_id,
+            event_id=booking.event_id,
+            user_id=user.id,  # Use user.id as the user_id
+            cleanliness_rating=cleanliness_rating,
+            price_value_rating=price_value_rating,
+            service_value_rating=service_value_rating,
+            location_rating=location_rating,
+            user_review=user_review
+        )
+
+        try:
+            db.session.add(new_review)
+            db.session.commit()
+
+            return jsonify({
+                "message": "Successfully reviewed !!"
+            }), 200
+
+        except IntegrityError as e:
+            db.session.rollback()
+            return jsonify({
+                "message": f"You have already reviewed this event !! {str(e)}"
+            }), 400
+
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({
+                "message": f"Failed to rate {str(e)}"
+            }), 500
+
+    else:
+        return jsonify({"message": "Booking has not been completed yet. Can't rate the event now."}), 400
+    
+    
+
+
 
 
 ###############################     Upload Profile Image      ######################################
@@ -774,7 +1032,7 @@ def upload_profile_image():
         user_email = get_jwt_identity()
 
         if not profile_image:
-            return jsonify({"message": "No profile image provided!!"}), 400
+            return jsonify({"status":False,"message": "No profile image provided!!"}), 400
 
         image_bytes = base64.b64decode(profile_image)
 
@@ -803,10 +1061,10 @@ def upload_profile_image():
             user.profile_image = filename_path
             db.session.commit()
 
-        return jsonify({"message": "Image uploaded successfully", "file_path": output_file_name}), 200
+        return jsonify({"status":True,"message": "Image uploaded successfully", "file_path": output_file_name}), 200
 
     except Exception as e:
-        return jsonify({"error": str(e)}), 500 
+        return jsonify({"status":False,"message": str(e)}), 500 
     
 ###############################     Update Profile Image      ######################################
 
@@ -825,7 +1083,7 @@ def update_profile_image():
         user = User.query.filter_by(email=user_email).first()
 
         if not profile_image:
-            return jsonify({"message": "No profile image provided!!"}), 400
+            return jsonify({"status":False,"message": "No profile image provided!!"}), 400
 
         if user.profile_image:
             # Delete the old image file if it exists
@@ -850,10 +1108,10 @@ def update_profile_image():
         user.profile_image = filename_path
         db.session.commit()
 
-        return jsonify({"message": "Profile image updated successfully", "file_path": filename_path}), 200
+        return jsonify({"status":True,"message": "Profile image updated successfully", "file_path": filename_path}), 200
 
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"status":False,"message": str(e)}), 500
     
 
 ###############################     Delete Profile Image      ######################################
@@ -881,6 +1139,7 @@ def get_profile_image():
 
 @app.route('/images/<image_name>')
 def serve_image(image_name):
+    print("dssdfsfsfsdf")
     return send_from_directory('images', image_name)
 
 
@@ -915,34 +1174,64 @@ def reset_password_request():
 
 ###############################     Route For Reset Password After Getting Token      ######################################
 
-
-@app.route('/reset_password/<token>', methods=['POST'])
-def reset_password(token):
+@app.route('/password_reset', methods=['POST'])
+def reset_password():
     data = request.get_json()
     new_password = data.get('new_password')
     confirm_password = data.get('confirm_password')
+    current_password = data.get('current_password')
+    email = data.get('email')
+    print(new_password,confirm_password,current_password)
+    user = User.query.filter_by(email=email).first()
+
+    if not user or not user.check_password(current_password):
+        return jsonify({"status":False,'message': 'Invalid credentials'}), 401
+    
+    if user.check_password(new_password):
+        return jsonify({"status":False,"message":"same_password"})
+
+
 
     password_validation_result = Validations.is_valid_password(new_password)
 
     if new_password != confirm_password:
         return jsonify({
+            "status":False,
             "message": "Password did not match."
         }), 400
+    user.password_hash = bcrypt.generate_password_hash(new_password).decode('utf-8')
+    db.session.commit()
+    return jsonify({"status":True,'message': 'Password reset successfully'}), 200
+
+
+# @app.route('/reset_password/<token>', methods=['POST'])
+# def reset_password(token):
+#     data = request.get_json()
+#     new_password = data.get('new_password')
+#     confirm_password = data.get('confirm_password')
+
+#     password_validation_result = Validations.is_valid_password(new_password)
+
+#     if new_password != confirm_password:
+#         return jsonify({
+#             "status":False,
+#             "message": "Password did not match."
+#         }), 400
     
 
-    reset_token_obj = PasswordResetToken.query.filter_by(token=token).first()
-    if not reset_token_obj:
-        return jsonify({'message': 'Invalid reset token'}), 400
+#     reset_token_obj = PasswordResetToken.query.filter_by(token=token).first()
+#     if not reset_token_obj:
+#         return jsonify({"status":False,'message': 'Invalid reset token'}), 400
 
-    if reset_token_obj.expired_at < datetime.utcnow():
-        return jsonify({'message': 'Reset token has expired'}), 400
+#     if reset_token_obj.expired_at < datetime.utcnow():
+#         return jsonify({"status":False,'message': 'Reset token has expired'}), 400
 
-    user = User.query.get(reset_token_obj.user_id)
-    user.password_hash = bcrypt.generate_password_hash(new_password).decode('utf-8')
-    db.session.delete(reset_token_obj)
-    db.session.commit()
+#     user = User.query.get(reset_token_obj.user_id)
+#     user.password_hash = bcrypt.generate_password_hash(new_password).decode('utf-8')
+#     db.session.delete(reset_token_obj)
+#     db.session.commit()
 
-    return jsonify({'message': 'Password reset successfully'}), 200
+#     return jsonify({"status":True,'message': 'Password reset successfully'}), 200
 
 
 if __name__ == '__main__':
