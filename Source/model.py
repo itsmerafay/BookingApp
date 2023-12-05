@@ -113,24 +113,21 @@ class Event(db.Model):
         return total_earnings
 
 
-
 class Review(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-
     booking_id = db.Column(db.Integer, db.ForeignKey("booking.id"), nullable=False)
     event_id = db.Column(db.Integer, db.ForeignKey("event.id"), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    cleanliness_rating = db.Column(db.Integer, nullable=False)
-    price_value_rating = db.Column(db.Integer, nullable=False)
-    service_value_rating = db.Column(db.Integer, nullable=False)
-    location_rating = db.Column(db.Integer, nullable=False)
+    cleanliness_rating = db.Column(db.Float, nullable=False)
+    price_value_rating = db.Column(db.Float, nullable=False)
+    service_value_rating = db.Column(db.Float, nullable=False)
+    location_rating = db.Column(db.Float, nullable=False)
     user_review = db.Column(db.String(1024), nullable=True)
+    average_rating = db.Column(db.Float, nullable=False)
 
     booking = db.relationship("Booking", backref="reviews")  # Represents the one-to-many relationship
     event = db.relationship("Event", backref="reviews")  # Represents the one-to-many relationship
     user = db.relationship("User", backref="reviews")  # Represents the one-to-many relationship
-
-
 
 
 class Booking(db.Model):
@@ -229,6 +226,7 @@ class Booking(db.Model):
         booking_dict['total_paid_price'] = self.calculate_total_price()
 
         return booking_dict
+
 
 class PasswordResetToken(db.Model):
     id = db.Column(db.Integer, primary_key=True)

@@ -73,8 +73,6 @@ def signup():
         print(e)
         return jsonify({"status":False,"message":"errro"})
 
-
-
 ###############################     Route For SignIn      ######################################
 
 
@@ -108,7 +106,6 @@ def signin():
     })
 
 
-
 ###############################     Function For Getting The Current User      ######################################
 
 
@@ -120,9 +117,7 @@ def get_current_user():
     return user
 
 
-
 ###############################     Route For Protected Route      ######################################
-
 
 
 @app.route('/protected_route', methods=['GET'])
@@ -133,8 +128,6 @@ def protected_route():
         return jsonify({ "message": "This route is protected and accessible to authenticated users"})
     else:
         return jsonify({"message": "Authentication failed"}), 401
-
-
 
 
 
@@ -149,6 +142,9 @@ def profile():
     except Exception as e:
         print(e)  # Log the error for debugging
         return jsonify({"status": False, "error": str(e)})
+
+###############################    Complete Vendor Profile        ######################################
+
 
 @app.route('/complete_vendor_profile', methods=["POST"])
 @jwt_required()
@@ -194,8 +190,6 @@ def complete_vendor_profile():
         db.session.commit()
         return jsonify({"status":True,"message": "Vendor profile completed successfully"})
     
-
-
 
 VENDOR_IMAGES_FOLDER = 'images'
 app.config["VENDOR_IMAGES_FOLDER"] = VENDOR_IMAGES_FOLDER
@@ -446,9 +440,6 @@ def delete_event(event_id):
         })
 
 
- 
-
-
 
 ###############################     Get Event     ######################################
 
@@ -620,102 +611,119 @@ def bookings_today(vendor_id):
         print(e)
         return jsonify({"status": False, "error": str(e)})
 
-@app.route('/search_event', methods=["POST"])
+################### Search Event ###############################
+
+@app.route("/search_event", methods=["POST"])
 @jwt_required()
 def search_event():
     data = request.get_json()
     event_type = data.get("event_type")
     location_name = data.get("location_name")
+    latitude = data.get("latitude")
+    longitude = data.get("longitude")
 
-    # Pagination
-    # Events Per Page
-    events_per_page = 5
-
-    # default set to page 1
-    # In summary, offset helps you figure out where to start displaying items (pages) on a specific page, just like you would turn to a certain page in a book to read.
-    
-    # page will be passed as ?page = 1,2 .. it should be integer so we set for int.
-    # By default page is set for 1
+    # Pagination setup
+    events_per_page = 10
     page = int(request.args.get("page", 1))
-
     offset = (page - 1) * events_per_page
 
-    if event_type and not location_name:
-        events = Event.query.filter_by(event_type = event_type).offset(offset).limit(events_per_page).all()
-
-    elif not event_type and location_name:
-        events = Event.query.filter_by(location_name = location_name).offset(offset).limit(events_per_page).all()
-    
-    else:
+    if event_type.lower() != "all":
+        # Query based on event_type and location_name
         events = Event.query.filter_by(event_type=event_type, location_name=location_name).offset(offset).limit(events_per_page).all()
 
-
-    if not event_type.strip() or not location_name.strip():
-        if not event_type.strip() and not location_name.strip():
-
-            # fetch all the events
-            all_events = Event.query.all()
-
-            # shuffled them for random records 
-            random.shuffle(all_events)
-
-            random_events = all_events[offset:offset + events_per_page]
-
-            # random_events = Event.query.order_by(func.random()).offset(offset).limit(events_per_page).all()
-            total_events_found = len(random_events)
-
-            event_list = []
-            for event in random_events:
-                event_info = {
-                    "thumbnail":event.thumbnail,
-                    "event_type":event.event_type,
-                    "rate":event.rate,
-                    "fixed_price":event.fixed_price
-                }
-                event_list.append(event_info)
-
+        if not events:
             return jsonify({
-                "status":True,
-                "Total Random Events":"",
-                "Event Information":event_list
-            }), 200
+                "status": False,
+                "message": "Events Not Found !!"
+            })
+    else:
+        # Get all events if event_type is "all"
+        all_events = Event.query.all()
 
+        # Filter events by location_name if provided, otherwise, consider all events
+        if location_name:
+            events = [event for event in all_events if event.location_name == location_name]
+        else:
+            events = all_events
 
-    if not events:
+        # Calculate distances for events with latitude and longitude
+        user_location = (latitude, longitude)
+        results_with_distance = [
+            (event, geodesic((event.latitude, event.longitude), user_location).kilometers)
+            for event in events 
+            if event.latitude is not None and event.longitude is not None
+        ]
+
+        # Sort events based on distance in ascending order
+        sorted_results = sorted(results_with_distance, key=lambda x: x[1])
+
+        # Paginate the sorted results
+        total_events_found = len(sorted_results)
+        paginated_results = sorted_results[offset: offset + events_per_page]
+
+        event_list = []
+        for event, distance in paginated_results:
+            # Search event than since event is connected with vendor so we access vendor details
+
+            vendor_details = {
+                "id": event.vendor.id,
+                "full_name": event.vendor.full_name,
+                "phone_number": event.vendor.phone_number,
+                "location": event.vendor.location,
+                "biography": event.vendor.biography
+            }
+
+            event_info = {
+                "id": event.id,
+                "thumbnail": event.thumbnail,
+                "event_type": event.event_type,
+                "custom_event_name": event.custom_event_name,
+                "rate": event.rate,
+                "fixed_price": event.fixed_price,
+                "distance_km": distance,
+                "vendor_details": vendor_details
+            }
+            event_list.append(event_info)
+
         return jsonify({
-            "status":False,
-            "message": "Events Not Found !!"
-        })
-    
+            "status": True,
+            "Total_Events": total_events_found,
+            "Events": event_list
+        }), 200
+
+    # If event_type is not "all", proceed with filtered events
     total_events_found = len(events)
 
     event_list = []
     for event in events:
-        vendor_details = []
-        for vendor_user in event.vendor.user:
-        # vendor = event.vendor
-            vendor_details.append({
-                "vendor_profile_image": vendor_user.profile_image
-            })
+        vendor_details = {
+            "id": event.vendor.id,
+            "full_name": event.vendor.full_name,
+            "phone_number": event.vendor.phone_number,
+            "location": event.vendor.location,
+            "biography": event.vendor.biography
+        }
 
         event_info = {
             "id": event.id,
             "thumbnail": event.thumbnail,
             "event_type": event.event_type,
-            "custom event name":event.custom_event_name,
+            "custom_event_name": event.custom_event_name,
             "rate": event.rate,
             "fixed_price": event.fixed_price,
-            "vendor details": vendor_details
+            "vendor_details": vendor_details
         }
-
         event_list.append(event_info)
 
     return jsonify({
-        "status":True,
-        "Total Events": total_events_found ,
-        "Events":event_list
+        "status": True,
+        "Total_Events": total_events_found,
+        "Events": event_list
     }), 200
 
+
+
+################### Custom Event Search ###########################
 
 @app.route("/custom_event_search", methods=["POST"])
 @jwt_required()
@@ -770,7 +778,7 @@ def custom_event_search():
     user_location = (latitude, longitude)
     nearby_events = [
         event for event in results 
-        if event.latitude and event.longitude and geodesic ((event.latitude , event.longitude), user_location).kilometers <3
+        if event.latitude and event.longitude and geodesic ((event.latitude , event.longitude), user_location).kilometers < 3
     ]
 
 
@@ -818,6 +826,12 @@ def create_booking():
             return jsonify({
                 "status":False,
                 "message": "User not authenticated !!"
+            })
+            
+        if user.role != "user":
+            return jsonify({
+                "status": False,
+                "message": "Unauthorized access: Only users can create bookings."
             })
 
         full_name = data.get('full_name')
@@ -940,6 +954,9 @@ def calculate_hours_for_duration(start_datetime, end_datetime):
 def calculate_days_involved(start_datetime, end_datetime):
     return (end_datetime.date() - start_datetime.date()).days + 1
 
+###############################################################     Reviews Section      ###############################################################
+
+
 
 ##############################     Submit Review      ####################################
 
@@ -948,6 +965,13 @@ def calculate_days_involved(start_datetime, end_datetime):
 @jwt_required()
 def submit_review():
     data = request.get_json()
+    user = get_current_user()
+
+    if user.role != "user":
+        return jsonify({
+            "status": False,
+            "message": "Unauthorized access: Only users can create bookings."
+        })
 
     booking_id = data.get("booking_id")
     cleanliness_rating = data.get("cleanliness_rating")
@@ -956,10 +980,18 @@ def submit_review():
     location_rating = data.get("location_rating")
     user_review = data.get("user_review")
 
+    reviews_sum = cleanliness_rating + price_value_rating + service_value_rating + location_rating
+    average_of_reviews = round((reviews_sum / 4), 1)
+
     # Check if the booking exists or not
     booking = Booking.query.filter_by(id=booking_id).first()
+
     if not booking:
         return jsonify({"message": "Booking Does Not Exist!"}), 400
+
+    # Check if the booking belongs to the authenticated user
+    if booking.user_id != user.id:
+        return jsonify({"message": "Unauthorized: You can only review your own bookings!"}), 403
 
     booking_end_time = datetime.combine(booking.end_date, booking.end_time)
 
@@ -983,7 +1015,8 @@ def submit_review():
             price_value_rating=price_value_rating,
             service_value_rating=service_value_rating,
             location_rating=location_rating,
-            user_review=user_review
+            user_review=user_review,
+            average_rating=average_of_reviews
         )
 
         try:
@@ -1008,16 +1041,124 @@ def submit_review():
 
     else:
         return jsonify({"message": "Booking has not been completed yet. Can't rate the event now."}), 400
-    
-    
+
+##############################     Pending Review      ####################################
 
 
+@app.route("/pending_reviews", methods=["GET"])
+@jwt_required()
+def pending_reviews():
+    try:
+        # Extract the user's email from the JWT token
+        email = get_jwt_identity()
+        
+        # Find the user's ID using the email retrieved from the JWT token
+        user = User.query.filter_by(email=email).first()
+        
+        # Get the user ID
+        user_id = user.id
+
+        # Fetch all bookings made by the user
+        user_bookings = Booking.query.filter_by(user_id=user_id).all()
+
+        # Fetch all reviews made by the user
+        user_reviews = Review.query.filter_by(user_id=user_id).all()
+
+        # Initialize a set to hold reviewed event and booking IDs
+        reviewed_events_bookings = {(review.event_id, review.booking_id) for review in user_reviews}
+
+        # Collect pending reviews by comparing bookings and reviewed events
+        pending_reviews_info = []
+        for booking in user_bookings:
+            is_reviewed = False
+            for review in user_reviews:
+                if review.event_id == booking.event_id and review.booking_id == booking.id:
+                    is_reviewed = True
+                    break
+
+            if not is_reviewed:
+                event = Event.query.get(booking.event_id)
+                if event:
+                    event_rate = event.rate
+                    event_type = event.event_type
+                    event_address = event.address
+                    event_thumbnail = event.thumbnail
+                    custom_event_name = event.custom_event_name if event.custom_event_name else "Unknown Custom Event Name"
+
+                    pending_reviews_info.append({
+                        "event_id": event.id,
+                        "event_rate": event_rate,
+                        "event_type": event_type,
+                        "event_address": event_address,
+                        "event_thumbnail": event_thumbnail,
+                        "custom_event_name": custom_event_name,
+                        "booking_date": booking.start_date.isoformat(),
+                        "booking_time": booking.start_time.isoformat()
+                    })
+
+        return jsonify({
+            "Pending Reviews": pending_reviews_info,
+            "Pending Reviews Length": len(pending_reviews_info)
+        })
+
+    except Exception as e:
+        print(f"Error fetching pending reviews: {str(e)}")
+        return jsonify({"error": "An error occurred while fetching pending reviews."}), 500
+
+
+##############################     All Rated Reviews      ####################################
+
+
+@app.route('/all_reviews', methods=["GET"])
+@jwt_required()
+def all_reviews():
+    try:
+        email = get_jwt_identity()
+        user = User.query.filter_by(email=email).first()
+
+        user_id = user.id
+        reviews = (
+            db.session.query(Review, Event, Vendor)
+            .join(Event, Review.event_id == Event.id)
+            .join(Vendor, Event.vendor_id == Vendor.id)
+            .filter(Review.user_id == user_id)
+            .all()
+        )
+
+        if not reviews:
+            return jsonify({"message": "Reviews Not Found !!"}), 400
+
+        review_data = []
+
+        for review, event, vendor in reviews:
+            vendor_user = User.query.filter_by(vendor_id=vendor.id).first()
+            vendor_profile_image = getattr(vendor_user, 'profile_image', None)
+
+            review_data.append({
+                "event_id": event.id,
+                "event_thumbnail": event.thumbnail,
+                "event_name": event.custom_event_name,
+                "event_rate": event.rate,
+                "event_address": event.address,
+                "vendor_profile_image": vendor_profile_image,
+                "user_review": review.user_review,
+                "cleanliness_rating": review.cleanliness_rating,
+                "price_value_rating": review.price_value_rating,
+                "service_value_rating": review.service_value_rating,
+                "location_rating": review.location_rating
+            })
+
+        return jsonify({
+            "rated_reviews": review_data,
+            "total_rated_reviews": len(review_data)
+        })
+
+    except Exception as e:
+        print(f"Error in fetching rated reviews: {str(e)}")
+        return jsonify({"error": "An error occurred while fetching rated reviews."}), 500
 
 
 ###############################     Upload Profile Image      ######################################
-
-
-# remaining work : don't ask for email 
 
 @app.route('/upload_profile_image', methods=["POST"])
 @jwt_required()
@@ -1067,7 +1208,6 @@ def upload_profile_image():
         return jsonify({"status":False,"message": str(e)}), 500 
     
 ###############################     Update Profile Image      ######################################
-
 
 @app.route('/update_profile_image', methods=["POST"])
 @jwt_required()
@@ -1129,10 +1269,9 @@ def get_profile_image():
     if user and user.profile_image:
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], user.profile_image)
         if os.path.exists(file_path):
-            return send_file(file_path, as_attachment=True)
+            return send_file(file_path)
     
     return jsonify({"message": "Profile image not found"}), 404
-
 
 
 # getting the image
@@ -1202,36 +1341,6 @@ def reset_password():
     user.password_hash = bcrypt.generate_password_hash(new_password).decode('utf-8')
     db.session.commit()
     return jsonify({"status":True,'message': 'Password reset successfully'}), 200
-
-
-# @app.route('/reset_password/<token>', methods=['POST'])
-# def reset_password(token):
-#     data = request.get_json()
-#     new_password = data.get('new_password')
-#     confirm_password = data.get('confirm_password')
-
-#     password_validation_result = Validations.is_valid_password(new_password)
-
-#     if new_password != confirm_password:
-#         return jsonify({
-#             "status":False,
-#             "message": "Password did not match."
-#         }), 400
-    
-
-#     reset_token_obj = PasswordResetToken.query.filter_by(token=token).first()
-#     if not reset_token_obj:
-#         return jsonify({"status":False,'message': 'Invalid reset token'}), 400
-
-#     if reset_token_obj.expired_at < datetime.utcnow():
-#         return jsonify({"status":False,'message': 'Reset token has expired'}), 400
-
-#     user = User.query.get(reset_token_obj.user_id)
-#     user.password_hash = bcrypt.generate_password_hash(new_password).decode('utf-8')
-#     db.session.delete(reset_token_obj)
-#     db.session.commit()
-
-#     return jsonify({"status":True,'message': 'Password reset successfully'}), 200
 
 
 if __name__ == '__main__':
