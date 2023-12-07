@@ -12,7 +12,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(255), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
-    access_token = db.Column(db.String(255), unique=True, nullable=True)
+    access_token = db.Column(db.Text, unique=True, nullable=True)
     role = db.Column(db.String(50), nullable=False)
     profile_image = db.Column(db.String(255))
     # is_vendor = db.Column(db.Boolean, default=False)
@@ -145,6 +145,7 @@ class Booking(db.Model):
     all_day = db.Column(db.Boolean, default = False)
     event_type = db.Column(db.String(255), nullable = True)
     created_at = db.Column(db.DateTime, default = datetime.utcnow)
+    cancelled = db.Column(db.Boolean, default = False)
 
     # bookings instead of booking bcz of many relations
     # backref used is bcz of bi-directional relationship 

@@ -197,6 +197,7 @@ app.config["VENDOR_IMAGES_FOLDER"] = VENDOR_IMAGES_FOLDER
 
 
 
+
 ###############################     Route For Event Management      ######################################
 
 ###############################     Create Event       ######################################
@@ -283,7 +284,7 @@ def create_event():
     return jsonify({"status":True,"message": "Event created successfully"})
 
 
-###############################     Update Event     ######################################
+###############################     Get My Events     ######################################
 
 @app.route("/get_my_events", methods=["GET"])
 @jwt_required()
@@ -305,6 +306,9 @@ def getmyevents():
     except Exception as e:
         print(e)
         return jsonify({"status": False, "events": []})
+
+
+###############################     Update My Event     ######################################
 
 
 @app.route("/update_event/<int:event_id>", methods = ["PUT"])
@@ -632,287 +636,6 @@ def bookings_today(vendor_id):
 
 ################### Search Event ###############################
 
-# @app.route("/search_event", methods=["POST"])
-# @jwt_required()
-# def search_event():
-#     data = request.get_json()
-#     event_type = data.get("event_type")
-#     location_name = data.get("location_name")
-#     latitude = data.get("latitude")
-#     longitude = data.get("longitude")
-
-#     # Pagination setup
-#     events_per_page = 10
-#     page = int(request.args.get("page", 1))
-#     offset = (page - 1) * events_per_page
-
-#     if event_type.lower() != "all":
-#         # Query based on event_type and location_name
-#         events = Event.query.filter_by(event_type=event_type, location_name=location_name).offset(offset).limit(events_per_page).all()
-
-#         if not events:
-#             return jsonify({
-#                 "status": False,
-#                 "message": "Events Not Found !!"
-#             })
-#     else:
-#         # Get all events if event_type is "all"
-#         all_events = Event.query.all()
-
-#         # Filter events by location_name if provided, otherwise, consider all events
-#         if location_name:
-#             filtered_events = []
-#             for event in all_events: # this loop will check all the events that has the same location name
-#                 if event.location_name == location_name:
-#                     filtered_events.append(event)
-
-#             # Here the events are based on location_name
-#             events = filtered_events
-#             print(f"Events when loc_name is mentioned : {events}")
-
-#         else:
-#             events = all_events
-#             print(f"Events when loc_name is not mentioned : {events}")
-
-#         # Calculate distances for events with latitude and longitude
-#         user_location = (latitude , longitude)
-#         results_with_distance = []
-#         for event in events:
-#             if event.latitude is not None and event.longitude is not None:
-#                 event_location = (event.latitude, event.longitude)
-#                 distance = geodesic(event_location, user_location).kilometers <=3
-#                 results_with_distance.append((event,distance))
-#                 print(f"Results with distance :  {results_with_distance}")
-
-
-#         # Sort events based on distance in ascending order
-#         # sorted(iterable, key=key, reverse=reverse)
-
-#         sorted_results = sorted(results_with_distance, key=lambda x: x[1])
-
-
-#         # Paginate the sorted results
-#         total_events_found = len(sorted_results)
-#         paginated_results = sorted_results[offset: offset + events_per_page]
-#         print(f"Paginated Reuslts : {paginated_results}")
-
-#         event_list = []
-#         for event, distance in paginated_results:
-#             # Search event than since event is connected with vendor so we access vendor details
-        
-#             vendor_details = {
-#                 "id": event.vendor.id,
-#                 "full_name": event.vendor.full_name,
-#                 "phone_number": event.vendor.phone_number,
-#                 "location": event.vendor.location,
-#                 "biography": event.vendor.biography
-#             }
-
-#             event_info = {
-#                 "id": event.id,
-#                 "thumbnail": event.thumbnail,
-#                 "event_type": event.event_type,
-#                 "custom_event_name": event.custom_event_name,
-#                 "location_name":event.location_name,
-#                 "rate": event.rate,
-#                 "fixed_price": event.fixed_price,
-#                 "distance_km": distance,
-#                 "vendor_details": vendor_details
-#             }
-#             event_list.append(event_info)
-
-#         return jsonify({
-#             "status": True,
-#             "Total_Events": total_events_found,
-#             "Events": event_list
-#         }), 200
-
-#     # If event_type is not "all", proceed with filtered events
-#     total_events_found = len(events)
-
-#     event_list = []
-#     for event in events:
-#         vendor_details = {
-#             "id": event.vendor.id,
-#             "full_name": event.vendor.full_name,
-#             "phone_number": event.vendor.phone_number,
-#             "location": event.vendor.location,
-#             "biography": event.vendor.biography
-#         }
-
-#         event_info = {
-#             "id": event.id,
-#             "thumbnail": event.thumbnail,
-#             "event_type": event.event_type,
-#             "custom_event_name": event.custom_event_name,
-#             "rate": event.rate,
-#             "fixed_price": event.fixed_price,
-#             "vendor_details": vendor_details
-#         }
-#         event_list.append(event_info)
-
-#     return jsonify({
-#         "status": True,
-#         "Total_Events": total_events_found,
-#         "Events": event_list
-#     }), 200
-
-# @app.route("/search_event", methods=["POST"])
-# @jwt_required()
-# def search_event():
-#     data = request.get_json()
-#     event_type = data.get("event_type")
-#     location_name = data.get("location_name")
-#     latitude = data.get("latitude")
-#     longitude = data.get("longitude")
-
-#     if event_type.lower() != "all":
-#         # Query based on event_type and location_name
-#         events = Event.query.filter_by(event_type=event_type, location_name=location_name).offset(offset).limit(events_per_page).all()
-
-#         if not events:
-#             return jsonify({
-#                 "status": False,
-#                 "message": "Events Not Found !!"
-#             })
-#     else:
-
-#         all_events = Event.query.all()
-#         # print(f"All Events : {all_events}")
-
-#         # Filter events by location_name if provided, otherwise, consider all events
-#         if location_name:
-#             filtered_events = []
-#             for event in all_events:
-#                 if event.location_name == location_name:
-#                     filtered_events.append(event)
-#             events = filtered_events
-#             # print(f"Events = Filtered Events {events}")
-
-#         else:
-#             events = all_events
-
-#         # Calculate distances for events with latitude and longitude
-#         user_location = (latitude , longitude)
-#         results_with_distance = []
-#         for event in events:
-#             if event.latitude is not None and event.longitude is not None:
-#                 event_location = (event.latitude, event.longitude)
-#                 distance = geodesic(event_location, user_location).kilometers <=100
-#                 results_with_distance.append((event,distance))
-#         print(f"Results with distance :  {results_with_distance}")
-
-
-#         # Sort events based on distance in ascending order
-#         sorted_results = sorted(results_with_distance, key=lambda x: x[1])
-
-#         # Paginate the sorted results
-#         total_events_found = len(sorted_results)
-#         events_per_page = 10  
-#         page_number = 1  
-#         offset = (page_number - 1) * events_per_page  
-
-#         # Calculate the index range of events for the current page
-#         start_index = offset 
-#         end_index = min(offset + events_per_page, len(sorted_results))
-
-#         # Extract events for the current page
-#         paginated_results = sorted_results[start_index:end_index]
-#         event_list = []
-
-#         RADIUS_IN_KM = 100
-
-
-#         events_within_radius = []
-#         for result in results_with_distance:
-#             # as event is at 0th index and distance at 1st index & we are getting distance in boolean not in numerical
-#             event = result[0]
-#             print(event)
-#             within_radius = result[1] # distance in boolean 
-#             print(f"Distance : {distance}")
-
-#             if within_radius:
-#                 events_within_radius.append(event)
-
-#         if events_within_radius:
-
-#             get_average_review = get_average_rating(event.id)
-
-#             # Sort events within the radius by their average ratings
-#             events_within_radius.sort(key=lambda event: get_average_rating(event.id), reverse=True)
-    
-
-#             # Append events within the radius to the event list
-#             for event in events_within_radius:
-#                 vendor_details = {
-#                     "id": event.vendor.id,
-#                     "full_name": event.vendor.full_name,
-#                     "phone_number": event.vendor.phone_number,
-#                     "location": event.vendor.location,
-#                     "biography": event.vendor.biography
-#                 }
-
-#                 event_info = {
-#                     "id": event.id,
-#                     "thumbnail": event.thumbnail,
-#                     "event_type": event.event_type,
-#                     "custom_event_name": event.custom_event_name,
-#                     "rate": event.rate,
-#                     "event_rating":get_average_review,
-#                     "fixed_price": event.fixed_price,
-#                     "distance_km": geodesic((event.latitude, event.longitude), user_location).kilometers,
-#                     "vendor_details": vendor_details
-#                 }
-#                 event_list.append(event_info)
-
-#         return jsonify({
-#             "status": True,
-#             "Total_Events": total_events_found,
-#             "Events": event_list
-#         }), 200
-
-#     # If event_type is not "all", proceed with filtered events
-#     total_events_found = len(events)
-
-#     event_list = []
-#     for event in events:
-#         vendor_details = {
-#             "id": event.vendor.id,
-#             "full_name": event.vendor.full_name,
-#             "phone_number": event.vendor.phone_number,
-#             "location": event.vendor.location,
-#             "biography": event.vendor.biography
-#         }
-
-#         event_info = {
-#             "id": event.id,
-#             "thumbnail": event.thumbnail,
-#             "event_type": event.event_type,
-#             "custom_event_name": event.custom_event_name,
-#             "rate": event.rate,
-#             "fixed_price": event.fixed_price,
-#             "vendor_details": vendor_details
-#         }
-#         event_list.append(event_info)
-
-#     return jsonify({
-#         "status": True,
-#         "Total_Events": total_events_found,
-#         "Events": event_list
-#     }), 200
-
-# def get_average_rating(event_id):
-
-#     # query the review table to get the average of all the average rating for specific events
-    
-#     total_avg_rating = db.session.query(func.avg(Review.average_rating)).filter(event_id==event_id).scalar()
-#     total_num_reviews = db.session.query(func.count(Review.id)).filter(event_id==event_id).scalar()
-
-#     if total_avg_rating is None or total_num_reviews == 0:
-#         return 0
-#     else:
-#         return round(float(total_avg_rating), 2)
-    
 
 @app.route("/search_event", methods=["POST"])   
 @jwt_required()
@@ -986,7 +709,6 @@ def search_event():
         "Total_Events": total_events_found,
         "Events": event_list
     }), 200
-
 
 
 def get_average_rating(event_id):
@@ -1333,6 +1055,163 @@ def calculate_hours_for_duration(start_datetime, end_datetime):
 def calculate_days_involved(start_datetime, end_datetime):
     return (end_datetime.date() - start_datetime.date()).days + 1
 
+###############################    Cancel Booking By User      ######################################
+
+# @app.route("/cancel_booking", methods=["POST"])
+# @jwt_required()
+# def cancel_booking():
+#     try:
+#         data = request.get_json()
+#         user = get_current_user()
+
+#         if not user:
+#             return jsonify({"status": False, "message": "User not authenticated !!"})
+
+#         if user.role != "user":
+#             return jsonify({"status": False, "message": "Unauthorized access: Only users can cancel bookings."})
+
+#         booking_id = data.get("booking_id")
+
+#         # Check if the booking exists and belongs to the current user
+#         booking_to_cancel = Booking.query.filter_by(id=booking_id, user_id=user.id).first()
+
+#         if not booking_to_cancel:
+#             return jsonify({"status": False, "message": "Booking not found or does not belong to the user."})
+
+#         # Update the booking status to cancelled
+#         booking_to_cancel.cancelled = True
+#         db.session.commit()
+
+#         return jsonify({"status": True, "message": "Booking cancelled successfully."})
+
+#     except Exception as e:
+#         return jsonify({"status": False, "message": str(e)}), 500
+
+
+@app.route("/cancel_booking", methods = ["POST"])
+@jwt_required()
+def cancel_booking():
+    try:
+        data = request.get_json()
+        user = get_current_user()
+
+        if not user:
+            return jsonify({
+                "status":False,
+                "message": "User not authenticated !!"
+            })
+            
+        if user.role != "user":
+            return jsonify({
+                "status": False,
+                "message": "Unauthorized access: Only users can create bookings."
+            })
+
+        booking_id = data.get("booking_id")
+
+        booking_to_cancel = Booking.query.filter_by(id=booking_id, user_id = user.id).first()
+
+        if not booking_to_cancel:
+            return jsonify({
+                "message":"Booking not found"
+            })
+        
+        booking_to_cancel.cancelled = True  
+        db.session.commit()
+
+        # return jsonify({
+        #     "status":True,
+        #     "message":"Booking cancelled successfully !!"
+        #     "event_id":Booking.event_id,
+        #     "vendor_id":Booking.
+        # })
+    
+    except Exception as e:
+        return jsonify({
+            "status":False,
+            "message": str(e)
+        }), 500
+
+
+
+
+
+###############################   Booking History For User      ######################################
+
+@app.route("/booking_history", methods = ["GET"])
+@jwt_required()
+def booking_history():
+    try:
+        data = request.get_json()
+        user = get_current_user()
+
+        if not user:
+            return jsonify({
+                "status":False,
+                "message": "User not authenticated !!"
+            })
+            
+        if user.role != "user":
+            return jsonify({
+                "status": False,
+                "message": "Unauthorized access: Only users can create bookings."
+            })
+
+        booking_type = data.get("booking_type")
+        current_datetime = datetime.now()
+
+
+        if booking_type.lower() == "done":
+            bookings = Booking.query.filter(
+                (Booking.user_id == user.id) &
+                ((Booking.end_date < current_datetime.date()) |
+                ((Booking.end_date == current_datetime.date()) &
+                (Booking.end_time < current_datetime.time())))
+                ).all()
+                    
+        elif booking_type.lower() == "upcoming":
+            bookings =  Booking.query.filter(
+                (Booking.user_id ==  user.id) &
+                ((Booking.start_date > current_datetime.date()) |
+                ((Booking.start_date == current_datetime.date) & 
+                (Booking.start_time > current_datetime.time())))
+            ).all()
+
+
+        # elif booking_type.lower() == "cancelled":
+        #     bookings = 
+
+
+        user_bookings = []
+        for booking in bookings:
+            user_booking = {
+                "event_id":booking.event_id,
+                "event_vendor_id":booking.event.vendor_id,
+                "custom_event_name": booking.event.custom_event_name,
+                "event_address":booking.event.address,
+                "event_rate":booking.event.rate,
+                "booking_end_date": str(booking.end_date),
+                "booking_start_time": str(booking.start_time),
+                "booking_end_time":str(booking.end_time),
+                # "vendor_image":booking.vendor.user.profile_image
+            }
+
+            user_bookings.append(user_booking)
+
+        return jsonify({
+            "status":True,
+            "booking_details":user_bookings
+        })
+
+    except Exception as e:
+        return jsonify({
+            "status":False,
+            "message": str(e)
+        }), 500
+
+
+
+
 ###############################################################     Reviews Section      ###############################################################
 
 
@@ -1488,6 +1367,55 @@ def pending_reviews():
 ##############################     All Rated Reviews      ####################################
 
 
+# @app.route('/all_reviews', methods=["GET"])
+# @jwt_required()
+# def all_reviews():
+#     try:
+#         email = get_jwt_identity()
+#         user = User.query.filter_by(email=email).first()
+
+#         user_id = user.id
+#         reviews = (
+#             db.session.query(Review, Event, Vendor)
+#             .join(Event, Review.event_id == Event.id)
+#             .join(Vendor, Event.vendor_id == Vendor.id)
+#             .filter(Review.user_id == user_id)
+#             .all()
+#         )
+
+#         if not reviews:
+#             return jsonify({"message": "Reviews Not Found !!"}), 400
+
+#         review_data = []
+
+#         for review, event, vendor in reviews:
+#             vendor_user = User.query.filter_by(vendor_id=vendor.id).first()
+#             vendor_profile_image = getattr(vendor_user, 'profile_image', None)
+
+#             review_data.append({
+#                 "event_id": event.id,
+#                 "event_thumbnail": event.thumbnail,
+#                 "event_name": event.custom_event_name,
+#                 "event_rate": event.rate,
+#                 "event_address": event.address,
+#                 "vendor_profile_image": vendor_profile_image,
+#                 "user_review": review.user_review,
+#                 "cleanliness_rating": review.cleanliness_rating,
+#                 "price_value_rating": review.price_value_rating,
+#                 "service_value_rating": review.service_value_rating,
+#                 "location_rating": review.location_rating
+#             })
+
+#         return jsonify({
+#             "rated_reviews": review_data,
+#             "total_rated_reviews": len(review_data)
+#         })
+
+#     except Exception as e:
+#         print(f"Error in fetching rated reviews: {str(e)}")
+#         return jsonify({"error": "An error occurred while fetching rated reviews."}), 500
+
+
 @app.route('/all_reviews', methods=["GET"])
 @jwt_required()
 def all_reviews():
@@ -1495,14 +1423,25 @@ def all_reviews():
         email = get_jwt_identity()
         user = User.query.filter_by(email=email).first()
 
-        user_id = user.id
-        reviews = (
-            db.session.query(Review, Event, Vendor)
-            .join(Event, Review.event_id == Event.id)
-            .join(Vendor, Event.vendor_id == Vendor.id)
-            .filter(Review.user_id == user_id)
-            .all()
-        )
+        if user.role == "user":
+            # Fetch all reviews given by the user
+            reviews = (
+                db.session.query(Review, Event, Vendor)
+                .join(Event, Review.event_id == Event.id)
+                .join(Vendor, Event.vendor_id == Vendor.id)
+                .filter(Review.user_id == user.id)
+                .all()
+            )
+        elif user.role == "vendor":
+            reviews = (
+                db.session.query(Review, Event, Vendor)
+                .join(Event, Review.event_id == Event.id)
+                .join(Vendor, Event.vendor_id == Vendor.id)
+                .filter(Event.vendor_id == user.vendor_id)
+                .all()
+            )
+        else:
+            return jsonify({"message": "Invalid user role."}), 400
 
         if not reviews:
             return jsonify({"message": "Reviews Not Found !!"}), 400
@@ -1535,6 +1474,7 @@ def all_reviews():
     except Exception as e:
         print(f"Error in fetching rated reviews: {str(e)}")
         return jsonify({"error": "An error occurred while fetching rated reviews."}), 500
+
 
 
 ###############################     Upload Profile Image      ######################################
@@ -1692,34 +1632,34 @@ def reset_password_request():
 
 ###############################     Route For Reset Password After Getting Token      ######################################
 
-@app.route('/password_reset', methods=['POST'])
-def reset_password():
-    data = request.get_json()
-    new_password = data.get('new_password')
-    confirm_password = data.get('confirm_password')
-    current_password = data.get('current_password')
-    email = data.get('email')
-    print(new_password,confirm_password,current_password)
-    user = User.query.filter_by(email=email).first()
+# @app.route('/password_reset', methods=['POST'])
+# def reset_password():
+#     data = request.get_json()
+#     new_password = data.get('new_password')
+#     confirm_password = data.get('confirm_password')
+#     current_password = data.get('current_password')
+#     email = data.get('email')
+#     print(new_password,confirm_password,current_password)
+#     user = User.query.filter_by(email=email).first()
 
-    if not user or not user.check_password(current_password):
-        return jsonify({"status":False,'message': 'Invalid credentials'}), 401
+#     if not user or not user.check_password(current_password):
+#         return jsonify({"status":False,'message': 'Invalid credentials'}), 401
     
-    if user.check_password(new_password):
-        return jsonify({"status":False,"message":"same_password"})
+#     if user.check_password(new_password):
+#         return jsonify({"status":False,"message":"same_password"})
 
 
 
-    password_validation_result = Validations.is_valid_password(new_password)
+#     password_validation_result = Validations.is_valid_password(new_password)
 
-    if new_password != confirm_password:
-        return jsonify({
-            "status":False,
-            "message": "Password did not match."
-        }), 400
-    user.password_hash = bcrypt.generate_password_hash(new_password).decode('utf-8')
-    db.session.commit()
-    return jsonify({"status":True,'message': 'Password reset successfully'}), 200
+#     if new_password != confirm_password:
+#         return jsonify({
+#             "status":False,
+#             "message": "Password did not match."
+#         }), 400
+#     user.password_hash = bcrypt.generate_password_hash(new_password).decode('utf-8')
+#     db.session.commit()
+#     return jsonify({"status":True,'message': 'Password reset successfully'}), 200
 
 
 if __name__ == '__main__':
