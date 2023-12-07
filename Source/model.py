@@ -62,8 +62,19 @@ class Vendor(db.Model):
     # Define the reverse relationship from Vendor to User
     user = db.relationship('User', back_populates='vendor')
     event = db.relationship('Event', back_populates='vendor')
+    # def as_dict(self):
+    #    return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
     def as_dict(self):
-       return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        vendor_dict = {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        if self.user and self.user.profile_image:
+            vendor_dict['profile_image'] = self.user.profile_image  # Include the profile image in the vendor's dictionary
+        else:
+            vendor_dict['profile_image'] = None  # Set profile image as None if not available
+
+        return vendor_dict
+    
+    
     def is_profile_complete(self):
         required_fields = [self.full_name, self.phone_number, self.location, self.biography]
         return all(field is not None and field.strip() != '' for field in required_fields)

@@ -617,23 +617,6 @@ def bookings_today(vendor_id):
 
 
 
-##############################   Average Rating Function   ###################################
-
-# .scalar is used when we are querying a table for one row for one value i.e, one value for row not the whole row.
-# def get_average_rating(event_id):
-
-#     # query the review table to get the average of all the average rating for specific events
-    
-#     total_avg_rating = db.session.query(func.avg(Review.average_rating)).filter_by(event_id==event_id).scalar()
-
-#     if total_avg_rating is None:
-#         return 0
-#     else:
-#         return total_avg_rating
-    
-
-
-
 ################### Search Event ###############################
 
 
@@ -1057,37 +1040,6 @@ def calculate_days_involved(start_datetime, end_datetime):
 
 ###############################    Cancel Booking By User      ######################################
 
-# @app.route("/cancel_booking", methods=["POST"])
-# @jwt_required()
-# def cancel_booking():
-#     try:
-#         data = request.get_json()
-#         user = get_current_user()
-
-#         if not user:
-#             return jsonify({"status": False, "message": "User not authenticated !!"})
-
-#         if user.role != "user":
-#             return jsonify({"status": False, "message": "Unauthorized access: Only users can cancel bookings."})
-
-#         booking_id = data.get("booking_id")
-
-#         # Check if the booking exists and belongs to the current user
-#         booking_to_cancel = Booking.query.filter_by(id=booking_id, user_id=user.id).first()
-
-#         if not booking_to_cancel:
-#             return jsonify({"status": False, "message": "Booking not found or does not belong to the user."})
-
-#         # Update the booking status to cancelled
-#         booking_to_cancel.cancelled = True
-#         db.session.commit()
-
-#         return jsonify({"status": True, "message": "Booking cancelled successfully."})
-
-#     except Exception as e:
-#         return jsonify({"status": False, "message": str(e)}), 500
-
-
 @app.route("/cancel_booking", methods = ["POST"])
 @jwt_required()
 def cancel_booking():
@@ -1133,12 +1085,101 @@ def cancel_booking():
         }), 500
 
 
-
-
-
 ###############################   Booking History For User      ######################################
 
-@app.route("/booking_history", methods = ["GET"])
+# @app.route("/booking_history", methods = ["GET"])
+# @jwt_required()
+# def booking_history():
+#     try:
+#         data = request.get_json()
+#         user = get_current_user()
+
+#         if not user:
+#             return jsonify({
+#                 "status":False,
+#                 "message": "User not authenticated !!"
+#             })
+            
+#         if user.role != "user":
+#             return jsonify({
+#                 "status": False,
+#                 "message": "Unauthorized access: Only users can create bookings."
+#             })
+
+#         booking_type = data.get("booking_type")
+#         current_datetime = datetime.now()
+
+
+#         if booking_type.lower() == "done":
+#             bookings = Booking.query.filter(
+#                 (Booking.user_id == user.id) &
+#                 ((Booking.end_date < current_datetime.date()) |
+#                 ((Booking.end_date == current_datetime.date()) &
+#                 (Booking.end_time < current_datetime.time())))
+#                 ).all()
+                    
+#         elif booking_type.lower() == "upcoming":
+#             bookings =  Booking.query.filter(
+#                 (Booking.user_id ==  user.id) &
+#                 ((Booking.start_date > current_datetime.date()) |
+#                 ((Booking.start_date == current_datetime.date) & 
+#                 (Booking.start_time > current_datetime.time())))
+#             ).all()
+
+
+#         elif booking_type.lower() == "cancelled":
+#             bookings = Booking.query.filter(
+#                 (Booking.user_id == user.id) &
+#                 (Booking.cancelled == True)
+#             ).all()
+        
+
+#         user_bookings = []
+#         for booking in bookings:
+#             vendor_image = None
+#             print(booking.id)
+#             if booking.event.vendor:
+#                 if isinstance(booking.event.vendor, Vendor):
+#                     vendor = booking.event.vendor
+#                     vendor_image = vendor.user.profile_image if hasattr(vendor.user, 'profile_image') else None
+#                     print(vendor_image)
+#                     # You can handle other vendor details here similarly
+#             else:
+#                 # If it's a list (unexpected), iterate through it
+#                 for vendor in booking.event.vendor:
+#                     vendor_image = vendor.user.profile_image if hasattr(vendor.user, 'profile_image') else None
+#                     print(vendor_image)
+    
+
+#             user_booking = {
+#                 "booking_id":booking.id,
+#                 "event_id":booking.event_id,
+#                 "event_vendor_id":booking.event.vendor_id,
+#                 "custom_event_name": booking.event.custom_event_name,
+#                 "event_address":booking.event.address,
+#                 "event_rate":booking.event.rate,
+#                 "booking_end_date": str(booking.end_date),
+#                 "booking_start_time": str(booking.start_time),
+#                 "booking_end_time":str(booking.end_time),
+#                 "vendor_image": vendor_image
+#             }
+
+#             user_bookings.append(user_booking)
+
+#         return jsonify({
+#             "status":True,
+#             "booking_details":user_bookings,
+#             "Total Bookings":len(user_bookings)
+#         })
+
+#     except Exception as e:
+#         return jsonify({
+#             "status":False,
+#             "message": str(e)
+#         }), 500
+
+
+@app.route("/booking_history", methods=["GET"])
 @jwt_required()
 def booking_history():
     try:
@@ -1147,10 +1188,10 @@ def booking_history():
 
         if not user:
             return jsonify({
-                "status":False,
+                "status": False,
                 "message": "User not authenticated !!"
             })
-            
+
         if user.role != "user":
             return jsonify({
                 "status": False,
@@ -1160,56 +1201,64 @@ def booking_history():
         booking_type = data.get("booking_type")
         current_datetime = datetime.now()
 
-
         if booking_type.lower() == "done":
             bookings = Booking.query.filter(
                 (Booking.user_id == user.id) &
                 ((Booking.end_date < current_datetime.date()) |
-                ((Booking.end_date == current_datetime.date()) &
-                (Booking.end_time < current_datetime.time())))
-                ).all()
-                    
-        elif booking_type.lower() == "upcoming":
-            bookings =  Booking.query.filter(
-                (Booking.user_id ==  user.id) &
-                ((Booking.start_date > current_datetime.date()) |
-                ((Booking.start_date == current_datetime.date) & 
-                (Booking.start_time > current_datetime.time())))
+                 ((Booking.end_date == current_datetime.date()) &
+                  (Booking.end_time < current_datetime.time())))
             ).all()
 
+        elif booking_type.lower() == "upcoming":
+            bookings = Booking.query.filter(
+                (Booking.user_id == user.id) &
+                ((Booking.start_date > current_datetime.date()) |
+                 ((Booking.start_date == current_datetime.date()) &
+                  (Booking.start_time > current_datetime.time())))
+            ).all()
 
-        # elif booking_type.lower() == "cancelled":
-        #     bookings = 
-
+        elif booking_type.lower() == "cancelled":
+            bookings = Booking.query.filter(
+                (Booking.user_id == user.id) &
+                (Booking.cancelled == True)
+            ).all()
 
         user_bookings = []
         for booking in bookings:
+            vendor_image = None
+            if booking.event.vendor:
+                if isinstance(booking.event.vendor, Vendor):
+                    vendor = booking.event.vendor
+                    vendor_image = vendor.user.profile_image if hasattr(vendor.user, 'profile_image') else None
+            else:
+                for vendor in booking.event.vendor:
+                    vendor_image = vendor.user.profile_image if hasattr(vendor.user, 'profile_image') else None
+
             user_booking = {
-                "event_id":booking.event_id,
-                "event_vendor_id":booking.event.vendor_id,
+                "event_id": booking.event_id,
+                "event_vendor_id": booking.event.vendor_id,
                 "custom_event_name": booking.event.custom_event_name,
-                "event_address":booking.event.address,
-                "event_rate":booking.event.rate,
+                "event_address": booking.event.address,
+                "event_rate": booking.event.rate,
                 "booking_end_date": str(booking.end_date),
                 "booking_start_time": str(booking.start_time),
-                "booking_end_time":str(booking.end_time),
-                # "vendor_image":booking.vendor.user.profile_image
+                "booking_end_time": str(booking.end_time),
+                "vendor_image": vendor_image
             }
 
             user_bookings.append(user_booking)
 
         return jsonify({
-            "status":True,
-            "booking_details":user_bookings
+            "status": True,
+            "booking_details": user_bookings,
+            "Total Bookings": len(user_bookings)
         })
 
     except Exception as e:
         return jsonify({
-            "status":False,
+            "status": False,
             "message": str(e)
         }), 500
-
-
 
 
 ###############################################################     Reviews Section      ###############################################################
@@ -1344,6 +1393,8 @@ def pending_reviews():
                     custom_event_name = event.custom_event_name if event.custom_event_name else "Unknown Custom Event Name"
 
                     pending_reviews_info.append({
+                        "booking_id":booking.id,
+                        "location_name":booking.event.location_name,
                         "event_id": event.id,
                         "event_rate": event_rate,
                         "event_type": event_type,
