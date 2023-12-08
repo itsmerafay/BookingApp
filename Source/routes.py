@@ -707,6 +707,108 @@ def get_average_rating(event_id):
 
 ################### Custom Event Search ###########################
 
+# @app.route("/custom_event_search", methods=["POST"])
+# @jwt_required()
+# def custom_event_search():
+#     data = request.get_json()
+#     event_type = data.get("event_type")
+#     location_name = data.get("location_name")
+#     min_price = data.get("min_price")
+#     max_price = data.get("max_price")
+#     start_date = data.get("start_date")
+#     end_date = data.get("end_date")
+#     start_time = data.get("start_time")
+#     end_time = data.get("end_time")
+#     all_day = data.get("all_day")
+#     latitude = data.get("event_latitude")
+#     longitude = data.get("event_longitude")
+#     ratings = data.get("ratings")
+#     query = db.session.query(Event)
+
+#     # Apply filters based on search criteria
+#     if event_type:
+#         query = query.filter(func.lower(Event.event_type) == event_type.lower())
+
+#     if location_name:
+#         query = query.filter(func.lower(Event.location_name) == location_name.lower())
+
+#     if min_price is not None and max_price is not None:
+#         # Both min_price and max_price are provided, filter based on the range
+#         query = query.filter(Event.rate.between(min_price, max_price))
+
+#     elif min_price is not None or max_price is not None:
+#         # Either min_price or max_price is provided, filter based on the provided value
+#         if min_price is not None:
+#             query = query.filter(Event.rate >= min_price)
+#         elif max_price is not None:
+#             query = query.filter(Event.rate <= max_price)
+
+#     if not all_day and start_date and end_date and start_time and end_time:
+#         # Subquery to select overlapping event IDs
+#         subquery = db.session.query(Booking.event_id).filter(
+#             (Booking.start_date <= end_date) &
+#             (Booking.end_date >= start_date) &
+#             (Booking.start_time <= end_time) &
+#             (Booking.end_time >= start_time)
+#         ).distinct()
+
+#         # Filter events that do not have overlapping bookings 
+#         query = query.filter(~Event.id.in_(subquery))
+
+#     results = query.all()
+#     user_location = (latitude, longitude)
+#     results_with_distance = []
+
+#     for event in results:
+#         if event.latitude is not None and event.longitude is not None:
+#             event_location = (event.latitude, event.longitude)
+#             distance = geodesic(event_location, user_location).kilometers <= 0.5
+#             results_with_distance.append((event, distance))
+
+#     sorted_results = sorted(results_with_distance, key=lambda x: get_average_rating(x[0].id), reverse=True)
+
+#     # Serialize Event objects to a list of dictionaries
+#     serialized_results = []
+
+#     # First loop is for one event and other is for each vendor specific details
+#     for event_tuple in sorted_results:
+#         event = event_tuple[0]  # Extract the event object from the tuple
+#         vendor_details = []
+
+#         # Check if latitude and longitude are non-empty before considering them
+#         if event.latitude is not None and event.longitude is not None:
+#             event_location = (event.latitude, event.longitude)
+#             distance = geodesic(event_location, user_location).kilometers <= 0.5
+
+#             if distance:
+#                 for vendor_user in event.vendor.user:
+#                     vendor_details.append({
+#                         "vendor_profile_image": vendor_user.profile_image
+#                     })
+
+#                 serialized_event = {
+#                     "id": event.id,
+#                     "event_type": event.event_type,
+#                     "location_name": event.location_name,
+#                     "rate": event.rate,
+#                     "thumbnail": event.thumbnail,
+#                     "vendor_details": vendor_details
+#                 }
+#                 serialized_results.append(serialized_event)
+
+#     # Filter results based on ratings
+#     filtered_results = []
+#     for event in serialized_results:
+#         # Check if the event has the desired rating
+#         if get_average_rating(event['id']) == ratings:
+#             filtered_results.append(event)
+
+#     return jsonify({
+#         "status": True,
+#         "Search Result Found": f"{len(filtered_results)} vendors found in {location_name} with {ratings} star rating",
+#         "Search results": filtered_results
+#     })
+
 @app.route("/custom_event_search", methods=["POST"])
 @jwt_required()
 def custom_event_search():
@@ -744,13 +846,12 @@ def custom_event_search():
             query = query.filter(Event.rate <= max_price)
 
     if not all_day and start_date and end_date and start_time and end_time:
-    # Subquery to select overlapping event IDs
+        # Subquery to select overlapping event IDs
         subquery = db.session.query(Booking.event_id).filter(
-                (Booking.start_date <= end_date)   &
-                (Booking.end_date >= start_date)   &
-                (Booking.start_time <= end_time)   &
-                (Booking.end_time >= start_time)   
-        
+            (Booking.start_date <= end_date) &
+            (Booking.end_date >= start_date) &
+            (Booking.start_time <= end_time) &
+            (Booking.end_time >= start_time)
         ).distinct()
 
         # Filter events that do not have overlapping bookings
@@ -763,137 +864,53 @@ def custom_event_search():
     for event in results:
         if event.latitude is not None and event.longitude is not None:
             event_location = (event.latitude, event.longitude)
-            distance = geodesic(event_location, user_location).kilometers <= 100
+            distance = geodesic(event_location, user_location).kilometers <= 0.5
             results_with_distance.append((event, distance))
 
     sorted_results = sorted(results_with_distance, key=lambda x: get_average_rating(x[0].id), reverse=True)
-    print(sorted_results)
-
 
     # Serialize Event objects to a list of dictionaries
     serialized_results = []
 
-
-    print(str(query))
-
-    # First loop is for one event and other is for each vendor specific details 
-    for event in sorted_results:
+    # First loop is for one event and other is for each vendor specific details
+    for event_tuple in sorted_results:
+        event = event_tuple[0]  # Extract the event object from the tuple
         vendor_details = []
-        for vendor_user in event.vendor.user:
-            vendor_details.append({
-                "vendor_profile_image":vendor_user.profile_image
-            })
 
-        serialized_event = {
-            "id": event.id,
-            "event_type": event.event_type,
-            "location_name": event.location_name,
-            "rate" : event.rate,
-            "thumbnail":event.thumbnail,
-            "vendor_details": vendor_details
-        }
-        serialized_results.append(serialized_event)
+        # Check if latitude and longitude are non-empty before considering them
+        if event.latitude is not None and event.longitude is not None:
+            event_location = (event.latitude, event.longitude)
+            distance = geodesic(event_location, user_location).kilometers <= 0.5
+
+            if distance:
+                for vendor_user in event.vendor.user:
+                    vendor_details.append({
+                        "vendor_profile_image": vendor_user.profile_image
+                    })
+
+                serialized_event = {
+                    "id": event.id,
+                    "vendor_id":event.vendor_id,
+                    "event_type": event.event_type,
+                    "location_name": event.location_name,
+                    "rate": event.rate,
+                    "thumbnail": event.thumbnail,
+                    "vendor_details": vendor_details
+                }
+                serialized_results.append(serialized_event)
+
+    # Filter results based on ratings if ratings are provided
+    if ratings:
+        filtered_results = [event for event in serialized_results if get_average_rating(event['id']) == ratings]
+    else:
+        # Apply ratings filter at the end if ratings are not provided
+        filtered_results = serialized_results
 
     return jsonify({
-        "status":True,
-        "Search Result Found": f"{len(serialized_results)} vendors found in {location_name}",
-        "Search results": serialized_results
+        "status": True,
+        "Search Result Found": f"{len(filtered_results)} vendors found in {location_name} with {ratings} star rating",
+        "Search results": filtered_results
     })
-
-# from sqlalchemy import func
-
-# @app.route("/custom_event_search", methods=["POST"])
-# @jwt_required()
-# def custom_event_search():
-#     data = request.get_json()
-#     event_type = data.get("event_type")
-#     location_name = data.get("location_name")
-#     min_price = data.get("min_price")
-#     max_price = data.get("max_price")
-#     start_date = data.get("start_date")
-#     end_date = data.get("end_date")
-#     start_time = data.get("start_time")
-#     end_time = data.get("end_time")
-#     all_day = data.get("all_day")
-#     latitude = data.get("event_latitude")
-#     longitude = data.get("event_longitude")
-#     ratings = data.get("ratings")
-    
-#     query = db.session.query(Event)
-
-#     # Apply filters based on search criteria
-#     if event_type:
-#         query = query.filter(func.lower(Event.event_type) == event_type.lower())
-
-#     if location_name:
-#         query = query.filter(func.lower(Event.location_name) == location_name.lower())
-
-#     if min_price is not None and max_price is not None:
-#         query = query.filter(Event.rate.between(min_price, max_price))
-#     elif min_price is not None or max_price is not None:
-#         if min_price is not None:
-#             query = query.filter(Event.rate >= min_price)
-#         elif max_price is not None:
-#             query = query.filter(Event.rate <= max_price)
-
-#     if not all_day and start_date and end_date and start_time and end_time:
-#         subquery = db.session.query(Booking.event_id).filter(
-#             (Booking.start_date <= end_date) &
-#             (Booking.end_date >= start_date) &
-#             (Booking.start_time <= end_time) &
-#             (Booking.end_time >= start_time)
-#         ).distinct()
-        
-#         query = query.filter(~Event.id.in_(subquery))
-
-#     results = query.all()
-    
-#     user_location = (latitude, longitude)
-#     results_with_distance = []
-
-#     for event in results:
-#         if event.latitude is not None and event.longitude is not None:
-#             event_location = (event.latitude, event.longitude)
-#             distance = geodesic(event_location, user_location).kilometers <= 1000000
-#             results_with_distance.append((event, distance))
-
-#     # Calculate average ratings for each event
-#     events_with_ratings = []
-#     for event, distance in results_with_distance:
-#         average_rating = get_average_rating(event.id)
-#         events_with_ratings.append((event, distance, average_rating))
-
-#     # Filter events based on user-provided ratings
-#     filtered_events = [event for event, _, avg_rating in events_with_ratings if avg_rating == ratings]
-
-#     # Sort filtered events by distance
-#     sorted_events = sorted(filtered_events, key=lambda x: x[1])
-
-#     # Serialize Event objects to a list of dictionaries
-#     serialized_results = []
-
-#     for event, distance, _ in sorted_events:
-#         vendor_details = []
-#         for vendor_user in event.vendor.user:
-#             vendor_details.append({
-#                 "vendor_profile_image": vendor_user.profile_image
-#             })
-
-#         serialized_event = {
-#             "id": event.id,
-#             "event_type": event.event_type,
-#             "location_name": event.location_name,
-#             "rate": event.rate,
-#             "thumbnail": event.thumbnail,
-#             "vendor_details": vendor_details
-#         }
-#         serialized_results.append(serialized_event)
-
-#     return jsonify({
-#         "status": True,
-#         "Search Result Found": f"{len(serialized_results)} vendors found in {location_name}",
-#         "Search results": serialized_results
-#     })
 
 
 ###############################   Create Booking      ######################################
@@ -1336,55 +1353,6 @@ def pending_reviews():
 
 
 ##############################     All Rated Reviews      ####################################
-
-
-# @app.route('/all_reviews', methods=["GET"])
-# @jwt_required()
-# def all_reviews():
-#     try:
-#         email = get_jwt_identity()
-#         user = User.query.filter_by(email=email).first()
-
-#         user_id = user.id
-#         reviews = (
-#             db.session.query(Review, Event, Vendor)
-#             .join(Event, Review.event_id == Event.id)
-#             .join(Vendor, Event.vendor_id == Vendor.id)
-#             .filter(Review.user_id == user_id)
-#             .all()
-#         )
-
-#         if not reviews:
-#             return jsonify({"message": "Reviews Not Found !!"}), 400
-
-#         review_data = []
-
-#         for review, event, vendor in reviews:
-#             vendor_user = User.query.filter_by(vendor_id=vendor.id).first()
-#             vendor_profile_image = getattr(vendor_user, 'profile_image', None)
-
-#             review_data.append({
-#                 "event_id": event.id,
-#                 "event_thumbnail": event.thumbnail,
-#                 "event_name": event.custom_event_name,
-#                 "event_rate": event.rate,
-#                 "event_address": event.address,
-#                 "vendor_profile_image": vendor_profile_image,
-#                 "user_review": review.user_review,
-#                 "cleanliness_rating": review.cleanliness_rating,
-#                 "price_value_rating": review.price_value_rating,
-#                 "service_value_rating": review.service_value_rating,
-#                 "location_rating": review.location_rating
-#             })
-
-#         return jsonify({
-#             "rated_reviews": review_data,
-#             "total_rated_reviews": len(review_data)
-#         })
-
-#     except Exception as e:
-#         print(f"Error in fetching rated reviews: {str(e)}")
-#         return jsonify({"error": "An error occurred while fetching rated reviews."}), 500
 
 
 @app.route('/all_reviews', methods=["GET"])
