@@ -899,12 +899,17 @@ def custom_event_search():
                 }
                 serialized_results.append(serialized_event)
 
+
     # Filter results based on ratings if ratings are provided
+    filtered_results = []
     if ratings:
-        filtered_results = [event for event in serialized_results if get_average_rating(event['id']) == ratings]
+        for event in serialized_results:
+            if get_average_rating(event['id']) == ratings:
+                filtered_results.append(event)
+
     else:
-        # Apply ratings filter at the end if ratings are not provided
         filtered_results = serialized_results
+
 
     return jsonify({
         "status": True,
