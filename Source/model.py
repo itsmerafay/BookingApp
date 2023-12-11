@@ -54,7 +54,6 @@ class User(db.Model):
 class Vendor(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     
-    # Part 1
     full_name = db.Column(db.String(255), nullable=False)
     phone_number = db.Column(db.String(255), nullable=False)
     location = db.Column(db.String(255), nullable=False)
@@ -75,13 +74,13 @@ class Event(db.Model):
     thumbnail = db.Column(db.String(255), nullable=False)
     other_images = db.Column(db.JSON, nullable=True)
     video_showcase = db.Column(db.String(255), nullable=True)
-    location_name = db.Column(db.String(255), nullable=False)
+    # location_name = db.Column(db.String(255), nullable=False)
     address = db.Column(db.String(255), nullable=False)
     rate = db.Column(db.Float, nullable=False)
     fixed_price = db.Column(db.Boolean, nullable=True)
 
     details = db.Column(db.String(1024), nullable=True)
-    custom_event_name = db.Column(db.String(255), nullable = True)
+    location_name = db.Column(db.String(255), nullable = True)
     services = db.Column(db.String(1024), nullable=True)
 
     # For services and facilities, use a JSON field for multiple images
@@ -94,14 +93,13 @@ class Event(db.Model):
 
     vendor_id = db.Column(db.Integer, db.ForeignKey("vendor.id"), nullable = False)
     def as_dict(self):
-       return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
     def get_total_bookings(self):
         return len(self.bookings)
 
     def get_total_bookings_value(self):
         return sum(booking.calculate_total_cost() for booking in self.bookings)
-
 
     def earnings_per_month(self):
         current_month = datetime.now().strftime('%Y-%m')  # Get current month in 'YYYY-MM' format
@@ -241,3 +239,24 @@ class PasswordResetToken(db.Model):
         self.user_id = user_id
         self.token = token
         self.expired_at = datetime.utcnow() + timedelta(minutes=expires_in_minutes)
+
+
+# class Preferences(db.Model):
+#     id = db.Column(db.Integer , primary_key = True)
+#     user_id = db.Column(db.Integer , db.ForeignKey("user.id"), nullable = False)
+#     event_preference = db.Column(db.JSON , nullable = True)
+#     vendor_preference = db.Column(db.JSON, nullable = True)
+
+#     user = db.relationship("User", backref = "preferences")
+
+#     def all_events(self, ):
+#         event = Event.query.filter_by()
+
+#     def my_area(self, ):
+        
+
+#     def top_rated(self, ):
+
+#     def cheapest(self, ):
+    
+#     def expensive(self, ):

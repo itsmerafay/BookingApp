@@ -202,13 +202,13 @@ app.config["VENDOR_IMAGES_FOLDER"] = VENDOR_IMAGES_FOLDER
 
 ###############################     Create Event       ######################################
 
-# First vendor will be registered or complete his profile then can create event
 
 @app.route("/create_event", methods=["POST"])
 @jwt_required()
 def create_event():
     data = request.get_json()
     user = get_current_user()
+    print(data)
 
     if not user:
         return jsonify({"status":False, "message": "User not found"}), 401
@@ -233,19 +233,16 @@ def create_event():
 
     # Additional fields
     details = data.get("details")
-    print("Request Data:", request.get_json())
     services = data.get("services")
-    print("Services:", services)
+    print(services)
 
     facilities = data.get("facilities")
     description = data.get("description")
     event_type = data.get("event_type")
-    latitude=data.get("latitude")
+    latitude=   data.get("latitude")
     longitude = data.get("longitude")
 
     # Create an event for the vendor
-    print(services)
-    print(rate,"this was rate")
     event = Event(
         thumbnail=thumbnail,
         other_images=other_images,
@@ -425,22 +422,22 @@ def delete_event(event_id):
         vendor = user.vendor
         event = Event.query.filter_by(id = event_id , vendor=vendor).first()
         if not event:
-          return jsonify({
-             "status":False,
-             "message":"User Not Found !!"
-          })
+            return jsonify({
+            "status":False,
+            "message":"User Not Found !!"
+        })
 
         db.session.delete(event)
         db.session.commit()
         return jsonify({
-           "status":True,
-           "message":"Event Deleted Successfully !!!"
+        "status":True,
+        "message":"Event Deleted Successfully !!!"
         })
     except Exception as e:
         print(e)
         return jsonify({
-           "status":False,
-           "message":"booking"
+        "status":False,
+        "message":"booking"
         })
 
 
@@ -463,8 +460,21 @@ def booking_details(booking_id):
 
 
 @app.route("/get_event/<int:event_id>", methods = ["GET"])
+@jwt_required()
 def get_event(event_id):
-    
+    user = get_current_user()
+
+    if not user:
+            return jsonify({
+                "status":False,
+                "message": "User not authenticated !!"
+            })
+            
+    if user.role != "user":
+            return jsonify({
+                "status": False,
+                "message": "Unauthorized access: Only users can create bookings."
+            })
     event = Event.query.get(event_id) 
     
     if event:
@@ -473,7 +483,6 @@ def get_event(event_id):
             "thumbnail": event.thumbnail,
             "other_images": event.other_images,
             "video_showcase": event.video_showcase,
-            "location_name": event.location_name,
             "address": event.address,
             "rate": event.rate,
             "fixed_price": event.fixed_price,
@@ -483,11 +492,11 @@ def get_event(event_id):
             "description": event.description,
             "event_type": event.event_type,
             "vendor_id": event.vendor_id,  # You can include vendor details if needed
-            "custom event name":event.custom_event_name,
+            "location_name":event.location_name,
             "longitude":event.longitude,
             "latitude":event.latitude
         }
-         # Fetch vendor details
+        # Fetch vendor details
         if event.vendor:
             vendor = event.vendor
             vendor_details = {
@@ -497,11 +506,9 @@ def get_event(event_id):
                 "location": vendor.location,
                 "biography": vendor.biography,
                 "email":vendor.user[0].email,
-                  "profile_image": vendor.user[0].profile_image
+                "profile_image": vendor.user[0].profile_image
                 # Include other vendor fields as necessary
             }
-
-     
 
             event_details['vendor_details'] = vendor_details
         return jsonify({"status":True,"Event Details":event_details})
@@ -617,10 +624,14 @@ def bookings_today(vendor_id):
 
 
 
+######################### Event Preferences #################### 
+
+
+
 ################### Search Event ###############################
 
 
-@app.route("/search_event", methods=["POST"])   
+@app.route("/search_event", methods=["POST"])
 @jwt_required()
 def search_event():
     page_number = request.args.get('page', default=1, type=int)
@@ -637,7 +648,7 @@ def search_event():
         events_query = events_query.filter_by(event_type=event_type)
 
     if location_name:
-        events_query = events_query.filter_by(location_name=location_name)
+        events_query = events_query.filter(or_(Event.location_name.ilike(f"%{location_name}%")))
 
     all_events = events_query.all()
 
@@ -665,34 +676,32 @@ def search_event():
         event = result[0]
         within_radius = result[1]
 
-        if within_radius:
-            vendor_details = {
-                "id": event.vendor.id,
-                "full_name": event.vendor.full_name,
-                "phone_number": event.vendor.phone_number,
-                "location": event.vendor.location,
-                "biography": event.vendor.biography
-            }
+        vendor_details = {
+            "id": event.vendor.id,
+            "full_name": event.vendor.full_name,
+            "phone_number": event.vendor.phone_number,
+            "location": event.vendor.location,
+            "biography": event.vendor.biography
+        }
 
-            event_info = {
-                "id": event.id,
-                "thumbnail": event.thumbnail,
-                "event_type": event.event_type,
-                "custom_event_name": event.custom_event_name,
-                "rate": event.rate,
-                "event_rating": get_average_rating(event.id),
-                "fixed_price": event.fixed_price,
-                "distance_km": geodesic((event.latitude, event.longitude), user_location).kilometers,
-                "vendor_details": vendor_details
-            }
-            event_list.append(event_info)
+        event_info = {
+            "id": event.id,
+            "thumbnail": event.thumbnail,
+            "event_type": event.event_type,
+            "rate": event.rate,
+            "event_rating": get_average_rating(event.id),
+            "fixed_price": event.fixed_price,
+            "distance_km": geodesic((event.latitude, event.longitude), user_location).kilometers,
+            "location_name":event.location_name,
+            "vendor_details": vendor_details
+        }
+        event_list.append(event_info)
 
     return jsonify({
         "status": True,
         "Total_Events": total_events_found,
         "Events": event_list
     }), 200
-
 
 def get_average_rating(event_id):
     total_avg_rating = db.session.query(func.avg(Review.average_rating)).filter(Review.event_id == event_id).scalar()
@@ -707,107 +716,6 @@ def get_average_rating(event_id):
 
 ################### Custom Event Search ###########################
 
-# @app.route("/custom_event_search", methods=["POST"])
-# @jwt_required()
-# def custom_event_search():
-#     data = request.get_json()
-#     event_type = data.get("event_type")
-#     location_name = data.get("location_name")
-#     min_price = data.get("min_price")
-#     max_price = data.get("max_price")
-#     start_date = data.get("start_date")
-#     end_date = data.get("end_date")
-#     start_time = data.get("start_time")
-#     end_time = data.get("end_time")
-#     all_day = data.get("all_day")
-#     latitude = data.get("event_latitude")
-#     longitude = data.get("event_longitude")
-#     ratings = data.get("ratings")
-#     query = db.session.query(Event)
-
-#     # Apply filters based on search criteria
-#     if event_type:
-#         query = query.filter(func.lower(Event.event_type) == event_type.lower())
-
-#     if location_name:
-#         query = query.filter(func.lower(Event.location_name) == location_name.lower())
-
-#     if min_price is not None and max_price is not None:
-#         # Both min_price and max_price are provided, filter based on the range
-#         query = query.filter(Event.rate.between(min_price, max_price))
-
-#     elif min_price is not None or max_price is not None:
-#         # Either min_price or max_price is provided, filter based on the provided value
-#         if min_price is not None:
-#             query = query.filter(Event.rate >= min_price)
-#         elif max_price is not None:
-#             query = query.filter(Event.rate <= max_price)
-
-#     if not all_day and start_date and end_date and start_time and end_time:
-#         # Subquery to select overlapping event IDs
-#         subquery = db.session.query(Booking.event_id).filter(
-#             (Booking.start_date <= end_date) &
-#             (Booking.end_date >= start_date) &
-#             (Booking.start_time <= end_time) &
-#             (Booking.end_time >= start_time)
-#         ).distinct()
-
-#         # Filter events that do not have overlapping bookings 
-#         query = query.filter(~Event.id.in_(subquery))
-
-#     results = query.all()
-#     user_location = (latitude, longitude)
-#     results_with_distance = []
-
-#     for event in results:
-#         if event.latitude is not None and event.longitude is not None:
-#             event_location = (event.latitude, event.longitude)
-#             distance = geodesic(event_location, user_location).kilometers <= 0.5
-#             results_with_distance.append((event, distance))
-
-#     sorted_results = sorted(results_with_distance, key=lambda x: get_average_rating(x[0].id), reverse=True)
-
-#     # Serialize Event objects to a list of dictionaries
-#     serialized_results = []
-
-#     # First loop is for one event and other is for each vendor specific details
-#     for event_tuple in sorted_results:
-#         event = event_tuple[0]  # Extract the event object from the tuple
-#         vendor_details = []
-
-#         # Check if latitude and longitude are non-empty before considering them
-#         if event.latitude is not None and event.longitude is not None:
-#             event_location = (event.latitude, event.longitude)
-#             distance = geodesic(event_location, user_location).kilometers <= 0.5
-
-#             if distance:
-#                 for vendor_user in event.vendor.user:
-#                     vendor_details.append({
-#                         "vendor_profile_image": vendor_user.profile_image
-#                     })
-
-#                 serialized_event = {
-#                     "id": event.id,
-#                     "event_type": event.event_type,
-#                     "location_name": event.location_name,
-#                     "rate": event.rate,
-#                     "thumbnail": event.thumbnail,
-#                     "vendor_details": vendor_details
-#                 }
-#                 serialized_results.append(serialized_event)
-
-#     # Filter results based on ratings
-#     filtered_results = []
-#     for event in serialized_results:
-#         # Check if the event has the desired rating
-#         if get_average_rating(event['id']) == ratings:
-#             filtered_results.append(event)
-
-#     return jsonify({
-#         "status": True,
-#         "Search Result Found": f"{len(filtered_results)} vendors found in {location_name} with {ratings} star rating",
-#         "Search results": filtered_results
-#     })
 
 @app.route("/custom_event_search", methods=["POST"])
 @jwt_required()
@@ -832,7 +740,9 @@ def custom_event_search():
         query = query.filter(func.lower(Event.event_type) == event_type.lower())
 
     if location_name:
-        query = query.filter(func.lower(Event.location_name) == location_name.lower())
+        # query = query.filter(func.lower(Event.location_name) == location_name.lower())
+        query = query.filter(or_(Event.location_name.ilike(f"%{location_name}%")))
+
 
     if min_price is not None and max_price is not None:
         # Both min_price and max_price are provided, filter based on the range
@@ -880,7 +790,7 @@ def custom_event_search():
         # Check if latitude and longitude are non-empty before considering them
         if event.latitude is not None and event.longitude is not None:
             event_location = (event.latitude, event.longitude)
-            distance = geodesic(event_location, user_location).kilometers <= 0.5
+            distance = geodesic(event_location, user_location).kilometers <= 4
 
             if distance:
                 for vendor_user in event.vendor.user:
@@ -913,9 +823,19 @@ def custom_event_search():
 
     return jsonify({
         "status": True,
-        "Search Result Found": f"{len(filtered_results)} vendors found in {location_name} with {ratings} star rating",
+        "Search Result Found": f"{len(filtered_results)} vendors found for {location_name} with {ratings} star rating",
         "Search results": filtered_results
     })
+
+def get_average_rating(event_id):
+    total_avg_rating = db.session.query(func.avg(Review.average_rating)).filter(Review.event_id == event_id).scalar()
+    total_num_reviews = db.session.query(func.count(Review.id)).filter(Review.event_id == event_id).scalar()
+
+    if total_avg_rating is None or total_num_reviews == 0:
+        return 0
+    else:
+        return round(float(total_avg_rating), 2)
+
 
 
 ###############################   Create Booking      ######################################
@@ -1177,7 +1097,7 @@ def booking_history():
                 "booking_id":booking.id,
                 "event_id":booking.event_id,
                 "event_vendor_id":booking.event.vendor_id,
-                "custom_event_name": booking.event.custom_event_name,
+                "location_name": booking.event.location_name,
                 "event_address":booking.event.address,
                 "event_rate":booking.event.rate,
                 "booking_end_date": str(booking.end_date),
@@ -1332,7 +1252,7 @@ def pending_reviews():
                     event_type = event.event_type
                     event_address = event.address
                     event_thumbnail = event.thumbnail
-                    custom_event_name = event.custom_event_name if event.custom_event_name else "Unknown Custom Event Name"
+                    location_name = event.location_name if event.location_name else "Unknown Custom Event Name"
 
                     pending_reviews_info.append({
                         "booking_id":booking.id,
@@ -1342,7 +1262,7 @@ def pending_reviews():
                         "event_type": event_type,
                         "event_address": event_address,
                         "event_thumbnail": event_thumbnail,
-                        "custom_event_name": custom_event_name,
+                        # "custom_event_name": custom_event_name,
                         "booking_date": booking.start_date.isoformat(),
                         "booking_time": booking.start_time.isoformat()
                     })
@@ -1399,7 +1319,7 @@ def all_reviews():
             review_data.append({
                 "event_id": event.id,
                 "event_thumbnail": event.thumbnail,
-                "event_name": event.custom_event_name,
+                "event_name": event.location_name,
                 "event_rate": event.rate,
                 "event_address": event.address,
                 "vendor_profile_image": vendor_profile_image,
@@ -1414,7 +1334,7 @@ def all_reviews():
             "rated_reviews": review_data,
             "total_rated_reviews": len(review_data)
         })
-
+    
     except Exception as e:
         print(f"Error in fetching rated reviews: {str(e)}")
         return jsonify({"error": "An error occurred while fetching rated reviews."}), 500
