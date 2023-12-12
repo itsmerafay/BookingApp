@@ -732,7 +732,7 @@ def custom_event_search():
     all_day = data.get("all_day")
     latitude = data.get("event_latitude")
     longitude = data.get("event_longitude")
-    ratings = data.get("ratings")
+    ratings = data.get("ratings")   
     query = db.session.query(Event)
 
     # Apply filters based on search criteria
