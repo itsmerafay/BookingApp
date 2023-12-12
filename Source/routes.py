@@ -1,16 +1,13 @@
-import random
 from sqlalchemy import func, or_, and_
-from validations import Validations
+from dry import Validations, Ratings
 from geopy.distance import geodesic
 from app import app, db, mail
 from flask import request, jsonify, url_for, current_app, send_file, send_from_directory
 from datetime import datetime, timedelta
-from model import User, PasswordResetToken, Vendor, Event, Booking , Review
+from model import User, PasswordResetToken, Vendor, Event, Booking , Review, Preferences
 import secrets
 from sqlalchemy.exc import IntegrityError
-import io
 import uuid
-import json
 import base64
 from flask_mail import Message
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, decode_token
@@ -473,7 +470,7 @@ def get_event(event_id):
     if user.role != "user":
             return jsonify({
                 "status": False,
-                "message": "Unauthorized access: Only users can create bookings."
+                "message": "Unauthorized access: Only users can get events."
             })
     event = Event.query.get(event_id) 
     
@@ -626,6 +623,48 @@ def bookings_today(vendor_id):
 
 ######################### Event Preferences #################### 
 
+@app.route("/set_user_preferences", methods = ["POST","PUT"])
+@jwt_required()
+def set_user_preference():
+    data = request.get_json()
+    user = get_current_user()
+
+    if not user:
+        return jsonify({
+            "status":False,
+            "message":"User not authenticated !!"
+        })
+
+    if user.role != "user":
+        return jsonify({
+            "status":False,
+            "message":"Unauthorized access: Only users can set preferences"
+        })
+    
+    user_preference = Preferences.query.filter_by(user_id = user.id).first()
+
+    event_preference = data.get("event_preferences")
+    vendor_preference = data.get("vendor_preferences")
+
+    if not user_preference:
+        user_preference = Preferences(user_id = user.id , event_preference = event_preference, vendor_preference = vendor_preference)
+        db.session.add(user_preference)
+    else:
+        user_preference.event_preference = Preferences.event_preference
+        vendor_preference.vendor_preference = Preferences.vendor_preference
+
+    db.session.commit()
+
+    return jsonify({
+        "status":True,
+        "message":"User preference set successfully !!"
+    })
+
+
+
+
+
+
 
 
 ################### Search Event ###############################
@@ -661,7 +700,7 @@ def search_event():
             distance = geodesic(event_location, user_location).kilometers <= 100
             results_with_distance.append((event, distance))
 
-    sorted_results = sorted(results_with_distance, key=lambda x: get_average_rating(x[0].id), reverse=True)
+    sorted_results = sorted(results_with_distance, key=lambda x: Ratings.get_average_rating(x[0].id), reverse=True)
     print(sorted_results)
 
     total_events_found = len(sorted_results)
@@ -689,7 +728,7 @@ def search_event():
             "thumbnail": event.thumbnail,
             "event_type": event.event_type,
             "rate": event.rate,
-            "event_rating": get_average_rating(event.id),
+            "event_rating": Ratings.get_average_rating(event.id),
             "fixed_price": event.fixed_price,
             "distance_km": geodesic((event.latitude, event.longitude), user_location).kilometers,
             "location_name":event.location_name,
@@ -702,16 +741,6 @@ def search_event():
         "Total_Events": total_events_found,
         "Events": event_list
     }), 200
-
-def get_average_rating(event_id):
-    total_avg_rating = db.session.query(func.avg(Review.average_rating)).filter(Review.event_id == event_id).scalar()
-    total_num_reviews = db.session.query(func.count(Review.id)).filter(Review.event_id == event_id).scalar()
-
-    if total_avg_rating is None or total_num_reviews == 0:
-        return 0
-    else:
-        return round(float(total_avg_rating), 2)
-
 
 
 ################### Custom Event Search ###########################
@@ -777,7 +806,7 @@ def custom_event_search():
             distance = geodesic(event_location, user_location).kilometers <= 0.5
             results_with_distance.append((event, distance))
 
-    sorted_results = sorted(results_with_distance, key=lambda x: get_average_rating(x[0].id), reverse=True)
+    sorted_results = sorted(results_with_distance, key=lambda x: Ratings.get_average_rating(x[0].id), reverse=True)
 
     # Serialize Event objects to a list of dictionaries
     serialized_results = []
@@ -814,7 +843,7 @@ def custom_event_search():
     filtered_results = []
     if ratings:
         for event in serialized_results:
-            if get_average_rating(event['id']) == ratings:
+            if Ratings.get_average_rating(event['id']) == ratings:
                 filtered_results.append(event)
 
     else:
@@ -826,15 +855,6 @@ def custom_event_search():
         "Search Result Found": f"{len(filtered_results)} vendors found for {location_name} with {ratings} star rating",
         "Search results": filtered_results
     })
-
-def get_average_rating(event_id):
-    total_avg_rating = db.session.query(func.avg(Review.average_rating)).filter(Review.event_id == event_id).scalar()
-    total_num_reviews = db.session.query(func.count(Review.id)).filter(Review.event_id == event_id).scalar()
-
-    if total_avg_rating is None or total_num_reviews == 0:
-        return 0
-    else:
-        return round(float(total_avg_rating), 2)
 
 
 
@@ -998,7 +1018,7 @@ def cancel_booking():
         if user.role != "user":
             return jsonify({
                 "status": False,
-                "message": "Unauthorized access: Only users can create bookings."
+                "message": "Unauthorized access: Only users can cancel bookings."
             })
 
         booking_id = data.get("booking_id")
@@ -1045,7 +1065,7 @@ def booking_history():
         if user.role != "user":
             return jsonify({
                 "status": False,
-                "message": "Unauthorized access: Only users can create bookings."
+                "message": "Unauthorized access: Only users can check booking history."
             })
 
         booking_type = data.get("booking_type")
@@ -1139,7 +1159,7 @@ def submit_review():
     if user.role != "user":
         return jsonify({
             "status": False,
-            "message": "Unauthorized access: Only users can create bookings."
+            "message": "Unauthorized access: Only users can submit reviews."
         })
 
     booking_id = data.get("booking_id")

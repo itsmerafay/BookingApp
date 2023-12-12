@@ -1,5 +1,8 @@
 import re
-from flask import jsonify
+from flask import jsonify 
+from sqlalchemy import func
+from app import db
+from model import Review
 
 import sys
 sys.dont_write_bytecode = True
@@ -40,3 +43,14 @@ class Validations:
             return jsonify({
                 'message':'There should be atleast one special character in your password'
             })
+
+class Ratings:
+
+    def get_average_rating(event_id):
+        total_avg_rating = db.session.query(func.avg(Review.average_rating)).filter(Review.event_id == event_id).scalar()
+        total_num_reviews = db.session.query(func.count(Review.id)).filter(Review.event_id == event_id).scalar()
+
+        if total_avg_rating is None or total_num_reviews == 0:
+            return 0
+        else:
+            return round(float(total_avg_rating), 2)

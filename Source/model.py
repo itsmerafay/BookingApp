@@ -1,7 +1,8 @@
 from app import db
 from flask_bcrypt import Bcrypt
+from geopy.distance import geodesic
 from datetime import datetime, timedelta,date, time
-from sqlalchemy import UniqueConstraint
+from sqlalchemy import UniqueConstraint, func
 from collections import defaultdict
 import sys
 sys.dont_write_bytecode = True
@@ -241,22 +242,35 @@ class PasswordResetToken(db.Model):
         self.expired_at = datetime.utcnow() + timedelta(minutes=expires_in_minutes)
 
 
-# class Preferences(db.Model):
-#     id = db.Column(db.Integer , primary_key = True)
-#     user_id = db.Column(db.Integer , db.ForeignKey("user.id"), nullable = False)
-#     event_preference = db.Column(db.JSON , nullable = True)
-#     vendor_preference = db.Column(db.JSON, nullable = True)
+class Preferences(db.Model):
+    id = db.Column(db.Integer , primary_key = True)
+    user_id = db.Column(db.Integer , db.ForeignKey("user.id"), nullable = False)
+    event_preference = db.Column(db.JSON , nullable = True)
+    vendor_preference = db.Column(db.JSON, nullable = True)
 
-#     user = db.relationship("User", backref = "preferences")
+    user = db.relationship("User", backref = "preferences")
 
-#     def all_events(self, ):
-#         event = Event.query.filter_by()
+    def all_events(self):
+        event = Event.query.all()
+        return event
 
-#     def my_area(self, ):
-        
+    def my_area(self, latitude, longitude):
+        user_location = (latitude, longitude)
+        nearby_events = []
 
-#     def top_rated(self, ):
+        all_events = Event.query.filter(Event.latitude.isnot(None) , Event.longitude.isnot(None)).all()                 
+        for event in all_events:
+            event_location = (event.latitude, event.longitude)
+            distance = geodesic(user_location, event_location).kilometers
+            if distance <= 3:
+                nearby_events.append(event)
+        return nearby_events
 
-#     def cheapest(self, ):
-    
-#     def expensive(self, ):
+    def top_rated(self):
+        return Event.query.join(Review).group_by(Event.id).having(func.avg(Review.average_rating) == 5).all()
+
+    def cheapest(self):
+        return Event.query.order_by(Event.rate).all()
+
+    def expensive(self):
+        return Event.query.order_by(Event.rate.desc()).all()
