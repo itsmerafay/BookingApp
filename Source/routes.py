@@ -138,9 +138,9 @@ def security():
         return jsonify({
             "message":"All fields should be filled !! "
         }), 400
+    
 
-
-    user = User.query.filter_by(email = email, password = password).first()
+    user = User.query.filter_by(email=email).first()
 
     if not user  :
         return jsonify({
@@ -159,6 +159,7 @@ def security():
             "status":False,
             "message":"Please enter correct password !!"
         }), 400
+    # print(user.check_password)
 
     if new_password !=  confirm_password:
         return jsonify({
@@ -167,8 +168,9 @@ def security():
         }), 400
     
     password_validation_result = Validations.is_valid_password(new_password)
+    print(password_validation_result)
     
-    if not password_validation_result:
+    if password_validation_result:
         return jsonify({
             "status":False,
             "message":"Please enter strong password !!"
