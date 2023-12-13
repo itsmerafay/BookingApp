@@ -128,7 +128,7 @@ def security():
             "status":False,
             "message":"User should be authenticated to access the security !!"
         }), 401
-
+    
     email = data.get("email")
     password = data.get("password")
     new_password = data.get("new_password")
@@ -387,7 +387,7 @@ def update_event(event_id):
         return jsonify({
             "status":False,
             "message":"User Not Found !!"
-        })
+        }), 401
 
     if user.role != "vendor":
         return jsonify({
@@ -477,7 +477,7 @@ def delete_event(event_id):
         return jsonify({
             "status":False,
             "message":"User Not Found !!"
-        })
+        }), 401
 
     if user.role != "vendor":
         return jsonify({
@@ -537,7 +537,7 @@ def get_event(event_id):
             return jsonify({
                 "status":False,
                 "message": "User not authenticated !!"
-            })
+            }), 401
             
     if user.role != "user":
             return jsonify({
@@ -636,29 +636,19 @@ def top_venues(vendor_id):
     try:
         # Get the total number of bookings for the vendor
         total_bookings = (db.session.query(func.count(Booking.id))
-                          .join(Event)
-                          .filter(Event.vendor_id == vendor_id)
-                          .scalar())
-
-        # Get booking count per venue (using location_name as the venue identifier)
-        # venue_bookings = (db.session.query(Event.location_name, func.count(Booking.id).label('booking_count'))
-        #                   .join(Event)
-        #                   .filter(Event.vendor_id == vendor_id)
-        #                   .group_by(Event.location_name)
-        #                   .order_by(func.count(Booking.id).desc())
-        #                   .all())
+                        .join(Event)
+                        .filter(Event.vendor_id == vendor_id)
+                        .scalar())
         venue_bookings = (db.session.query(Event.location_name, Event.thumbnail, func.count(Booking.id).label('booking_count'))
-                          .join(Event)
-                          .filter(Event.vendor_id == vendor_id)
-                          .group_by(Event.location_name, Event.thumbnail)
-                          .order_by(func.count(Booking.id).desc())
-                          .all())
+                        .join(Event)
+                        .filter(Event.vendor_id == vendor_id)
+                        .group_by(Event.location_name, Event.thumbnail)
+                        .order_by(func.count(Booking.id).desc())
+                        .all())
 
         # Calculate the percentage for each venue
         venues_list = []
-        # for venue, count in venue_bookings:
-        #     percentage = (count / total_bookings) * 100 if total_bookings > 0 else 0
-        #     venues_list.append({"venue": venue, "bookings": count, "percentage": round(percentage, 2)})
+
         for location_name, thumbnail, count in venue_bookings:
             percentage = (count / total_bookings) * 100 if total_bookings > 0 else 0
             venues_list.append({
@@ -693,6 +683,7 @@ def bookings_today(vendor_id):
 
 
 
+
 ######################### Event Preferences #################### 
 
 @app.route("/set_user_preferences", methods = ["POST","PUT"])
@@ -705,7 +696,7 @@ def set_user_preference():
         return jsonify({
             "status":False,
             "message":"User not authenticated !!"
-        })
+        }), 401
 
     if user.role != "user":
         return jsonify({
@@ -731,6 +722,26 @@ def set_user_preference():
         "status":True,
         "message":"User preference set successfully !!"
     })
+
+
+################### Home Events ###############################
+
+@app.route("/home_events", methods = ["POST"])
+@jwt_required()
+def home_events():
+    random_events = Event.query.order_by
+
+
+def get_event_info(event, user_location):
+    return {
+        "id":event.id,
+        "thumbnail":event.thumbnail,
+        "location_name":event.location_name,
+        "rate":event.rate,
+        "event_rating":Ratings.get_average_rating(event.id),
+        "address":Event.address,
+        "vendor_profile_image":event.vendor.user.profile_image
+    }
 
 
 
@@ -938,7 +949,7 @@ def create_booking():
             return jsonify({
                 "status":False,
                 "message": "User not authenticated !!"
-            })
+            }), 401
             
         if user.role != "user":
             return jsonify({
@@ -1060,6 +1071,7 @@ def convert_to_datetime(date_str, time_str):
     return datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %H:%M:%S")
 
 
+
 def calculate_hours_for_duration(start_datetime, end_datetime):
     return (end_datetime - start_datetime).total_seconds() / 3600
 
@@ -1080,7 +1092,7 @@ def cancel_booking():
             return jsonify({
                 "status":False,
                 "message": "User not authenticated !!"
-            })
+            }), 401
             
         if user.role != "user":
             return jsonify({
@@ -1100,18 +1112,73 @@ def cancel_booking():
         booking_to_cancel.cancelled = True  
         db.session.commit()
 
-        # return jsonify({
-        #     "status":True,
-        #     "message":"Booking cancelled successfully !!"
-        #     "event_id":Booking.event_id,
-        #     "vendor_id":Booking.
-        # })
+        return jsonify({
+            "status":True,
+            "message":"Booking cancelled successfully !!",
+            "event_id":Booking.event_id,
+            "vendor_id":Booking.event.vendor.id
+        })
     
     except Exception as e:
         return jsonify({
             "status":False,
             "message": str(e)
         }), 500
+
+
+###############################    Cancel Booking By Vendor      ######################################
+
+
+@app.route("/cancel_booking_by_vendor", methods = ["POST"])
+@jwt_required()
+def cancel_booking_by_vendor():
+    try:
+        data = request.get_json()
+        user = get_current_user()
+
+        if not user:
+            return jsonify({
+                "status":False,
+                "message": "User not authenticated !!"
+            }), 401
+            
+        if user.role != "vendor":
+            return jsonify({
+                "status": False,
+                "message": "Unauthorized access: Only vendors can cancel bookings."
+            })
+
+        booking_id = data.get("booking_id")
+
+        booking_to_cancel = Booking.query.filter_by(id=booking_id).first()
+
+        if booking_to_cancel.cancelled == 1:
+            return jsonify({
+                "message":"Booking is already cancelled !1"
+        })
+
+        if not booking_to_cancel or booking_to_cancel.event.vendor.id != user.vendor.id:
+            return jsonify({
+                "message":"Booking not found or unauthorized to cancel"})
+
+        booking_to_cancel.cancelled = True  
+        db.session.commit()
+
+        return jsonify({
+            "status":True,
+            "message":"Successfully cancelled the booking !!",
+            "event_id":booking_to_cancel.event_id,
+            "vendor_id":booking_to_cancel.event.vendor.id
+        })
+    
+    except Exception as e:
+        return jsonify({
+            "status":False,
+            "message": str(e)
+        }), 500
+
+
+
 
 
 ###############################   Booking History For User      ######################################
@@ -1127,7 +1194,7 @@ def booking_history():
             return jsonify({
                 "status":False,
                 "message": "User not authenticated !!"
-            })
+            }), 401
             
         if user.role != "user":
             return jsonify({
@@ -1255,7 +1322,7 @@ def submit_review():
         user = User.query.filter_by(email=user_email).first()
 
         if not user:
-            return jsonify({"message": "User not found!"}), 400
+            return jsonify({"message": "User not found!"}), 401
 
         existing_review = Review.query.filter_by(booking_id=booking_id, user_id=user.id).first()
 
