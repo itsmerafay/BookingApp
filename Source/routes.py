@@ -100,7 +100,7 @@ def signin():
         "role":user.role,
         "id":user.id,
         "profile_image":user.profile_image
-    })
+    }), 200
 
 
 ###############################     Function For Getting The Current User      ######################################
@@ -112,6 +112,76 @@ def get_current_user():
     # Use the email to retrieve the user from the database
     user = User.query.filter_by(email=current_user_email).first()
     return user
+
+
+###############################     Route For Security In The Internal App      ######################################
+
+
+@app.route("/security", methods =  ["PUT"])
+@jwt_required()
+def security():
+    data = request.get_json()
+    current_user = get_current_user()
+
+    if not current_user:
+        return jsonify({
+            "status":False,
+            "message":"User should be authenticated to access the security !!"
+        }), 401
+
+    email = data.get("email")
+    password = data.get("password")
+    new_password = data.get("new_password")
+    confirm_password = data.get("confirm_password")
+
+    if not all([email,password,new_password,confirm_password]):
+        return jsonify({
+            "message":"All fields should be filled !! "
+        }), 400
+
+
+    user = User.query.filter_by(email = email, password = password).first()
+
+    if not user  :
+        return jsonify({
+            "status":False,
+            "message":"User not found !!"
+        }), 400
+    
+    if user.email != email:
+        return jsonify({
+            "status":False,
+            "message":"Please enter your correct email !!"
+        }), 400
+    
+    if not user.check_password(password):
+        return jsonify({
+            "status":False,
+            "message":"Please enter correct password !!"
+        }), 400
+
+    if new_password !=  confirm_password:
+        return jsonify({
+            "status":False,
+            "message":"Please enter same password for both fields"
+        }), 400
+    
+    password_validation_result = Validations.is_valid_password(new_password)
+    
+    if not password_validation_result:
+        return jsonify({
+            "status":False,
+            "message":"Please enter strong password !!"
+        }), 400
+
+    user.password_hash = bcrypt.generate_password_hash(new_password).decode("utf-8")
+    db.session.commit()
+
+    return jsonify({
+        "message":"Password updated successfully !!"
+    }), 200
+
+
 
 
 ###############################     Route For Protected Route      ######################################
@@ -662,11 +732,6 @@ def set_user_preference():
 
 
 
-
-
-
-
-
 ################### Search Event ###############################
 
 
@@ -1115,6 +1180,7 @@ def booking_history():
 
             user_booking = {
                 "booking_id":booking.id,
+                "event_thumbnail": booking.event.thumbnail,
                 "event_id":booking.event_id,
                 "event_vendor_id":booking.event.vendor_id,
                 "location_name": booking.event.location_name,
@@ -1132,15 +1198,13 @@ def booking_history():
             "status":True,
             "booking_details":user_bookings,
             "Total Bookings":len(user_bookings)
-        })
+        }), 200
 
     except Exception as e:
         return jsonify({
             "status":False,
             "message": str(e)
         }), 500
-
-
 
 
 ###############################################################     Reviews Section      ###############################################################
@@ -1358,7 +1422,6 @@ def all_reviews():
     except Exception as e:
         print(f"Error in fetching rated reviews: {str(e)}")
         return jsonify({"error": "An error occurred while fetching rated reviews."}), 500
-
 
 
 ###############################     Upload Profile Image      ######################################
