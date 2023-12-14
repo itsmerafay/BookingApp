@@ -3,6 +3,7 @@ from flask import jsonify
 from sqlalchemy import func
 from app import db
 from model import Review
+from datetime import datetime, timedelta
 
 import sys
 sys.dont_write_bytecode = True
@@ -54,3 +55,44 @@ class Ratings:
             return 0
         else:
             return round(float(total_avg_rating), 2)
+
+class DateTimeConversions:
+    
+    @staticmethod
+    def convert_to_datetime(date_str, time_str):
+        return datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %H:%M:%S")
+
+    @staticmethod
+    def calculate_hours_for_duration(start_datetime, end_datetime):
+        return (end_datetime - start_datetime).total_seconds() / 3600
+
+    @staticmethod
+    def calculate_days_involved(start_datetime, end_datetime):
+        return (end_datetime.date() - start_datetime.date()).days + 1
+
+    @staticmethod
+    def calculate_event_hours(start_date, end_date, start_time, end_time, all_day):
+        # If it's an all-day event, set start_time and end_time accordingly
+        if all_day:
+            start_time = "00:00:00"
+            end_time = "23:59:59"
+
+        # Convert start and end dates/times to datetime objects
+        start_datetime = DateTimeConversions.convert_to_datetime(start_date, start_time)
+        end_datetime = DateTimeConversions.convert_to_datetime(end_date, end_time)
+
+        # If it's an all-day event, set end_datetime to 23:59:59 of the end_date
+        if all_day:
+            end_datetime = datetime.combine(end_datetime.date(), datetime.max.time())
+
+        # Calculate total event hours for the specified time duration
+        total_hours_for_duration = DateTimeConversions.calculate_hours_for_duration(start_datetime, end_datetime)
+
+        # Calculate the number of days involved
+        total_days_involved = DateTimeConversions.calculate_days_involved(start_datetime, end_datetime)
+
+        # Use the minimum of total_hours_for_duration and total_days_involved as event_hours
+        event_hours = max(total_hours_for_duration, total_days_involved * 24)
+
+        return event_hours
+

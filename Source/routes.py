@@ -1,5 +1,7 @@
-from sqlalchemy import func, or_, and_
-from dry import Validations, Ratings
+from sqlalchemy import func, or_, and_ 
+from sqlalchemy.orm import joinedload
+from utils import Validations, Ratings, DateTimeConversions
+from random import sample 
 from geopy.distance import geodesic
 from app import app, db, mail
 from flask import request, jsonify, url_for, current_app, send_file, send_from_directory
@@ -628,7 +630,6 @@ def refresh_token():
         return jsonify({"status":False,'message': 'Invalid refresh token'}), 401
 
 
-
 ###############################     Search Events API        ######################################
 
 @app.route("/top_venues/<int:vendor_id>", methods=["GET"])
@@ -729,7 +730,16 @@ def set_user_preference():
 @app.route("/home_events", methods = ["POST"])
 @jwt_required()
 def home_events():
-    random_events = Event.query.order_by
+    random_events = Event.query.order_by(func.random()).limit(10).all()
+    
+    # Distinct and with entities return values as tuple
+    event_types = Event.query.filter.with_entities(Event.event_type).distinct.all()
+    
+    categories = []
+
+    for event_type in event_types:
+        first_element = event_type
+
 
 
 def get_event_info(event, user_location):
@@ -966,6 +976,7 @@ def create_booking():
         all_day = data.get('all_day')
         event_id = data.get('event_id')
         event_type = data.get("event_type")
+    
         if not all([full_name, email, guest_count, start_date, end_date, event_id]):
             return jsonify({
                 "status":False,
@@ -981,7 +992,7 @@ def create_booking():
             end_time = data.get('end_time', "23:59:59")
 
         # Calculate total event hours
-        event_hours = calculate_event_hours(start_date, end_date, start_time, end_time, all_day)
+        event_hours = DateTimeConversions.calculate_event_hours(start_date, end_date, start_time, end_time, all_day)
 
         overlapping_booking = Booking.query.filter(
             (Booking.event_id == event_id) &
@@ -1041,43 +1052,7 @@ def create_booking():
             "message": str(e)
         }), 500
 
-def calculate_event_hours(start_date, end_date, start_time, end_time, all_day):
-    # If it's an all-day event, set start_time and end_time accordingly
-    if all_day:
-        start_time = "00:00:00"
-        end_time = "23:59:59"
 
-    # Convert start and end dates/times to datetime objects
-    start_datetime = convert_to_datetime(start_date, start_time)
-    end_datetime = convert_to_datetime(end_date, end_time)
-
-    # If it's an all-day event, set end_datetime to 23:59:59 of the end_date
-    if all_day:
-        end_datetime = datetime.combine(end_datetime.date(), datetime.max.time())
-
-    # Calculate total event hours for the specified time duration
-    total_hours_for_duration = calculate_hours_for_duration(start_datetime, end_datetime)
-
-    # Calculate the number of days involved
-    total_days_involved = calculate_days_involved(start_datetime, end_datetime)
-
-    # Use the minimum of total_hours_for_duration and total_days_involved as event_hours
-    event_hours = max(total_hours_for_duration, total_days_involved * 24)
-
-    return event_hours
-
-
-def convert_to_datetime(date_str, time_str):
-    return datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %H:%M:%S")
-
-
-
-def calculate_hours_for_duration(start_datetime, end_datetime):
-    return (end_datetime - start_datetime).total_seconds() / 3600
-
-
-def calculate_days_involved(start_datetime, end_datetime):
-    return (end_datetime.date() - start_datetime.date()).days + 1
 
 ###############################    Cancel Booking By User      ######################################
 
@@ -1147,7 +1122,7 @@ def cancel_booking_by_vendor():
                 "status": False,
                 "message": "Unauthorized access: Only vendors can cancel bookings."
             })
-
+        
         booking_id = data.get("booking_id")
 
         booking_to_cancel = Booking.query.filter_by(id=booking_id).first()
@@ -1178,7 +1153,87 @@ def cancel_booking_by_vendor():
         }), 500
 
 
+###############################   Vendor's Events      ######################################
 
+
+
+@app.route("/vendor_events", methods=["GET"])
+@jwt_required()
+def vendor_events():
+    try:
+        data = request.get_json()
+        user = get_current_user()
+
+        if not user:
+            return jsonify({
+                "status": False,
+                "message": "User not authenticated",
+            }), 401
+    
+        if user.role != "vendor":
+            return jsonify({
+                "status": False,
+                "message": "Can only access by the vendor !!"
+            }), 401
+        
+        event_date_str = data.get("event_date_str")
+        if not event_date_str:
+            return jsonify({
+                "status": False,
+                "message": "Date is required!"
+            }), 400
+        
+        event_date = datetime.strptime(event_date_str, "%Y-%m-%d").date()
+
+        # Query to fetch events on the specified date
+        events_on_date = Booking.query.options(joinedload(Booking.event)).filter(
+            (Booking.start_date == event_date) &
+            (Booking.event.has(Event.vendor.has(Vendor.id == user.vendor.id))) &
+            (~Booking.cancelled)
+        ).all()
+
+        # Query to fetch events for the rest of the month # options is for getting the additional data with the main data
+        events_for_month_afterwards = Booking.query.options(joinedload(Booking.event)).filter(
+            (Booking.start_date > event_date) &
+            (Booking.start_date < event_date.replace(day=1) + timedelta(days=32)) &
+            (Booking.event.has(Event.vendor.has(Vendor.id == user.vendor.id))) &
+            (~Booking.cancelled)
+        ).all()
+
+        events_on_date_dict = []
+        for booking in events_on_date:
+            events_dict = {
+                "location_name":booking.event.location_name,
+                "event_thumbnail":booking.event.thumbnail,
+                "user_profile_image":booking.user.profile_image,
+                "other_details":booking.as_dict()
+            }
+            events_on_date_dict.append(events_dict)
+
+
+        events_after_date_dict = []
+        for booking in events_for_month_afterwards:
+            events_dict = {
+                "location_name":booking.event.location_name,
+                "event_thumbnail":booking.event.thumbnail,
+                "user_profile_image":booking.user.profile_image,
+                "other_details":booking.as_dict()
+            }
+            events_after_date_dict.append(events_dict)
+
+        return jsonify({
+            "status": True,
+            "total_events_on_date": events_on_date_dict,
+            "total_length_of_events_on_date": len(events_on_date_dict),
+            "total_events_after_date": events_after_date_dict,
+            "total_length_of_events_after_date": len(events_after_date_dict)
+        })
+
+    except Exception as e:
+        return jsonify({
+            "status": False,
+            "message": str(e)
+        }), 500
 
 
 ###############################   Booking History For User      ######################################
