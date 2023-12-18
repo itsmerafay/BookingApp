@@ -1,5 +1,6 @@
 import re
 from flask import jsonify 
+from geopy.distance import geodesic
 from sqlalchemy import func
 from app import db
 from model import Review
@@ -45,6 +46,7 @@ class Validations:
                 'message':'There should be atleast one special character in your password'
             })
 
+
 class Ratings:
 
     def get_average_rating(event_id):
@@ -55,6 +57,7 @@ class Ratings:
             return 0
         else:
             return round(float(total_avg_rating), 2)
+
 
 class DateTimeConversions:
     
@@ -96,3 +99,94 @@ class DateTimeConversions:
 
         return event_hours
 
+
+class BookingAvailability:
+    def check_availability(booking, current_date_time):
+        start_datetime = datetime.combine(booking.start_date, booking.start_time)
+        end_datetime = datetime.combine(booking.end_date , booking.end_time)
+
+        if start_datetime <= current_date_time <= end_datetime:
+            return True
+        else:
+            return False
+
+
+class Filterations:
+    
+    # Filteration based event location 
+
+    @staticmethod
+    def filter_events_by_location(events_data, user_location):
+        filtered_events = [
+            event for event in events_data
+            if Filterations.calculate_distance(user_location, (event.get("latitude"), event.get("longitude")))
+            ]
+        return filtered_events
+    
+    @staticmethod
+    def calculate_distance(location1, location2):
+        return geodesic(location1, location2).km if location1 and location2 else 0
+
+    # Filteration based cheapest events 
+
+    @staticmethod
+    def filter_events_by_cheapest(events_data):
+        filtered_events = sorted(events_data, key=lambda x: x.get("event_rate",0))
+        return filtered_events    
+
+    # Filteration based filter events by least rated
+
+    @staticmethod
+    def filter_events_by_least_rated(events_data):
+        filtered_events = [
+            event for event in events_data 
+            if Ratings.get_average_rating(event.get("event_id")) <= 4
+        ]
+        
+        return filtered_events
+    
+    # Filteration based filter top rated events
+
+    @staticmethod
+    def filter_events_by_top_rated(events_data):
+        filtered_events = [
+            event for event in events_data
+            if Ratings.get_average_rating(event.get("event_id")) == 5
+        ]
+        return filtered_events
+    
+    @staticmethod
+    def filtered_events_by_trending(events_data):
+        current_datetime = datetime.now()
+        filtered_events = sorted(events_data , key = lambda event : len([
+            booking for booking in event.get("bookings", [])
+            if booking["start_date"] <= current_datetime <= booking["end_date"]
+        ]), reverse = True)
+        return filtered_events
+    
+
+    @staticmethod
+    def apply_filters(events_data , prefered_filter):
+        if prefered_filter.lower() == "my_location":
+            filtered_events = Filterations.filter_events_by_location(events_data)
+            return filtered_events
+        
+        if prefered_filter.lower() == "cheapest":
+            filtered_events = Filterations.filter_events_by_cheapest(events_data)
+            return filtered_events
+        
+        if prefered_filter.lower() == "least_rated":
+            filtered_events = Filterations.filter_events_by_least_rated(events_data)
+            return filtered_events
+
+        if prefered_filter.lower() ==  "top_rated":
+            filtered_events = Filterations.filter_events_by_top_rated(events_data)
+            return filtered_events
+
+        if prefered_filter.lower() == "trending":
+            filtered_events = Filterations.filtered_events_by_trending(events_data)
+            return filtered_events
+
+        else:
+            filtered_events = events_data
+            return filtered_events

@@ -54,7 +54,7 @@ class User(db.Model):
 
 class Vendor(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-        
+    
     full_name = db.Column(db.String(255), nullable=False)
     phone_number = db.Column(db.String(255), nullable=False)
     location = db.Column(db.String(255), nullable=False)
@@ -62,6 +62,7 @@ class Vendor(db.Model):
     # Define the reverse relationship from Vendor to User
     user = db.relationship('User', back_populates='vendor')
     event = db.relationship('Event', back_populates='vendor')
+
     def as_dict(self):
        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
@@ -249,28 +250,3 @@ class Preferences(db.Model):
     vendor_preference = db.Column(db.JSON, nullable = True)
 
     user = db.relationship("User", backref = "preferences")
-
-    def all_events(self):
-        event = Event.query.all()
-        return event
-
-    def my_area(self, latitude, longitude):
-        user_location = (latitude, longitude)
-        nearby_events = []
-
-        all_events = Event.query.filter(Event.latitude.isnot(None) , Event.longitude.isnot(None)).all()                 
-        for event in all_events:
-            event_location = (event.latitude, event.longitude)
-            distance = geodesic(user_location, event_location).kilometers
-            if distance <= 3:
-                nearby_events.append(event)
-        return nearby_events
-
-    def top_rated(self):
-        return Event.query.join(Review).group_by(Event.id).having(func.avg(Review.average_rating) == 5).all()
-
-    def cheapest(self):
-        return Event.query.order_by(Event.rate).all()
-
-    def expensive(self):
-        return Event.query.order_by(Event.rate.desc()).all()
