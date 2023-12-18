@@ -881,7 +881,7 @@ def set_user_preference():
 #         }), 500
 
 
-@app.route("/home_events", methods=["GET"])
+@app.route("/home_events", methods=["POST"])
 @jwt_required()
 def home_events():
     try:
