@@ -137,12 +137,6 @@ class Filterations:
     def calculate_distance(location1, location2):
         return geodesic(location1, location2).km if location1 and location2 else float('inf')
 
-
-    @staticmethod
-    def calculate_distance(location1, location2):
-        return geodesic(location1, location2).km if location1 and location2 else float('inf')
-    # Filteration based cheapest events 
-
     @staticmethod
     def filter_events_by_cheapest(events_data):
         filtered_events = sorted(events_data, key=lambda x: x.get("event_rate", float("inf")))
@@ -200,6 +194,10 @@ class Filterations:
 
         if prefered_filter.lower() == "trending":
             filtered_events = Filterations.filtered_events_by_trending(events_data)
+            return filtered_events
+
+        if prefered_filter.lower() == "all":
+            filtered_events = events_data
             return filtered_events
 
         else:

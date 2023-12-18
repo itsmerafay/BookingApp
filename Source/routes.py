@@ -752,7 +752,7 @@ def home_events():
 
         requested_availability = data.get("is_available")
         user_location = (data.get("latitude"), data.get("longitude"))  # Retrieve user's location from request data
-        max_distance = 3000000000
+        max_distance = 30
 
         event_types = Event.query.with_entities(Event.event_type).distinct().all()
 
@@ -828,7 +828,6 @@ def home_events():
             "status": False,
             "message": str(e)
         }), 500
-
 
 
 
