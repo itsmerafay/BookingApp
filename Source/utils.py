@@ -114,19 +114,33 @@ class BookingAvailability:
 class Filterations:
 
     # Filteration based event location 
-
     @staticmethod
-    def filter_events_by_location(events_data, user_location):
+    def filter_events_by_location(events_data, user_location, max_distance=None):
         filtered_events = [
             event for event in events_data
-            if Filterations.calculate_distance(user_location, (event.get("latitude"), event.get("longitude")))
-            ]
+            if Filterations.is_valid_latitude(event.get("event_latitude")) and
+               Filterations.is_valid_longitude(event.get("event_longitude")) and
+               Filterations.calculate_distance(user_location, (event.get("event_latitude"), event.get("event_longitude"))) <= max_distance
+        ]
         return filtered_events
     
     @staticmethod
-    def calculate_distance(location1, location2):
-        return geodesic(location1, location2).km if location1 and location2 else 0
+    def is_valid_latitude(latitude):
+        return -90 <= latitude <= 90 if latitude is not None else False
 
+    @staticmethod
+    def is_valid_longitude(longitude):
+        return -180 <= longitude <= 180 if longitude is not None else False
+
+
+    @staticmethod
+    def calculate_distance(location1, location2):
+        return geodesic(location1, location2).km if location1 and location2 else float('inf')
+
+
+    @staticmethod
+    def calculate_distance(location1, location2):
+        return geodesic(location1, location2).km if location1 and location2 else float('inf')
     # Filteration based cheapest events 
 
     @staticmethod
@@ -167,9 +181,9 @@ class Filterations:
     
 
     @staticmethod
-    def apply_filters(events_data , prefered_filter):
+    def apply_filters(events_data, prefered_filter, user_location, max_distance=None):
         if prefered_filter.lower() == "my_location":
-            filtered_events = Filterations.filter_events_by_location(events_data)
+            filtered_events = Filterations.filter_events_by_location(events_data, user_location, max_distance)
             return filtered_events
         
         if prefered_filter.lower() == "cheapest":

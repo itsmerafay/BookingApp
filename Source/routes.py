@@ -690,45 +690,52 @@ def bookings_today(vendor_id):
 @app.route("/set_user_preferences", methods = ["POST","PUT"])
 @jwt_required()
 def set_user_preference():
-    data = request.get_json()
-    user = get_current_user()
+    try:
+        data = request.get_json()
+        user = get_current_user()
 
-    if not user:
-        return jsonify({
-            "status":False,
-            "message":"User not authenticated !!"
-        }), 401
+        if not user:
+            return jsonify({
+                "status":False,
+                "message":"User not authenticated !!"
+            }), 401
 
-    if user.role != "user":
+        if user.role != "user":
+            return jsonify({
+                "status":False,
+                "message":"Unauthorized access: Only users can set preferences"
+            })
+        
+        user_preference = Preferences.query.filter_by(user_id = user.id).first()
+
+        event_preference = data.get("event_preferences")
+        vendor_preference = data.get("vendor_preferences")
+
+        if not user_preference:
+            user_preference = Preferences(user_id = user.id , event_preference = event_preference, vendor_preference = vendor_preference)
+            db.session.add(user_preference)
+        else:
+            user_preference.event_preference = Preferences.event_preference
+            vendor_preference.vendor_preference = Preferences.vendor_preference
+
+        db.session.commit()
+
         return jsonify({
-            "status":False,
-            "message":"Unauthorized access: Only users can set preferences"
+            "status":True,
+            "message":"User preference set successfully !!"
         })
-    
-    user_preference = Preferences.query.filter_by(user_id = user.id).first()
 
-    event_preference = data.get("event_preferences")
-    vendor_preference = data.get("vendor_preferences")
+    except Exception as e:
+        return jsonify({
+            "status": False,
+            "message": str(e)
+        }), 500
 
-    if not user_preference:
-        user_preference = Preferences(user_id = user.id , event_preference = event_preference, vendor_preference = vendor_preference)
-        db.session.add(user_preference)
-    else:
-        user_preference.event_preference = Preferences.event_preference
-        vendor_preference.vendor_preference = Preferences.vendor_preference
-
-    db.session.commit()
-
-    return jsonify({
-        "status":True,
-        "message":"User preference set successfully !!"
-    })
 
 
 ################### Home Events ###############################
 
 
-from collections import defaultdict
 
 @app.route("/home_events", methods=["POST"])
 @jwt_required()
@@ -744,6 +751,8 @@ def home_events():
             }), 401
 
         requested_availability = data.get("is_available")
+        user_location = (data.get("latitude"), data.get("longitude"))  # Retrieve user's location from request data
+        max_distance = 3000000000
 
         event_types = Event.query.with_entities(Event.event_type).distinct().all()
 
@@ -786,6 +795,8 @@ def home_events():
                     "event_type": event.event_type,
                     "event_rate": event.rate,
                     "event_address": event.address,
+                    "event_latitude":event.latitude,
+                    "event_longitude":event.longitude,
                     "event_ratings": Ratings.get_average_rating(event.id),
                     "total_bookings": total_bookings  # Include total bookings in the response
                     # Add other necessary event details
@@ -794,7 +805,7 @@ def home_events():
 
             prefered_filter = data.get("prefered_filter")
             if prefered_filter:
-                events_data = Filterations.apply_filters(events_data, prefered_filter)
+                events_data = Filterations.apply_filters(events_data, prefered_filter, user_location, max_distance)
 
                 available_events_sorted = sorted(
                     events_data,
