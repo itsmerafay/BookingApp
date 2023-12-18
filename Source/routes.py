@@ -1,6 +1,6 @@
 from sqlalchemy import func, or_, and_ 
 from sqlalchemy.orm import joinedload
-from utils import Validations, Ratings, DateTimeConversions, BookingAvailability, Filterations
+from utils import Validations, Ratings, DateTimeConversions, BookingAvailability, Filterations, BookingCount
 from random import sample 
 from geopy.distance import geodesic
 from app import app, db, mail
@@ -728,6 +728,8 @@ def set_user_preference():
 ################### Home Events ###############################
 
 
+from collections import defaultdict
+
 @app.route("/home_events", methods=["POST"])
 @jwt_required()
 def home_events():
@@ -761,19 +763,22 @@ def home_events():
                 current_date_time = datetime.now()
 
                 if requested_availability:
-                    for event in events_data:
-                        is_event_available = any(
-                            BookingAvailability.check_availability(booking, current_date_time)
-                            for booking in event.get("bookings", [])
-                            if not booking.get("all_day")
-                        )
+                    is_event_available = any(
+                        BookingAvailability.check_availability(booking, current_date_time)
+                        for booking in event.bookings
+                        if not booking.all_day
+                    )
 
-                        if not is_event_available:
-                            continue 
+                    if not is_event_available:
+                        continue
 
                 # Check the condition from Booking table before adding to the response
                 if any(booking.all_day for booking in event.bookings):
                     continue  # Skip this event if the condition is met
+
+                # Calculate total bookings
+                # total_bookings = sum(1 for booking in event.bookings)
+                total_bookings = sum(1 for booking in event.bookings)
 
                 serialized_event = {
                     "event_id": event.id,
@@ -781,7 +786,8 @@ def home_events():
                     "event_type": event.event_type,
                     "event_rate": event.rate,
                     "event_address": event.address,
-                    "event_ratings":Ratings.get_average_rating(event.id)
+                    "event_ratings": Ratings.get_average_rating(event.id),
+                    "total_bookings": total_bookings  # Include total bookings in the response
                     # Add other necessary event details
                 }
                 events_data.append(serialized_event)

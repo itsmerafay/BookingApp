@@ -3,7 +3,7 @@ from flask import jsonify
 from geopy.distance import geodesic
 from sqlalchemy import func
 from app import db
-from model import Review
+from model import Review, Booking, Event
 from datetime import datetime, timedelta
 
 import sys
@@ -162,6 +162,7 @@ class Filterations:
             booking for booking in event.get("bookings", [])
             if booking["start_date"] <= current_datetime <= booking["end_date"]
         ]), reverse = True)
+        print(len(events_data))
         return filtered_events
     
 
@@ -190,3 +191,14 @@ class Filterations:
         else:
             filtered_events = events_data
             return filtered_events
+
+
+class BookingCount:
+
+    def count_booking(event_id):   
+        try:
+            booking_count = Booking.query.filter_by(event_id=event_id).count()
+
+        except Exception as e:
+            print(f"Error fetching booking count : {e}")
+            return 0
