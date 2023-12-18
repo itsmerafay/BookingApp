@@ -1,6 +1,6 @@
 from sqlalchemy import func, or_, and_ 
 from sqlalchemy.orm import joinedload
-from utils import Validations, Ratings, DateTimeConversions, BookingAvailability
+from utils import Validations, Ratings, DateTimeConversions, BookingAvailability, Filterations
 from random import sample 
 from geopy.distance import geodesic
 from app import app, db, mail
@@ -911,34 +911,9 @@ def home_events():
 
             events_data = []
             for event in events:
-                event_rating = Ratings.get_average_rating(event.id)
-                event_bookings = event.bookings
                 current_date_time = datetime.now()
-                # if requested_availability:
-                #     # Gather events that have availability based on the requested time
-                #     available_events = []
-
-                #     for event in events_data:
-                #         is_event_available = any(
-                #             BookingAvailability.check_availability(booking, current_date_time)
-                #             for booking in event.get("bookings", [])
-                #             if not booking.get("all_day")
-                #         )
-
-                #         if is_event_available:
-                #             available_events.append(event)
-
-                #     available_events_sorted = sorted(
-                #         available_events,
-                #         key=lambda x: x.get("event_ratings", 0),  # Sort based on event_ratings
-                #         reverse=True  # Sort in descending order
-                #     )
-
-                #     if not available_events:
-                #         continue
 
                 if requested_availability:
-                    available_events = []
                     for event in events_data:
                         is_event_available = any(
                             BookingAvailability.check_availability(booking, current_date_time)
@@ -946,17 +921,8 @@ def home_events():
                             if not booking.get("all_day")
                         )
 
-                        if is_event_available:
-                            available_events.append(event)
-                    
-                    available_events_sorted = sorted(
-                        available_events , 
-                        key=lambda x : x.get("event_ratings", 0),
-                        reverse = True
-                    )
-
-                    if not available_events:
-                        continue
+                        if not is_event_available:
+                            continue 
 
                 # Check the condition from Booking table before adding to the response
                 if any(booking.all_day for booking in event.bookings):
@@ -973,8 +939,17 @@ def home_events():
                 }
                 events_data.append(serialized_event)
 
-            events_sorted_by_rating = sorted(events_data, key=lambda x: x.get("event_average_rating", 0), reverse=True)
-            events_by_types[event_type[0]] = events_sorted_by_rating
+            prefered_filter = data.get("prefered_filter")
+            if prefered_filter:
+                events_data = Filterations.apply_filters
+
+            available_events_sorted = sorted(
+                        events_data,
+                        key=lambda x: x.get("event_ratings", 0),
+                        reverse=True
+                )
+            
+            events_by_types[event_type[0]] = available_events_sorted
 
         return jsonify({
             "status": True,
@@ -1391,6 +1366,9 @@ def cancel_booking_by_vendor():
 ###############################   Vendor's Events      ######################################
 
 
+# calender
+# Bookings
+# Events taking place 
 
 @app.route("/vendor_events", methods=["POST"])
 @jwt_required()
@@ -1441,8 +1419,10 @@ def vendor_events():
                 "location_name":booking.event.location_name,
                 "event_thumbnail":booking.event.thumbnail,
                 "user_profile_image":booking.user.profile_image,
-                "other_details":booking.as_dict()
+                # "other_details":booking.as_dict()
             }
+            # print(booking.as_dict())
+
             events_on_date_dict.append(events_dict)
 
 
@@ -1452,7 +1432,7 @@ def vendor_events():
                 "location_name":booking.event.location_name,
                 "event_thumbnail":booking.event.thumbnail,
                 "user_profile_image":booking.user.profile_image,
-                "other_details":booking.as_dict()
+                # "other_details":booking.as_dict()
             }
             events_after_date_dict.append(events_dict)
 
