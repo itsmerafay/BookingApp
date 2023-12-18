@@ -919,18 +919,15 @@ def home_events():
                 #     available_events = []
 
                 #     for event in events_data:
-                #         # Check if any booking for the event is available at the current date and time
                 #         is_event_available = any(
                 #             BookingAvailability.check_availability(booking, current_date_time)
                 #             for booking in event.get("bookings", [])
                 #             if not booking.get("all_day")
                 #         )
 
-                #         # If the event is available, add it to the list of available events
                 #         if is_event_available:
                 #             available_events.append(event)
 
-                #     # Sort the available events by average ratings in descending order
                 #     available_events_sorted = sorted(
                 #         available_events,
                 #         key=lambda x: x.get("event_ratings", 0),  # Sort based on event_ratings
@@ -958,7 +955,7 @@ def home_events():
                         reverse = True
                     )
 
-                    if not available_events_sorted:
+                    if not available_events:
                         continue
 
                 # Check the condition from Booking table before adding to the response
