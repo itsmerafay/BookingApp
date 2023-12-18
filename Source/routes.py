@@ -728,159 +728,6 @@ def set_user_preference():
 ################### Home Events ###############################
 
 
-
-# @app.route("/home_events", methods = ["GET"])
-# @jwt_required()
-# def home_events():
-#     try:
-#         data = request.get_json()
-#         user = get_current_user()
-
-#         if not user:
-#             return jsonify({
-#                 "status":False,
-#                 "message": "User not authenticated !!"
-#             }), 401
-
-#         requested_availability = data.get("is_available")
-        
-#         # Getting distinct event types
-#         event_types = Event.query.with_entities(Event.event_type).distinct().all()
-
-
-#         # Getting 5 random events for distinct event_types
-#         events_by_types = {}
-#         for event_type in event_types:
-#             events = (
-#                     db.session.query(Event, User.profile_image)
-#                     .join(Event.vendor)
-#                     .join(Vendor.user)
-#                     .filter(Event.event_type == event_type[0])
-#                     .order_by(func.random())
-#                     .limit(5)
-#                     .all()
-#                 )
-
-#             events_data = []
-#             for event, profile_image in events:
-#                 print(f"Event : {event}")
-
-#                 event_rating = Ratings.get_average_rating(event.id)
-#                 event_bookings = event.bookings
-#                 current_date_time = datetime.now()
-                
-#                 if requested_availability:
-#                     is_available = False
-#                     for booking in event_bookings:
-#                         if booking.all_day:
-#                             continue
-#                         print(booking.all_day)
-
-#                         if BookingAvailability.check_availability(booking, current_date_time):
-#                             is_available = True
-#                             break
-#                     if not is_available:
-#                         continue 
-
-#                 # conversion in dictionary
-#                 serialized_events = {
-#                         "event_id":event.id,
-#                         "vendor_id":event.vendor_id,
-#                         "event_type":event.event_type,
-#                         "event_Rate":event.rate,
-#                         "event_address":event.address,
-#                         "event_thumbnail":event.thumbnail,
-#                         "event_average_rating":event_rating,
-#                         "event_vendor_profile_image":profile_image
-#                     }
-#                 events_data.append(serialized_events)
-#                 print(f"Event data : {events_data}")
-            
-
-#                 events_sorted_by_rating = sorted(events_data , key=lambda x :x["event_average_rating"], reverse = True)
-                
-#                     # key value for dictionary
-#                 events_by_types[event_type[0]] = events_sorted_by_rating
-
-#         return jsonify({
-#             "status":True,
-#             "events_by_events_types":events_by_types
-#         }), 200
-
-#     except Exception as e:
-#         return jsonify({
-#             "status":False,
-#             "message":str(e)
-#         }), 500
-
-
-# @app.route("/home_events", methods=["GET"])
-# @jwt_required()
-# def home_events():
-#     try:
-#         data = request.get_json()
-#         user = get_current_user()
-
-#         if not user:
-#             return jsonify({
-#                 "status": False,
-#                 "message": "User not authenticated !!"
-#             }), 401
-
-#         requested_availability = data.get("is_available")
-
-#         event_types = Event.query.with_entities(Event.event_type).distinct().all()
-
-#         events_by_types = {}
-#         for event_type in event_types:
-#             events = (
-#                 Event.query.join(Event.vendor)
-#                     .join(Vendor.user)
-#                     .filter(Event.event_type == event_type[0])
-#                     .order_by(func.random())
-#                     .limit(5)
-#                     .all()
-#             )
-
-#             events_data = []
-#             for event in events:
-#                 event_rating = Ratings.get_average_rating(event.id)
-#                 event_bookings = event.bookings
-#                 current_date_time = datetime.now()
-
-#                 if requested_availability:
-#                     is_available = any(
-#                         BookingAvailability.check_availability(booking, current_date_time)
-#                         for booking in event_bookings if not booking.all_day
-#                     )
-#                     if not is_available:
-#                         continue
-
-#                 serialized_event = {
-#                     "event_id": event.id,
-#                     "vendor_id": event.vendor_id,
-#                     "event_type": event.event_type,
-#                     "event_Rate": event.rate,
-#                     "event_address": event.address,
-#                     # Add other necessary event details
-#                 }
-#                 events_data.append(serialized_event)
-
-#             events_sorted_by_rating = sorted(events_data, key=lambda x: x.get("event_average_rating", 0), reverse=True)
-#             events_by_types[event_type[0]] = events_sorted_by_rating
-
-#         return jsonify({
-#             "status": True,
-#             "events_by_events_types": events_by_types
-#         }), 200
-
-#     except Exception as e:
-#         return jsonify({
-#             "status": False,
-#             "message": str(e)
-#         }), 500
-
-
 @app.route("/home_events", methods=["POST"])
 @jwt_required()
 def home_events():
@@ -941,13 +788,16 @@ def home_events():
 
             prefered_filter = data.get("prefered_filter")
             if prefered_filter:
-                events_data = Filterations.apply_filters
+                events_data = Filterations.apply_filters(events_data, prefered_filter)
 
-            available_events_sorted = sorted(
-                        events_data,
-                        key=lambda x: x.get("event_ratings", 0),
-                        reverse=True
+                available_events_sorted = sorted(
+                    events_data,
+                    key=lambda x: x.get("event_rate", float("inf")) 
+                    if x.get("event_rate") is not None else float("inf")
                 )
+
+            else:
+                continue
             
             events_by_types[event_type[0]] = available_events_sorted
 
@@ -1418,6 +1268,7 @@ def vendor_events():
             events_dict = {
                 "location_name":booking.event.location_name,
                 "event_thumbnail":booking.event.thumbnail,
+                "booking_id":booking.id,
                 "user_profile_image":booking.user.profile_image,
                 # "other_details":booking.as_dict()
             }
@@ -1431,6 +1282,7 @@ def vendor_events():
             events_dict = {
                 "location_name":booking.event.location_name,
                 "event_thumbnail":booking.event.thumbnail,
+                "booking_id":booking.id,
                 "user_profile_image":booking.user.profile_image,
                 # "other_details":booking.as_dict()
             }

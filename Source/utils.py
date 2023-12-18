@@ -112,7 +112,7 @@ class BookingAvailability:
 
 
 class Filterations:
-    
+
     # Filteration based event location 
 
     @staticmethod
@@ -131,8 +131,8 @@ class Filterations:
 
     @staticmethod
     def filter_events_by_cheapest(events_data):
-        filtered_events = sorted(events_data, key=lambda x: x.get("event_rate",0))
-        return filtered_events    
+        filtered_events = sorted(events_data, key=lambda x: x.get("event_rate", float("inf")))
+        return filtered_events
 
     # Filteration based filter events by least rated
 
