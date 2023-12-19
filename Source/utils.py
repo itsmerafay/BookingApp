@@ -111,12 +111,110 @@ class BookingAvailability:
             return False
 
 
-class Filterations:
+# class Filterations:
 
+#     @staticmethod
+#     def filter_events_by_all(events_data):
+#         filterered_events = sorted(events_data , key=lambda x: x.get("event_ratings", 0), reverse = True)
+#         return filterered_events
+
+#     @staticmethod
+#     def filter_events_by_location(events_data, user_location, max_distance=3):
+#         filtered_events = [
+#             event for event in events_data
+#             if Filterations.is_valid_latitude(event.get("event_latitude")) and
+#             Filterations.is_valid_longitude(event.get("event_longitude")) and
+#             Filterations.calculate_distance(user_location, (event.get("event_latitude"), event.get("event_longitude"))) <= max_distance
+#         ]
+#         filtered_events = sorted(filtered_events, key=lambda x: x.get("event_ratings", 0), reverse=True)
+#         return filtered_events
+    
+#     @staticmethod
+#     def calculate_distance(location1, location2):
+#         return geodesic(location1, location2).km if location1 and location2 else float('inf')
+
+#     @staticmethod
+#     def is_valid_latitude(latitude):
+#         return -90 <= latitude <= 90 if latitude is not None else False
+
+#     @staticmethod
+#     def is_valid_longitude(longitude):
+#         return -180 <= longitude <= 180 if longitude is not None else False
+
+#     @staticmethod
+#     def filter_events_by_cheapest(events_data):
+#         filtered_events = sorted(events_data, key=lambda x: x.get("event_rate", float("inf")))
+#         return filtered_events
+        
+#     @staticmethod
+#     def filter_events_by_expensive(events_data):
+#         filtered_events = sorted(events_data, key=lambda x: x.get("event_rate", float("-inf")), reverse=True)
+#         return filtered_events
+
+#     @staticmethod
+#     def filter_events_by_least_rated(events_data):
+#         filtered_events = [
+#             event for event in events_data 
+#             if 0 < Ratings.get_average_rating(event.get("event_id")) < 5
+#         ]
+#         filtered_events = sorted(filtered_events, key=lambda x: x.get("event_ratings", 5))
+#         return filtered_events
+
+#     @staticmethod
+#     def filter_events_by_top_rated(events_data):
+#         filtered_events = [
+#             event for event in events_data
+#             if Ratings.get_average_rating(event.get("event_id")) == 5
+#         ]
+#         filtered_events = sorted(filtered_events, key=lambda x: x.get("event_ratings", 0), reverse=True)
+#         return filtered_events
+
+#     @staticmethod
+#     def apply_filters(events_data, prefered_filter, user_location, max_distance=None):
+#         if prefered_filter.lower() == "my_location":
+#             filtered_events = Filterations.filter_events_by_location(events_data, user_location, max_distance)
+#             return filtered_events
+        
+#         if prefered_filter.lower() == "cheapest":
+#             filtered_events = Filterations.filter_events_by_cheapest(events_data)
+#             return filtered_events
+
+#         if prefered_filter.lower() == "expensive":
+#             filtered_events = Filterations.filter_events_by_expensive(events_data)
+#             return filtered_events
+
+#         if prefered_filter.lower() == "least_rated":
+#             filtered_events = Filterations.filter_events_by_least_rated(events_data)
+#             return filtered_events
+
+#         if prefered_filter.lower() == "top_rated":
+#             filtered_events = Filterations.filter_events_by_top_rated(events_data)
+#             return filtered_events
+
+#         if prefered_filter.lower() == "all":
+#             filtered_events = Filterations.filter_events_by_all(events_data)
+#             return filtered_events
+
+#         else:
+#             filtered_events = events_data
+#             return filtered_events
+
+
+class Filterations:
+        
     @staticmethod
     def filter_events_by_all(events_data):
         filterered_events = sorted(events_data , key=lambda x: x.get("event_ratings", 0), reverse = True)
         return filterered_events
+
+
+    @staticmethod
+    def filter_events_by_event_preferences(events_data, event_preferences):
+        filtered_events = [
+            event for event in events_data
+            if event.get("event_type") in event_preferences
+        ]
+        return filtered_events
 
     @staticmethod
     def filter_events_by_location(events_data, user_location, max_distance=3):
@@ -160,6 +258,17 @@ class Filterations:
         filtered_events = sorted(filtered_events, key=lambda x: x.get("event_ratings", 5))
         return filtered_events
 
+
+    @staticmethod
+    def filtered_events_by_trending(events_data):
+        current_datetime = datetime.now()
+        filtered_events = sorted(events_data , key = lambda event : len([
+            booking for booking in event.get("bookings", [])
+            if booking["start_date"] <= current_datetime <= booking["end_date"]
+        ]), reverse = True)
+        print(len(events_data))
+        return filtered_events
+
     @staticmethod
     def filter_events_by_top_rated(events_data):
         filtered_events = [
@@ -190,13 +299,17 @@ class Filterations:
         if prefered_filter.lower() == "top_rated":
             filtered_events = Filterations.filter_events_by_top_rated(events_data)
             return filtered_events
+        
+        if prefered_filter.lower() == "trending":
+            filtered_events = Filterations.filtered_events_by_trending(events_data)
+            return filtered_events
 
         if prefered_filter.lower() == "all":
             filtered_events = Filterations.filter_events_by_all(events_data)
             return filtered_events
 
         else:
-            filtered_events = events_data
+            filtered_events = Filterations.filter_events_by_all(events_data)
             return filtered_events
 
 
