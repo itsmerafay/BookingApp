@@ -565,7 +565,8 @@ def get_event(event_id):
             "vendor_id": event.vendor_id,  # You can include vendor details if needed
             "location_name":event.location_name,
             "longitude":event.longitude,
-            "latitude":event.latitude
+            "latitude":event.latitude,
+            "event_icon":event.event_icon
         }
         # Fetch vendor details
         if event.vendor:
@@ -1320,8 +1321,8 @@ def create_booking():
         all_day = data.get('all_day')
         event_id = data.get('event_id')
         event_type = data.get("event_type")
-    
-        if not all([full_name, email, guest_count, start_date, end_date, event_id]):
+
+        if not all([full_name, email, guest_count, start_date, end_date, event_id,event_type]):
             return jsonify({
                 "status":False,
                 "message": "All necessary fields must be set !!"
@@ -1359,6 +1360,12 @@ def create_booking():
         tax_percentage = 0.15
         total_price = subtotal + (subtotal * tax_percentage)
 
+        if event_type:
+            event_icon_filename = f"{event_type.lower()}_icon_{uuid.uuid4()}.png"
+            event_icon_path = os.path.join(app.config["EVENT_ICON_FOLDER"], event_icon_filename)
+            if os.path.exists(event_icon_path):
+                booking.event_icon = event_icon_filename
+
         # Create and save the booking
         booking = Booking(
             user_id=user.id,
@@ -1372,8 +1379,10 @@ def create_booking():
             end_time=end_time,
             all_day=all_day,
             event_id=event_id,
-            event_type=event_type
+            event_type=event_type,
+            event_icon = event_icon_filename
         )
+
 
         db.session.add(booking)
         db.session.commit()
@@ -1381,12 +1390,12 @@ def create_booking():
         return jsonify({
             "status":True,
             "Summary": {
-                "Event Hours": f"{event_hours} Hours",
-                "Guests": f"{guest_count}",
-                "Vendor Rate": f"{event.rate}$",
-                "Subtotal": f"{subtotal}$",
-                "Taxes (15%)": "15%",
-                "Total Price": f"{total_price} $"
+                "event_hours": f"{event_hours} Hours",
+                "guest_count": f"{guest_count}",
+                "event_rate": f"{event.rate}$",
+                "subtotal": f"{subtotal}$",
+                "tax": "15%",
+                "total_price": f"{total_price} $"
             }
         })
 
@@ -1395,6 +1404,60 @@ def create_booking():
             "status":False,
             "message": str(e)
         }), 500
+
+
+
+
+###############################   Upload Event Icon   ######################################
+
+@app.route("/upload_event_icon", methods = ["POST"])
+@jwt_required()
+def upload_event_icon():
+    user = get_current_user()
+    UPLOAD_FOLDER = "static"
+    EVENT_ICON_SUBFOLDER = "event_icons"
+    app.config["EVENT_ICON_FOLDER"] = os.path.join(UPLOAD_FOLDER, EVENT_ICON_SUBFOLDER)
+    data = request.get_json()
+    event_type = data.get("event_type")
+    event_icon = data.get("event_icon")
+
+    try :
+        if user.role != "vendor":
+            return jsonify({
+                "status":False,
+                "message":"Authorization error , only vendor can upload an icon !!"
+            }), 401
+        
+        if not event_type or not event_icon:
+            return jsonify({
+                "status":False,
+                "message":"Event type or icon not provided !!"
+            }), 400
+        
+        event_icon_bytes = base64.b64decode(event_icon)
+        event_icon_filename = f"{event_type.lower()}_icon_{uuid.uuid4()}.png"
+        event_icon_path = os.path.join(app.config["EVENT_ICON_FOLDER"], event_icon_filename)
+
+        if not os.path.exists(app.config["EVENT_ICON_FOLDER"]):
+            os.makedirs(app.config["EVENT_ICON_FOLDER"])
+
+        with open(event_icon_path, "wb") as icon_file:
+            icon_file.write(event_icon_bytes)
+
+        return jsonify({
+            "status":True,
+            "message":"Event icon created successfully !!",
+            "file_path":event_icon_path,
+        }), 200
+
+        
+    except Exception as e:
+        return jsonify({
+            "status":False,
+            "message": str(e)
+        }), 500
+
+
 
 
 
@@ -1435,6 +1498,7 @@ def cancel_booking():
             "status":True,
             "message":"Booking cancelled successfully !!",
             "event_id":Booking.event_id,
+            # "event_icon":Booking.even,
             "vendor_id":Booking.event.vendor.id
         })
     
@@ -1552,6 +1616,7 @@ def vendor_events():
             events_dict = {
                 "location_name":booking.event.location_name,
                 "event_thumbnail":booking.event.thumbnail,
+                "event_icon":booking.event_icon,
                 "booking_id":booking.id,
                 "user_profile_image":booking.user.profile_image,
                 # "other_details":booking.as_dict()
@@ -1566,6 +1631,7 @@ def vendor_events():
             events_dict = {
                 "location_name":booking.event.location_name,
                 "event_thumbnail":booking.event.thumbnail,
+                "event_icon":booking.event_icon,
                 "booking_id":booking.id,
                 "user_profile_image":booking.user.profile_image,
                 # "other_details":booking.as_dict()
@@ -1839,6 +1905,148 @@ def pending_reviews():
 ##############################     All Rated Reviews      ####################################
 
 
+# @app.route('/all_reviews', methods=["GET"])
+# @jwt_required()
+# def all_reviews():
+#     try:
+#         email = get_jwt_identity()
+#         user = User.query.filter_by(email=email).first()
+
+#         if user.role == "user":
+#             # Fetch all reviews given by the user
+#             reviews = (
+#                 db.session.query(Review, Event, Vendor)
+#                 .join(Event, Review.event_id == Event.id)
+#                 .join(Vendor, Event.vendor_id == Vendor.id)
+#                 .filter(Review.user_id == user.id)
+#                 .all()
+#             )
+#         elif user.role == "vendor":
+#             reviews = (
+#                 db.session.query(Review, Event, Vendor)
+#                 .join(Event, Review.event_id == Event.id)
+#                 .join(Vendor, Event.vendor_id == Vendor.id)
+#                 .filter(Event.vendor_id == user.vendor_id)
+#                 .all()
+#             )
+#         else:
+#             return jsonify({"message": "Invalid user role."}), 400
+
+#         if not reviews:
+#             return jsonify({"message": "Reviews Not Found !!"}), 400
+
+#         review_data = []
+
+#         for review, event, vendor in reviews:
+#             vendor_user = User.query.filter_by(vendor_id=vendor.id).first()
+#             vendor_profile_image = getattr(vendor_user, 'profile_image', None)
+
+#             review_data.append({
+#                 "event_id": event.id,
+#                 "event_thumbnail": event.thumbnail,
+#                 "event_name": event.location_name,
+#                 "event_rate": event.rate,
+#                 "event_address": event.address,
+#                 "vendor_profile_image": vendor_profile_image,
+#                 "user_review": review.user_review,
+#                 "cleanliness_rating": review.cleanliness_rating,
+#                 "price_value_rating": review.price_value_rating,
+#                 "service_value_rating": review.service_value_rating,
+#                 "location_rating": review.location_rating
+#                 # ""
+#             })
+
+#         return jsonify({
+#             "rated_reviews": review_data,
+#             "total_rated_reviews": len(review_data)
+#         })
+    
+#     except Exception as e:
+#         print(f"Error in fetching rated reviews: {str(e)}")
+#         return jsonify({"error": "An error occurred while fetching rated reviews."}), 500
+
+# @app.route('/all_reviews', methods=["GET"])
+# @jwt_required()
+# def all_reviews():
+#     try:
+#         email = get_jwt_identity()
+#         user = User.query.filter_by(email=email).first()
+
+#         if user.role == "user":
+#             # Fetch all reviews given by the user
+#             reviews = (
+#                 db.session.query(Review, Event, Vendor)
+#                 .join(Event, Review.event_id == Event.id)
+#                 .join(Vendor, Event.vendor_id == Vendor.id)
+#                 .filter(Review.user_id == user.id)
+#                 .all()
+#             )
+#         elif user.role == "vendor":
+#             reviews = (
+#                 db.session.query(Review, Event, Vendor)
+#                 .join(Event, Review.event_id == Event.id)
+#                 .join(Vendor, Event.vendor_id == Vendor.id)
+#                 .filter(Event.vendor_id == user.vendor_id)
+#                 .all()
+#             )
+#         else:
+#             return jsonify({"message": "Invalid user role."}), 400
+
+#         if not reviews:
+#             return jsonify({"message": "Reviews Not Found !!"}), 400
+
+#         review_data = []
+
+#         for review, event, vendor in reviews:
+#             vendor_user = User.query.filter_by(vendor_id=vendor.id).first()
+#             vendor_profile_image = getattr(vendor_user, 'profile_image', None)
+
+#             # Fetch all bookings for this event
+#             bookings = Booking.query.filter_by(event_id=event.id).all()
+
+#             # Calculate total amount earned for the event
+#             total_amount = 0
+#             for booking in bookings:
+#                 # Calculate event hours for each booking
+#                 event_hours = DateTimeConversions.calculate_event_hours(
+#                     booking.start_date, booking.end_date,
+#                     booking.start_time, booking.end_time,
+#                     booking.all_day
+#                 )
+
+#                 subtotal = event.rate * event_hours
+#                 tax_percentage = 0.15
+#                 total_price = subtotal + (subtotal * tax_percentage)
+#                 total_amount += total_price
+
+#             review_data.append({
+#                 "event_id": event.id,
+#                 "event_thumbnail": event.thumbnail,
+#                 "event_name": event.location_name,
+#                 "event_rate": event.rate,
+#                 "total_event_hours":event_hours,
+#                 "total_amount_earned_by_the_vendor": total_amount,
+#                 "event_address": event.address,
+#                 "event_icon":booking.event_icon,
+#                 "vendor_profile_image": vendor_profile_image,
+#                 "user_review": review.user_review,
+#                 "cleanliness_rating": review.cleanliness_rating,
+#                 "price_value_rating": review.price_value_rating,
+#                 "service_value_rating": review.service_value_rating,
+#                 "location_rating": review.location_rating
+#             })
+
+#         return jsonify({
+#             "rated_reviews": review_data,
+#             "total_rated_reviews": len(review_data)
+#         })
+    
+#     except Exception as e:
+#         print(f"Error in fetching rated reviews: {str(e)}")
+#         return jsonify({"error": "An error occurred while fetching rated reviews."}), 500
+
+
+
 @app.route('/all_reviews', methods=["GET"])
 @jwt_required()
 def all_reviews():
@@ -1875,12 +2083,40 @@ def all_reviews():
             vendor_user = User.query.filter_by(vendor_id=vendor.id).first()
             vendor_profile_image = getattr(vendor_user, 'profile_image', None)
 
+            # Fetch all bookings for this event
+            bookings = Booking.query.filter_by(event_id=event.id).all()
+
+            # Calculate total amount earned for the event
+            total_amount = 0
+            for booking in bookings:
+                # Calculate event hours for each booking
+                event_hours = DateTimeConversions.calculate_event_hours(
+                    booking.start_date, booking.end_date,
+                    booking.start_time, booking.end_time,
+                    booking.all_day
+                )
+
+                subtotal = event.rate * event_hours
+                print(f"Subtotal : {subtotal}")
+                tax_percentage = 0.15
+                tax_amount = subtotal * tax_percentage
+                print(f"tax amount : {tax_amount}")
+                total_price = subtotal + tax_amount
+                total_amount += total_price
+                print(f"Total amount : {total_amount}")
+
+                print(total_amount)
+
             review_data.append({
                 "event_id": event.id,
                 "event_thumbnail": event.thumbnail,
                 "event_name": event.location_name,
                 "event_rate": event.rate,
+                "total_event_hours": event_hours,
+                "total_amount_earned_by_the_vendor": total_amount,
+                "tax_amount": tax_amount, 
                 "event_address": event.address,
+                "event_icon": booking.event_icon,
                 "vendor_profile_image": vendor_profile_image,
                 "user_review": review.user_review,
                 "cleanliness_rating": review.cleanliness_rating,
@@ -1897,6 +2133,7 @@ def all_reviews():
     except Exception as e:
         print(f"Error in fetching rated reviews: {str(e)}")
         return jsonify({"error": "An error occurred while fetching rated reviews."}), 500
+
 
 
 ###############################     Upload Profile Image      ######################################

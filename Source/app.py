@@ -26,6 +26,8 @@ app.config['MAIL_USERNAME'] = 'abdulrafayatiq.03@gmail.com'
 app.config['MAIL_PASSWORD'] = 'todp ilxm pjdf wdwa'
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
+app.config["EVENT_ICON_FOLDER"] = "static/event_icons"
+
 
 # app.config['WKHTMLTOPDF_PATH'] = 'C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe' # specify the path to wkhtmltopdf here
 # )
