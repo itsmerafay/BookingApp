@@ -354,6 +354,29 @@ def create_event():
 
 ###############################     Get My Events     ######################################
 
+# @app.route("/get_my_events", methods=["GET"])
+# @jwt_required()
+# def getmyevents():
+#     try:
+#         user = get_current_user()
+#         vendor = user.vendor
+#         events = Event.query.filter_by(vendor=vendor).all()
+#         print(events,"ll")
+#         events_data = []
+
+#         for event in events:
+#             event_dict = event.as_dict()
+#             event_dict['total_bookings'] = event.get_total_bookings()
+#             event_dict['total_bookings_value'] = event.earnings_per_month()  # Total earnings for the current month
+#             event_dict["event_icon"] = booking.event_icon
+#             events_data.append(event_dict)
+
+#         return jsonify({"status": True, "events": events_data})
+#     except Exception as e:
+#         print(e)
+#         return jsonify({"status": False, "events": []})
+
+
 @app.route("/get_my_events", methods=["GET"])
 @jwt_required()
 def getmyevents():
@@ -361,19 +384,31 @@ def getmyevents():
         user = get_current_user()
         vendor = user.vendor
         events = Event.query.filter_by(vendor=vendor).all()
-        print(events,"ll")
+        print(events, "ll")
         events_data = []
 
         for event in events:
             event_dict = event.as_dict()
             event_dict['total_bookings'] = event.get_total_bookings()
             event_dict['total_bookings_value'] = event.earnings_per_month()  # Total earnings for the current month
+
+            # Fetch bookings associated with this event
+            bookings = Booking.query.filter_by(event_id=event.id).all()
+
+            # Access the event_icon from the first booking associated with this event
+            event_icon = None
+            if bookings:
+                event_icon = bookings[0].event_icon
+
+            event_dict["event_icon"] = event_icon
             events_data.append(event_dict)
 
         return jsonify({"status": True, "events": events_data})
     except Exception as e:
         print(e)
         return jsonify({"status": False, "events": []})
+
+
 
 
 ###############################     Update My Event     ######################################
@@ -633,38 +668,80 @@ def refresh_token():
 
 ###############################     Search Events API        ######################################
 
+# @app.route("/top_venues/<int:vendor_id>", methods=["GET"])
+# def top_venues(vendor_id):
+
+#     try:
+#         # Get the total number of bookings for the vendor
+#         total_bookings = (db.session.query(func.count(Booking.id))
+#                         .join(Event)
+#                         .filter(Event.vendor_id == vendor_id)
+#                         .scalar())
+#         venue_bookings = (db.session.query(Event.location_name, Event.thumbnail, func.count(Booking.id).label('booking_count'))
+#                         .join(Event)
+#                         .filter(Event.vendor_id == vendor_id)
+#                         .group_by(Event.location_name, Event.thumbnail)
+#                         .order_by(func.count(Booking.id).desc())
+#                         .all())
+
+#         # Calculate the percentage for each venue
+#         venues_list = []
+
+#         for location_name, thumbnail, count in venue_bookings:
+#             percentage = (count / total_bookings) * 100 if total_bookings > 0 else 0
+#             venues_list.append({
+#                 "venue": location_name,
+#                 "thumbnail": thumbnail,
+#                 "bookings": count,
+#                 "percentage": round(percentage, 2)
+#             })
+
+
+#         return jsonify({"status": True, "top_venues": venues_list})
+#     except Exception as e:
+#         print(e)
+#         return jsonify({"status": False, "error": str(e)})
+
+
+
 @app.route("/top_venues/<int:vendor_id>", methods=["GET"])
 def top_venues(vendor_id):
     try:
-        # Get the total number of bookings for the vendor
         total_bookings = (db.session.query(func.count(Booking.id))
                         .join(Event)
                         .filter(Event.vendor_id == vendor_id)
                         .scalar())
-        venue_bookings = (db.session.query(Event.location_name, Event.thumbnail, func.count(Booking.id).label('booking_count'))
-                        .join(Event)
-                        .filter(Event.vendor_id == vendor_id)
-                        .group_by(Event.location_name, Event.thumbnail)
-                        .order_by(func.count(Booking.id).desc())
-                        .all())
 
-        # Calculate the percentage for each venue
+        venue_bookings = (db.session.query(
+                                Event.location_name,
+                                Event.thumbnail,
+                                func.count(Booking.id).label('booking_count'),
+                                Booking.event_icon
+                            )
+                            .join(Booking, Event.id == Booking.event_id)
+                            .filter(Event.vendor_id == vendor_id)
+                            .group_by(Event.location_name, Event.thumbnail, Booking.event_icon)
+                            .order_by(func.count(Booking.id).desc())
+                            .all()
+                        )
+
         venues_list = []
 
-        for location_name, thumbnail, count in venue_bookings:
+        for location_name, thumbnail, count, event_icon in venue_bookings:
             percentage = (count / total_bookings) * 100 if total_bookings > 0 else 0
             venues_list.append({
                 "venue": location_name,
                 "thumbnail": thumbnail,
                 "bookings": count,
-                "percentage": round(percentage, 2)
+                "percentage": round(percentage, 2),
+                "event_icon": event_icon
             })
-
 
         return jsonify({"status": True, "top_venues": venues_list})
     except Exception as e:
         print(e)
         return jsonify({"status": False, "error": str(e)})
+
 
 
 @app.route("/bookings_today/<int:vendor_id>", methods=["GET"])
@@ -682,7 +759,6 @@ def bookings_today(vendor_id):
     except Exception as e:
         print(e)
         return jsonify({"status": False, "error": str(e)})
-
 
 
 
@@ -823,6 +899,7 @@ def home_events():
             "status": False,
             "message": str(e)
         }), 500
+
 
 
 
@@ -1655,7 +1732,7 @@ def vendor_events():
 
 ###############################   Booking History For User      ######################################
 
-@app.route("/booking_history", methods = ["GET"])
+@app.route("/booking_history", methods = ["POST"])
 @jwt_required()
 def booking_history():
     try:
@@ -1722,6 +1799,7 @@ def booking_history():
             user_booking = {
                 "booking_id":booking.id,
                 "event_thumbnail": booking.event.thumbnail,
+                "event_icon":booking.event_icon,
                 "event_id":booking.event_id,
                 "event_vendor_id":booking.event.vendor_id,
                 "location_name": booking.event.location_name,
@@ -1882,13 +1960,14 @@ def pending_reviews():
                     pending_reviews_info.append({
                         "booking_id":booking.id,
                         "location_name":booking.event.location_name,
+                        "event_icon":booking.event_icon,
                         "event_id": event.id,
                         "event_rate": event_rate,
                         "event_type": event_type,
                         "event_address": event_address,
                         "event_thumbnail": event_thumbnail,
                         # "custom_event_name": custom_event_name,
-                        "booking_date": booking.start_date.isoformat(),
+                        "booking_date": booking.start_date.isoformat(), # date format in georgian calender
                         "booking_time": booking.start_time.isoformat()
                     })
 
