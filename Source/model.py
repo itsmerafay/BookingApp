@@ -147,7 +147,7 @@ class Booking(db.Model):
     event_type = db.Column(db.String(255), nullable = True)
     created_at = db.Column(db.DateTime, default = datetime.utcnow)
     cancelled = db.Column(db.Boolean, default = False)
-    event_icon = db.Column(db.String(255), nullable = True)
+    # event_icon = db.Column(db.String(255), nullable = True)
 
     # bookings instead of booking bcz of many relations
     # backref used is bcz of bi-directional relationship 
