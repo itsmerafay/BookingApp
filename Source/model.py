@@ -28,6 +28,7 @@ class User(db.Model):
         self.access_token = None
         self.role = role
 
+
     def as_dict(self):
        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
@@ -183,20 +184,21 @@ class Booking(db.Model):
                 event_dict[c.name] = value
         return event_dict
     def booking_today(self):
-        booking_dict = {}
-        for c in self.__table__.columns:
-            value = getattr(self, c.name)
-            if isinstance(value, (date, time)):
-                # Convert date/time to string
-                booking_dict[c.name] = value.isoformat()
-            else:
-                booking_dict[c.name] = value
+            booking_dict = {}
+            for c in self.__table__.columns:
+                value = getattr(self, c.name)
+                if isinstance(value, (date, time)):
+                    # Convert date/time to string
+                    booking_dict[c.name] = value.isoformat()
+                else:
+                    booking_dict[c.name] = value
 
-        # Include event details
-        if self.event:
-            booking_dict['event'] = self.event.as_dict()
-         
-        return booking_dict
+            # Include event details
+            if self.event:
+                event_details = self.event.as_dict()
+                booking_dict['event'] = {**event_details, 'event_type': self.event.event_type}
+            
+            return booking_dict
 
     def calculate_total_price(self):
         # Calculate the duration in hours
