@@ -377,15 +377,37 @@ def create_event():
 #         return jsonify({"status": False, "events": []})
 
 
+# @app.route("/get_my_events", methods=["GET"])
+# @jwt_required()
+# def getmyevents():
+#     try:
+#         user = get_current_user()
+#         vendor = user.vendor
+#         print(vendor)
+#         events = Event.query.filter_by(vendor=vendor).all()
+#         print(events, "ll")
+#         events_data = []
+
+#         for event in events:
+#             event_dict = event.as_dict()
+#             event_dict['total_bookings'] = event.get_total_bookings()
+#             event_dict['total_bookings_value'] = event.earnings_per_month()  # Total earnings for the current month
+
+#             events_data.append(event_dict)
+
+#         return jsonify({"status": True, "events": events_data})
+#     except Exception as e:
+#         print(e)
+#         return jsonify({"status": False, "events": []})
+
+
 @app.route("/get_my_events", methods=["GET"])
 @jwt_required()
 def getmyevents():
     try:
         user = get_current_user()
         vendor = user.vendor
-        print(vendor)
         events = Event.query.filter_by(vendor=vendor).all()
-        print(events, "ll")
         events_data = []
 
         for event in events:
@@ -393,14 +415,15 @@ def getmyevents():
             event_dict['total_bookings'] = event.get_total_bookings()
             event_dict['total_bookings_value'] = event.earnings_per_month()  # Total earnings for the current month
 
+            # Replace event_type with the event_type from Booking
+            event_dict['event_type'] = event.bookings[0].event_type if event.bookings else None
+
             events_data.append(event_dict)
 
         return jsonify({"status": True, "events": events_data})
     except Exception as e:
         print(e)
         return jsonify({"status": False, "events": []})
-
-
 
 
 ###############################     Update My Event     ######################################
@@ -555,6 +578,10 @@ def booking_details(booking_id):
     except Exception as e:
         print(e)
         return jsonify({"status": False, "error": str(e)})
+
+
+
+
 
 
 @app.route("/get_event/<int:event_id>", methods = ["GET"])
@@ -1702,6 +1729,7 @@ def vendor_events():
                 "location_name":booking.event.location_name,
                 "event_thumbnail":booking.event.thumbnail,
                 "event_icon":booking.event_icon,
+                "booking_event_type":booking.event_type,
                 "booking_id":booking.id,
                 "user_profile_image":booking.user.profile_image,
                 # "other_details":booking.as_dict()
@@ -1962,7 +1990,8 @@ def pending_reviews():
                         "event_thumbnail": event_thumbnail,
                         # "custom_event_name": custom_event_name,
                         "booking_date": booking.start_date.isoformat(), # date format in georgian calender
-                        "booking_time": booking.start_time.isoformat()
+                        "booking_time": booking.start_time.isoformat(),
+                        "event_type":booking.event_type,
                     })
 
         return jsonify({
@@ -1978,6 +2007,98 @@ def pending_reviews():
 ##############################     All Rated Reviews      ####################################
 
 
+# @app.route('/all_reviews', methods=["GET"])
+# @jwt_required()
+# def all_reviews():
+#     try:
+#         email = get_jwt_identity()
+#         user = User.query.filter_by(email=email).first()
+
+#         if user.role == "user":
+#             # Fetch all reviews given by the user
+#             reviews = (
+#                 db.session.query(Review, Event, Vendor)
+#                 .join(Event, Review.event_id == Event.id)
+#                 .join(Vendor, Event.vendor_id == Vendor.id)
+#                 .filter(Review.user_id == user.id)
+#                 .all()
+#             )
+#         elif user.role == "vendor":
+#             reviews = (
+#                 db.session.query(Review, Event, Vendor)
+#                 .join(Event, Review.event_id == Event.id)
+#                 .join(Vendor, Event.vendor_id == Vendor.id)
+#                 .filter(Event.vendor_id == user.vendor_id)
+#                 .all()
+#             )
+#         else:
+#             return jsonify({"message": "Invalid user role."}), 400
+
+#         if not reviews:
+#             return jsonify({"message": "Reviews Not Found !!"}), 400
+
+#         review_data = []
+
+#         for review, event, vendor in reviews:
+#             vendor_user = User.query.filter_by(vendor_id=vendor.id).first()
+#             vendor_profile_image = getattr(vendor_user, 'profile_image', None)
+#             review_user = User.query.get(review.user_id)
+#             user_profile_image = getattr(review_user ,"profile_image", None)
+#             print(review_user)
+
+#             # Fetch all bookings for this event
+#             bookings = Booking.query.filter_by(event_id=event.id).all()
+
+#             # Calculate total amount earned for the event
+#             total_amount = 0
+#             for booking in bookings:
+#                 # Calculate event hours for each booking
+#                 event_hours = DateTimeConversions.calculate_event_hours(
+#                     booking.start_date, booking.end_date,
+#                     booking.start_time, booking.end_time,
+#                     booking.all_day
+#                 )
+
+#                 subtotal = event.rate * event_hours
+#                 print(f"Subtotal : {subtotal}")
+#                 tax_percentage = 0.15
+#                 tax_amount = subtotal * tax_percentage
+#                 print(f"tax amount : {tax_amount}")
+#                 total_price = subtotal + tax_amount
+#                 total_amount += total_price
+#                 print(f"Total amount : {total_amount}")
+
+#                 print(total_amount)
+
+#             review_data.append({
+#                 "event_id": event.id,
+#                 "event_thumbnail": event.thumbnail,
+#                 "event_name": event.location_name,
+#                 "event_rate": event.rate,
+#                 "total_event_hours": event_hours,
+#                 "total_amount_earned_by_the_vendor": total_amount,
+#                 "tax_amount": tax_amount, 
+#                 "event_address": event.address,
+#                 "user_profile_image":user_profile_image,
+#                 # "event_icon": booking.event_icon,
+#                 "vendor_profile_image": vendor_profile_image,
+#                 "user_review": review.user_review,
+#                 "cleanliness_rating": review.cleanliness_rating,
+#                 "price_value_rating": review.price_value_rating,
+#                 "service_value_rating": review.service_value_rating,
+#                 "location_rating": review.location_rating
+#             })
+
+#         return jsonify({
+#             "rated_reviews": review_data,
+#             "total_rated_reviews": len(review_data)
+#         })
+    
+#     except Exception as e:
+#         print(f"Error in fetching rated reviews: {str(e)}")
+#         return jsonify({"error": "An error occurred while fetching rated reviews."}), 500
+
+
 @app.route('/all_reviews', methods=["GET"])
 @jwt_required()
 def all_reviews():
@@ -1986,7 +2107,6 @@ def all_reviews():
         user = User.query.filter_by(email=email).first()
 
         if user.role == "user":
-            # Fetch all reviews given by the user
             reviews = (
                 db.session.query(Review, Event, Vendor)
                 .join(Event, Review.event_id == Event.id)
@@ -2014,8 +2134,7 @@ def all_reviews():
             vendor_user = User.query.filter_by(vendor_id=vendor.id).first()
             vendor_profile_image = getattr(vendor_user, 'profile_image', None)
             review_user = User.query.get(review.user_id)
-            user_profile_image = getattr(review_user ,"profile_image", None)
-            print(review_user)
+            user_profile_image = getattr(review_user, "profile_image", None)
 
             # Fetch all bookings for this event
             bookings = Booking.query.filter_by(event_id=event.id).all()
@@ -2031,41 +2150,36 @@ def all_reviews():
                 )
 
                 subtotal = event.rate * event_hours
-                print(f"Subtotal : {subtotal}")
                 tax_percentage = 0.15
                 tax_amount = subtotal * tax_percentage
-                print(f"tax amount : {tax_amount}")
                 total_price = subtotal + tax_amount
                 total_amount += total_price
-                print(f"Total amount : {total_amount}")
-
-                print(total_amount)
 
             review_data.append({
                 "event_id": event.id,
                 "event_thumbnail": event.thumbnail,
                 "event_name": event.location_name,
-                "event_type":event.event_type,
                 "event_rate": event.rate,
                 "total_event_hours": event_hours,
                 "total_amount_earned_by_the_vendor": total_amount,
-                "tax_amount": tax_amount, 
+                "tax_amount": tax_amount,
                 "event_address": event.address,
-                "user_profile_image":user_profile_image,
-                # "event_icon": booking.event_icon,
+                "user_profile_image": user_profile_image,
                 "vendor_profile_image": vendor_profile_image,
                 "user_review": review.user_review,
                 "cleanliness_rating": review.cleanliness_rating,
                 "price_value_rating": review.price_value_rating,
                 "service_value_rating": review.service_value_rating,
-                "location_rating": review.location_rating
+                "location_rating": review.location_rating,
+                # Update event_type to fetch from Booking table
+                "event_type": bookings[0].event_type if bookings else None
             })
 
         return jsonify({
             "rated_reviews": review_data,
             "total_rated_reviews": len(review_data)
         })
-    
+
     except Exception as e:
         print(f"Error in fetching rated reviews: {str(e)}")
         return jsonify({"error": "An error occurred while fetching rated reviews."}), 500

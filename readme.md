@@ -1,3 +1,11 @@
+12/22/2023 03:10
+Added event_type in response from the booking table.
+For :
+Event icons in respnse : 1 - all_reviews 2 - pending_reviews 3 - booking_history 4 - get_my_events
+
+top_venues 5 - bookings_today 6 - booking_details 7 - vendor_events
+
+
 
 
 12/22/2023 12:59

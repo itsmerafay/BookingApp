@@ -183,6 +183,7 @@ class Booking(db.Model):
             else:
                 event_dict[c.name] = value
         return event_dict
+
     def booking_today(self):
             booking_dict = {}
             for c in self.__table__.columns:
@@ -195,10 +196,20 @@ class Booking(db.Model):
 
             # Include event details
             if self.event:
-                event_details = self.event.as_dict()
-                booking_dict['event'] = {**event_details, 'event_type': self.event.event_type}
-            
+                booking_dict['event'] = self.event.as_dict()
+
+            # Include total paid price
+            booking_dict['total_paid_price'] = self.calculate_total_price()
+
+            # Include user profile image
+            if self.user:
+                booking_dict['user_profile_image'] = self.user.profile_image
+
+            # Include event type from the Booking table
+            booking_dict['event_type'] = self.event_type
+
             return booking_dict
+
 
     def calculate_total_price(self):
         # Calculate the duration in hours
