@@ -65,7 +65,7 @@ class Vendor(db.Model):
     event = db.relationship('Event', back_populates='vendor')
 
     def as_dict(self):
-       return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
     def is_profile_complete(self):
         required_fields = [self.full_name, self.phone_number, self.location, self.biography]
@@ -74,7 +74,7 @@ class Vendor(db.Model):
 
 class Event(db.Model):
     id = db.Column(db.Integer, primary_key = True)
-    thumbnail = db.Column(db.String(255), nullable=False)
+    thumbnail = db.Column(db.String(255), nullable=True)
     other_images = db.Column(db.JSON, nullable=True)
     video_showcase = db.Column(db.String(255), nullable=True)
     # location_name = db.Column(db.String(255), nullable=False)
@@ -264,3 +264,6 @@ class Preferences(db.Model):
     vendor_preference = db.Column(db.JSON, nullable = True)
 
     user = db.relationship("User", backref = "preferences")
+
+
+

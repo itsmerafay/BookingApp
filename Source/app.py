@@ -7,6 +7,8 @@ from flask_migrate import Migrate
 from config import Config
 from json import JSONEncoder
 from flask_cors import CORS
+# from push_notification import setup_push_notifications, send_push_notification
+
 
 app = Flask(__name__)
 CORS(app)  # Add this line to enable CORS for all routes
@@ -37,7 +39,9 @@ mail = Mail(app)
 
 from routes import *
 
+
 if __name__ == '__main__':
     with app.app_context():
+        # setup_push_notifications()
         db.create_all()
     app.run(debug=True)

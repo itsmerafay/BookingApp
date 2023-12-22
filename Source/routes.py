@@ -1,6 +1,6 @@
 from sqlalchemy import func, or_, and_ 
 from sqlalchemy.orm import joinedload
-from utils import Validations, Ratings, DateTimeConversions, BookingAvailability, Filterations, BookingCount
+from utils import Validations, Ratings, DateTimeConversions, BookingAvailability, Filterations, BookingCount, Notification
 from random import sample 
 from geopy.distance import geodesic
 from app import app, db, mail
@@ -16,6 +16,7 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 from model import bcrypt   
 from werkzeug.utils import secure_filename
 import os
+
 
 import sys
 sys.dont_write_bytecode = True
@@ -279,7 +280,7 @@ app.config["VENDOR_IMAGES_FOLDER"] = VENDOR_IMAGES_FOLDER
 def create_event():
     data = request.get_json()
     user = get_current_user()
-    print(data)
+    # print(data)
 
     if not user:
         return jsonify({"status":False, "message": "User not found"}), 401
@@ -295,6 +296,7 @@ def create_event():
 
     # Fields for the event
     thumbnail = data.get("thumbnail")
+    print(thumbnail)
     other_images = data.get("other_images")
     video_showcase = data.get("video_showcase")
     location_name = data.get("location_name")
@@ -1377,12 +1379,33 @@ def custom_event_search():
 
 
 
+###############################   Create Booking      #####################################
 
+# @app.route('/send_notification', methods=['POST'])
+# def send_notification():
+#     data = request.get_json()
+#     device_token = data.get("device_token")
+#     title = data.get("title")
+#     body = data.get("body")
 
+#     if not all([device_token, title, body]):
+#         return jsonify({
+#             "status": False,
+#             "message": "Missing parameters !!"
+#         }), 400
+    
+#     success = Notification.send_push_notification(device_token, title, body)
 
-
-
-
+#     if success:
+#         return jsonify({
+#             "status": True,
+#             "message": "Message sent successfully!!"
+#         }), 200
+#     else:
+#         return jsonify({
+#             "status": False,
+#             "message": "Failed to send notifications !!"
+#         }), 500
 
 
 
@@ -1456,11 +1479,11 @@ def create_booking():
         tax_percentage = 0.15
         total_price = subtotal + (subtotal * tax_percentage)
 
-        if event_type:
-            event_icon_filename = f"{event_type.lower()}_icon_{uuid.uuid4()}.png"
-            event_icon_path = os.path.join(app.config["EVENT_ICON_FOLDER"], event_icon_filename)
-            if os.path.exists(event_icon_path):
-                booking.event_icon = event_icon_filename
+        # if event_type:
+        #     event_icon_filename = f"{event_type.lower()}_icon_{uuid.uuid4()}.png"
+        #     event_icon_path = os.path.join(app.config["EVENT_ICON_FOLDER"], event_icon_filename)
+        #     if os.path.exists(event_icon_path):
+        #         booking.event_icon = event_icon_filename
 
         # Create and save the booking
         booking = Booking(
@@ -1475,8 +1498,8 @@ def create_booking():
             end_time=end_time,
             all_day=all_day,
             event_id=event_id,
-            event_type=event_type,
-            event_icon = event_icon_filename
+            event_type=event_type
+            # event_icon = event_icon_filename
         )
 
 
@@ -1559,7 +1582,155 @@ def upload_event_icon():
 
 ###############################    Cancel Booking By User      ######################################
 
-@app.route("/cancel_booking", methods = ["POST"])
+# @app.route("/cancel_booking", methods = ["POST"])
+# @jwt_required()
+# def cancel_booking():
+#     try:
+#         data = request.get_json()
+#         user = get_current_user()
+
+#         if not user:
+#             return jsonify({
+#                 "status":False,
+#                 "message": "User not authenticated !!"
+#             }), 401
+            
+#         if user.role != "user":
+#             return jsonify({
+#                 "status": False,
+#                 "message": "Unauthorized access: Only users can cancel bookings."
+#             })
+
+#         booking_id = data.get("booking_id")
+
+#         booking_to_cancel = Booking.query.filter_by(id=booking_id, user_id = user.id).first()
+
+#         if not booking_to_cancel:
+#             return jsonify({
+#                 "message":"Booking not found"
+#             })
+        
+#         booking_to_cancel.cancelled = True  
+#         db.session.commit()
+
+#         return jsonify({
+#             "status":True,
+#             "message":"Booking cancelled successfully !!",
+#             "event_id":Booking.event_id,
+#             # "event_icon":Booking.even,
+#             "vendor_id":Booking.event.vendor.id
+#         })
+    
+#     except Exception as e:
+#         return jsonify({
+#             "status":False,
+#             "message": str(e)
+#         }), 500
+
+
+###############################    Cancel Booking By Vendor      ######################################
+
+
+# @app.route("/cancel_booking_by_vendor", methods = ["POST"])
+# @jwt_required()
+# def cancel_booking_by_vendor():
+#     try:
+#         data = request.get_json()
+#         user = get_current_user()
+
+#         if not user:
+#             return jsonify({
+#                 "status":False,
+#                 "message": "User not authenticated !!"
+#             }), 401
+            
+#         if user.role != "vendor":
+#             return jsonify({
+#                 "status": False,
+#                 "message": "Unauthorized access: Only vendors can cancel bookings."
+#             })
+        
+#         booking_id = data.get("booking_id")
+
+#         booking_to_cancel = Booking.query.filter_by(id=booking_id).first()
+
+#         if booking_to_cancel.cancelled == 1:
+#             return jsonify({
+#                 "message":"Booking is already cancelled !1"
+#         })
+
+#         if not booking_to_cancel or booking_to_cancel.event.vendor.id != user.vendor.id:
+#             return jsonify({
+#                 "message":"Booking not found or unauthorized to cancel"})
+
+#         booking_to_cancel.cancelled = True  
+#         db.session.commit()
+
+#         return jsonify({
+#             "status":True,
+#             "message":"Successfully cancelled the booking !!",
+#             "event_id":booking_to_cancel.event_id,
+#             "vendor_id":booking_to_cancel.event.vendor.id
+#         })
+    
+#     except Exception as e:
+#         return jsonify({
+#             "status":False,
+#             "message": str(e)
+#         }), 500
+
+
+
+
+###############################    Cancel Booking By User      ######################################
+
+# @app.route("/cancel_booking", methods = ["POST"])
+# @jwt_required()
+# def cancel_booking():
+#     try:
+#         data = request.get_json()
+#         user = get_current_user()
+
+#         if not user:
+#             return jsonify({
+#                 "status":False,
+#                 "message": "User not authenticated !!"
+#             }), 401
+            
+#         if user.role != "user":
+#             return jsonify({
+#                 "status": False,
+#                 "message": "Unauthorized access: Only users can cancel bookings."
+#             })
+
+#         booking_id = data.get("booking_id")
+
+#         booking_to_cancel = Booking.query.filter_by(id=booking_id, user_id = user.id).first()
+
+#         if not booking_to_cancel:
+#             return jsonify({
+#                 "message":"Booking not found"
+#             })
+        
+#         booking_to_cancel.cancelled = True  
+#         db.session.commit()
+
+#         return jsonify({
+#             "status":True,
+#             "message":"Booking cancelled successfully !!",
+#             "event_id":Booking.event_id,
+#             # "event_icon":Booking.even,
+#             "vendor_id":Booking.event.vendor.id
+#         })
+    
+#     except Exception as e:
+#         return jsonify({
+#             "status":False,
+#             "message": str(e)
+#         }), 500
+
+
+@app.route("/cancel_booking", methods=["POST"])
 @jwt_required()
 def cancel_booking():
     try:
@@ -1568,10 +1739,10 @@ def cancel_booking():
 
         if not user:
             return jsonify({
-                "status":False,
+                "status": False,
                 "message": "User not authenticated !!"
             }), 401
-            
+
         if user.role != "user":
             return jsonify({
                 "status": False,
@@ -1580,27 +1751,51 @@ def cancel_booking():
 
         booking_id = data.get("booking_id")
 
-        booking_to_cancel = Booking.query.filter_by(id=booking_id, user_id = user.id).first()
+        booking_to_cancel = Booking.query.filter_by(id=booking_id, user_id=user.id).first()
 
         if not booking_to_cancel:
             return jsonify({
-                "message":"Booking not found"
-            })
-        
-        booking_to_cancel.cancelled = True  
+                "status": False,
+                "message": "Booking not found"
+            }), 404
+
+        # Check if the booking is already canceled
+        if booking_to_cancel.cancelled:
+            return jsonify({
+                "status": False,
+                "message": "Booking is already canceled"
+            }), 400
+
+        booking_to_cancel.cancelled = True
         db.session.commit()
 
+        # Notification Data for Cancellation
+        send_notification_data = {
+            "device_token": "<YOUR_DEVICE_TOKEN_HERE>",
+            "title": "Booking Canceled by User",
+            "body": "Your booking has been canceled"
+        }
+
+        # Send Notification
+        send_notification_response = Notification.send_notification(send_notification_data)
+
+        if send_notification_response:
+            notification_status = "Notification sent successfully"
+        else:
+            notification_status = "Failed to send notification"
+
         return jsonify({
-            "status":True,
-            "message":"Booking cancelled successfully !!",
-            "event_id":Booking.event_id,
-            # "event_icon":Booking.even,
-            "vendor_id":Booking.event.vendor.id
-        })
-    
+            "status": True,
+            "message": "Booking cancelled successfully !!",
+            "event_id": booking_to_cancel.event_id,
+            # "event_icon": Booking.event.icon,  # Add the necessary field here
+            "vendor_id": booking_to_cancel.event.vendor.id,
+            "notification_status": notification_status
+        }), 200
+
     except Exception as e:
         return jsonify({
-            "status":False,
+            "status": False,
             "message": str(e)
         }), 500
 
@@ -1608,7 +1803,7 @@ def cancel_booking():
 ###############################    Cancel Booking By Vendor      ######################################
 
 
-@app.route("/cancel_booking_by_vendor", methods = ["POST"])
+@app.route("/cancel_booking_by_vendor", methods=["POST"])
 @jwt_required()
 def cancel_booking_by_vendor():
     try:
@@ -1617,7 +1812,7 @@ def cancel_booking_by_vendor():
 
         if not user:
             return jsonify({
-                "status":False,
+                "status": False,
                 "message": "User not authenticated !!"
             }), 401
             
@@ -1625,7 +1820,7 @@ def cancel_booking_by_vendor():
             return jsonify({
                 "status": False,
                 "message": "Unauthorized access: Only vendors can cancel bookings."
-            })
+            }), 403
         
         booking_id = data.get("booking_id")
 
@@ -1633,29 +1828,46 @@ def cancel_booking_by_vendor():
 
         if booking_to_cancel.cancelled == 1:
             return jsonify({
-                "message":"Booking is already cancelled !1"
-        })
+                "status": False,
+                "message": "Booking is already cancelled!"
+            }), 400
 
         if not booking_to_cancel or booking_to_cancel.event.vendor.id != user.vendor.id:
             return jsonify({
-                "message":"Booking not found or unauthorized to cancel"})
+                "status": False,
+                "message": "Booking not found or unauthorized to cancel"
+            }), 404
 
         booking_to_cancel.cancelled = True  
+
+        send_notification_data = {
+            "device_token": "emjWuhv2Tqa9R5k867wLUE:APA91bGx1TkzLVNpz2UfA_FOqOMVCZWaFEOMjPbUGsT0_1Mnhn9Rj8zAsBC77efdtQUZ9OzZj3D1FJvl3wlqtdIS5f7ABJF2BNkL9fP8wnqnxkKtI3BWPKQIq_hQpuKh81E9zQXBWCim",
+            "title": "Booking Canceled by Vendor",
+            "body": "Booking has been canceled by the vendor"
+        }
+
+        send_notification_response = Notification.send_notification(send_notification_data)
+
         db.session.commit()
 
-        return jsonify({
-            "status":True,
-            "message":"Successfully cancelled the booking !!",
-            "event_id":booking_to_cancel.event_id,
-            "vendor_id":booking_to_cancel.event.vendor.id
-        })
-    
+        if send_notification_response:
+            return jsonify({
+                "status": True,
+                "message": "Booking canceled by vendor and notification sent successfully!!",
+                "event_id": booking_to_cancel.event_id,
+                "vendor_id": booking_to_cancel.event.vendor.id
+            }), 200
+        else:
+            return jsonify({
+                "status": False,
+                "message": "Failed to send notification after canceling the booking by vendor!!"
+            }), 500
+
     except Exception as e:
         return jsonify({
-            "status":False,
+            "status": False,
             "message": str(e)
         }), 500
-
 
 ###############################   Vendor's Events      ######################################
 
