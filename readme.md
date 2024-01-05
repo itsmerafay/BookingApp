@@ -1,4 +1,12 @@
-12/229/2023 6:28
+1/5/2024 7:20
+
+favorite events api done in accordance with airbnb platform.
+
+
+
+
+
+12/29/2023 6:28
 
 Updated search_event api with dynamic distancing etc.
 

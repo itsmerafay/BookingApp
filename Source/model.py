@@ -21,6 +21,8 @@ class User(db.Model):
     # Define the relationship between User and Vendor (one-to-one)
     vendor_id = db.Column(db.Integer, db.ForeignKey('vendor.id'), unique=True, nullable=True)
     vendor = db.relationship('Vendor', back_populates='user')
+    favorites = db.relationship("Favorites", backref="user")  # Relationship to the 'Favorites' model
+    # favorite_events = db.relationship('Event', secondary='favorites', backref='users')
 
     def __init__(self, email, password, role):
         self.email = email
@@ -30,7 +32,7 @@ class User(db.Model):
 
 
     def as_dict(self):
-       return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
     def as_vendor(self):
         user_dict = {c.name: getattr(self, c.name) for c in self.__table__.columns}
@@ -93,6 +95,8 @@ class Event(db.Model):
     latitude = db.Column(db.Float, nullable =  True)
     longitude = db.Column(db.Float, nullable =  True)
     vendor = db.relationship("Vendor", back_populates="event")
+    # favorites = db.relationship("Favorites", backref="event")  # Relationship to the 'Favorites' model
+
 
     vendor_id = db.Column(db.Integer, db.ForeignKey("vendor.id"), nullable = False)
     def as_dict(self):
@@ -267,3 +271,9 @@ class Preferences(db.Model):
 
 
 
+class Favorites(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
+
+    event = db.relationship("Event", backref="favorites")  # Relationship to the 'Event' model

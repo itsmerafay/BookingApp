@@ -198,7 +198,7 @@ class Filterations:
         return filtered_events
 
     @staticmethod
-    def filter_events_by_location(events_data, user_location, max_distance=3):
+    def filter_events_by_location(events_data, user_location, max_distance = 3):
         filtered_events = [
             event for event in events_data
             if Filterations.is_valid_latitude(event.get("event_latitude")) and
@@ -304,15 +304,3 @@ class BookingCount:
             print(f"Error fetching booking count : {e}")
             return 0
         
-# class CityName:
-    
-#     @staticmethod
-#     def city_name(latitude, longitude):
-#         geolocator = Nominatim(user_agent = "geoapiExercises")
-#         location = geolocator.reverse(f"{latitude},{longitude}", exactly_one = True)
-#         if location:
-#             address = location.raw.get("address",{})
-#             city = address.get("city", "")
-#             return city
-#         return None
-    

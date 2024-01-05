@@ -6,7 +6,7 @@ from geopy.distance import geodesic
 from app import app, db, mail
 from flask import request, jsonify, url_for, current_app, send_file, send_from_directory
 from datetime import datetime, timedelta
-from model import User, PasswordResetToken, Vendor, Event, Booking , Review, Preferences
+from model import User, PasswordResetToken, Vendor, Event, Booking , Review, Preferences, Favorites
 import secrets
 from sqlalchemy.exc import IntegrityError
 import uuid
@@ -689,42 +689,6 @@ def refresh_token():
 
 ###############################     Search Events API        ######################################
 
-# @app.route("/top_venues/<int:vendor_id>", methods=["GET"])
-# def top_venues(vendor_id):
-
-#     try:
-#         # Get the total number of bookings for the vendor
-#         total_bookings = (db.session.query(func.count(Booking.id))
-#                         .join(Event)
-#                         .filter(Event.vendor_id == vendor_id)
-#                         .scalar())
-#         venue_bookings = (db.session.query(Event.location_name, Event.thumbnail, func.count(Booking.id).label('booking_count'))
-#                         .join(Event)
-#                         .filter(Event.vendor_id == vendor_id)
-#                         .group_by(Event.location_name, Event.thumbnail)
-#                         .order_by(func.count(Booking.id).desc())
-#                         .all())
-
-#         # Calculate the percentage for each venue
-#         venues_list = []
-
-#         for location_name, thumbnail, count in venue_bookings:
-#             percentage = (count / total_bookings) * 100 if total_bookings > 0 else 0
-#             venues_list.append({
-#                 "venue": location_name,
-#                 "thumbnail": thumbnail,
-#                 "bookings": count,
-#                 "percentage": round(percentage, 2)
-#             })
-
-
-#         return jsonify({"status": True, "top_venues": venues_list})
-#     except Exception as e:
-#         print(e)
-#         return jsonify({"status": False, "error": str(e)})
-
-
-
 @app.route("/top_venues/<int:vendor_id>", methods=["GET"])
 def top_venues(vendor_id):
     try:
@@ -850,7 +814,7 @@ def home_events():
 
         requested_availability = data.get("is_available")
         user_location = (data.get("latitude"), data.get("longitude"))  # Retrieve user's location from request data
-        max_distance = 30
+        max_distance = 3
 
         event_types = Event.query.with_entities(Event.event_type).distinct().all()
 
@@ -921,588 +885,173 @@ def home_events():
             "message": str(e)
         }), 500
 
+##################################################            Favorites             #############################################################
+    
+@app.route("/add_to_favorites", methods = ["POST"])
+@jwt_required()
+def add_to_favorites():
+    data = request.get_json()
+    user = get_current_user()
+
+    if not user:
+        return jsonify({ "status":False,"message": "User not found"}), 401
+
+
+    if user.role != "user":
+        return jsonify({
+                "status": False,
+                "message": "Unauthorized access: Only users can create bookings."
+            })
+    
+    event_id = data.get("event_id")
+    # user = User.query.filter_by(id = user.id).first_or_404()
+    event = Event.query.get_or_404(event_id)
+    
+    favorite = Favorites(user_id = user.id, event_id = event.id)
+    db.session.add(favorite)
+    db.session.commit()
+
+    return jsonify({
+        "status":True,
+        "message":"Successfully Added the event to favorites !!"
+    }), 200
+
+
+    
+@app.route("/wishlist", methods = ["GET"])
+@jwt_required()
+def wishlist():
+    user = get_current_user()
+
+    if not user:
+        return jsonify({ "status":False,"message": "User not found"}), 401
+
+    if user.role != "user":
+        return jsonify({
+                "status": False,
+                "message": "Unauthorized access: Only users can add the favorite "
+            })
+    
+    favorites = Favorites.query.filter_by(user_id = user.id).all()
+
+    # coverting each instance of the data to dictionary with key value -- present in the model.py
+    favorite_events = [fav.event.as_dict() for fav in favorites]
+
+    return jsonify({
+        "status":True,
+        "favorite_events":favorite_events
+    }), 200
+    
+
+
+@app.route("/get_my_favorite_event", methods = ["POST"])
+@jwt_required()
+def get_my_favorite_event():
+    data = request.get_json()
+    user = get_current_user()
+
+    if not user:
+        return jsonify({ "status":False,"message": "User not found"}), 401
+    
+    if user.role != "user":
+        return jsonify({
+                "status": False,
+                "message": "Unauthorized access: Only users can get the favorite events"
+            })
+    
+    favorite_id = data.get("favorite_id")
+
+    favorites = Favorites.query.filter_by(id = favorite_id ,user_id = user.id).first()
+
+    # coverting each instance of the data to dictionary with key value -- present in the model.py
+    favorite_events = [favorites.event.as_dict()]
+
+    return jsonify({
+        "status":True,
+        "favorite_events":favorite_events
+    }), 200
+    
+
+
+
+@app.route("/update_my_favorite_event", methods = ["PUT"])
+@jwt_required()
+def update_my_favorite_event():
+    data = request.get_json()
+    user = get_current_user()
+
+    if not user:
+        return jsonify({ "status":False,"message": "User not found"}), 401
+    
+    if user.role != "user":
+        return jsonify({
+                "status": False,
+                "message": "Unauthorized access: Only users can update the favorite events"
+            })
+    
+    favorite_id = data.get("favorite_id")
+    new_event_id = data.get("new_event_id")
+
+    favorites = Favorites.query.filter_by(id = favorite_id ,user_id = user.id).first()
+
+    if favorites:
+        favorites.event_id = new_event_id
+        db.session.commit()
+
+        return jsonify({
+            "status":True,
+            "message":"Successfully updated the favorite event !"
+        }), 200
+    
+    else:
+        return jsonify({
+            "status":False,
+            "message":"Favorite event not found !!"
+        }),404 
+
+
+
+@app.route("/delete_my_favorite_event", methods = ["DELETE"])
+@jwt_required()
+def delete_my_favorite_event():
+    data = request.get_json()
+    user = get_current_user()
+
+    if not user:
+        return jsonify({ "status":False,"message": "User not found"}), 401
+    
+    if user.role != "user":
+        return jsonify({
+                "status": False,
+                "message": "Unauthorized access: Only users can delete the favorite event."
+            })
+    
+    favorite_id = data.get("favorite_id")
+
+    favorites = Favorites.query.filter_by(id = favorite_id ,user_id = user.id).first()
+
+    if favorites:
+        db.session.delete(favorites)
+        db.session.commit()
+
+        return jsonify({
+            "status":True,
+            "message":"Successfully updated the favorite event !"
+        }), 200
+    
+    else:
+        return jsonify({
+            "status":False,
+            "message":"Favorite event not found !!"
+        }),404 
+
 
 
 
 
 ################### Search Event ###############################
 
-
-# @app.route("/search_event", methods=["POST"])
-# @jwt_required()
-# def search_event():
-#     page_number = request.args.get('page', default=1, type=int)
-#     data = request.get_json()
-#     event_type = data.get("event_type")
-#     location_name = data.get("location_name")
-#     latitude = data.get("latitude")
-#     longitude = data.get("longitude")
-
-#     # Query based on event_type and location_name
-#     events_query = Event.query
-
-#     if event_type.lower() != "all":
-#         events_query = events_query.filter_by(event_type=event_type)
-
-#     if location_name:
-#         events_query = events_query.filter(or_(Event.location_name.ilike(f"%{location_name}%")))
-
-#     all_events = events_query.all()
-
-#     user_location = (latitude, longitude)
-#     results_with_distance = []
-
-#     for event in all_events:
-#         if event.latitude is not None and event.longitude is not None:
-#             event_location = (event.latitude, event.longitude)
-#             distance = geodesic(event_location, user_location).kilometers <= 100
-#             results_with_distance.append((event, distance))
-
-#     sorted_results = sorted(results_with_distance, key=lambda x: Ratings.get_average_rating(x[0].id), reverse=True)
-#     print(sorted_results)
-
-#     total_events_found = len(sorted_results)
-#     events_per_page = 5 
-#     offset = (page_number - 1) * events_per_page
-#     end_index = min(offset + events_per_page, len(sorted_results))
-
-#     paginated_results = sorted_results[offset:end_index]
-#     event_list = []
-
-#     for result in paginated_results:
-#         event = result[0]
-#         within_radius = result[1]
-
-#         vendor_details = {
-#             "id": event.vendor.id,
-#             "full_name": event.vendor.full_name,
-#             "phone_number": event.vendor.phone_number,
-#             "location": event.vendor.location,
-#             "biography": event.vendor.biography
-#         }
-
-#         event_info = {
-#             "id": event.id,
-#             "thumbnail": event.thumbnail,
-#             "event_type": event.event_type,
-#             "rate": event.rate,
-#             "event_rating": Ratings.get_average_rating(event.id),
-#             "fixed_price": event.fixed_price,
-#             "distance_km": geodesic((event.latitude, event.longitude), user_location).kilometers,
-#             "location_name":event.location_name,
-#             "vendor_details": vendor_details
-#         }
-#         event_list.append(event_info)
-
-#     return jsonify({
-#         "status": True,
-#         "Total_Events": total_events_found,
-#         "Events": event_list
-#     }), 200
-
-
 # ################### Custom Event Search ###########################
-
-
-# # @app.route("/custom_event_search", methods=["POST"])
-# # @jwt_required()
-# # def custom_event_search():
-# #     data = request.get_json()
-# #     event_type = data.get("event_type")
-# #     location_name = data.get("location_name")
-# #     min_price = data.get("min_price")
-# #     max_price = data.get("max_price")
-# #     start_date = data.get("start_date")
-# #     end_date = data.get("end_date")
-# #     start_time = data.get("start_time")
-# #     end_time = data.get("end_time")
-# #     all_day = data.get("all_day")
-# #     latitude = data.get("event_latitude")
-# #     longitude = data.get("event_longitude")
-# #     ratings = data.get("ratings")   
-# #     query = db.session.query(Event)
-
-# #     # Apply filters based on search criteria
-# #     if event_type:
-# #         query = query.filter(func.lower(Event.event_type) == event_type.lower())
-
-# #     if location_name:
-# #         # query = query.filter(func.lower(Event.location_name) == location_name.lower())
-# #         query = query.filter(or_(Event.location_name.ilike(f"%{location_name}%")))
-
-
-# #     if min_price is not None and max_price is not None:
-# #         # Both min_price and max_price are provided, filter based on the range
-# #         query = query.filter(Event.rate.between(min_price, max_price))
-
-# #     elif min_price is not None or max_price is not None:
-# #         # Either min_price or max_price is provided, filter based on the provided value
-# #         if min_price is not None:
-# #             query = query.filter(Event.rate >= min_price)
-# #         elif max_price is not None:
-# #             query = query.filter(Event.rate <= max_price)
-
-# #     if not all_day and start_date and end_date and start_time and end_time:
-# #         # Subquery to select overlapping event IDs
-# #         subquery = db.session.query(Booking.event_id).filter(
-# #             (Booking.start_date <= end_date) &
-# #             (Booking.end_date >= start_date) &
-# #             (Booking.start_time <= end_time) &
-# #             (Booking.end_time >= start_time)
-# #         ).distinct()
-
-# #         # Filter events that do not have overlapping bookings
-# #         query = query.filter(~Event.id.in_(subquery))
-
-# #     results = query.all()
-# #     user_location = (latitude, longitude)
-# #     results_with_distance = []
-
-# #     for event in results:
-# #         if event.latitude is not None and event.longitude is not None:
-# #             event_location = (event.latitude, event.longitude)
-# #             distance = geodesic(event_location, user_location).kilometers <= 5
-# #             results_with_distance.append((event, distance))
-
-# #     sorted_results = sorted(results_with_distance, key=lambda x: Ratings.get_average_rating(x[0].id), reverse=True)
-
-# #     # Serialize Event objects to a list of dictionaries
-# #     serialized_results = []
-
-# #     # First loop is for one event and other is for each vendor specific details
-# #     for event_tuple in sorted_results:
-# #         event = event_tuple[0]  # Extract the event object from the tuple
-# #         vendor_details = []
-
-# #         # Check if latitude and longitude are non-empty before considering them
-# #         if event.latitude is not None and event.longitude is not None:
-# #             event_location = (event.latitude, event.longitude)
-# #             distance = geodesic(event_location, user_location).kilometers <= 4
-
-# #             if distance:
-# #                 for vendor_user in event.vendor.user:
-# #                     vendor_details.append({
-# #                         "vendor_profile_image": vendor_user.profile_image
-# #                     })
-
-# #                 serialized_event = {
-# #                     "id": event.id,
-# #                     "vendor_id":event.vendor_id,
-# #                     "event_type": event.event_type,
-# #                     "location_name": event.location_name,
-# #                     "rate": event.rate,
-# #                     "thumbnail": event.thumbnail,
-# #                     "vendor_details": vendor_details
-# #                 }
-# #                 serialized_results.append(serialized_event)
-
-
-# #     # Filter results based on ratings if ratings are provided
-# #     filtered_results = []
-# #     if ratings:
-# #         for event in serialized_results:
-# #             if Ratings.get_average_rating(event['id']) == ratings:
-# #                 filtered_results.append(event)
-
-# #     else:
-# #         filtered_results = serialized_results
-
-
-# #     return jsonify({
-# #         "status": True,
-# #         "Search Result Found": f"{len(filtered_results)} vendors found for {location_name} with {ratings} star rating",
-# #         "Search results": filtered_results
-# #     })
-
-# @app.route("/custom_event_search", methods=["POST"])
-# @jwt_required()
-# def custom_event_search():
-#     data = request.get_json()
-#     event_type = data.get("event_type")
-#     location_name = data.get("location_name")
-#     min_price = data.get("min_price")
-#     max_price = data.get("max_price")
-#     start_date = data.get("start_date")
-#     end_date = data.get("end_date")
-#     start_time = data.get("start_time")
-#     end_time = data.get("end_time")
-#     all_day = data.get("all_day")
-#     latitude = data.get("event_latitude")
-#     longitude = data.get("event_longitude")
-#     ratings = data.get("ratings")
-#     query = db.session.query(Event)
-
-#     # Apply filters based on search criteria
-#     if event_type:
-#         query = query.filter(func.lower(Event.event_type) == event_type.lower())
-
-#     if location_name:
-#         query = query.filter(or_(Event.location_name.ilike(f"%{location_name}%")))
-
-#     if min_price is not None and max_price is not None:
-#         query = query.filter(Event.rate.between(min_price, max_price))
-
-#     elif min_price is not None or max_price is not None:
-#         if min_price is not None:
-#             query = query.filter(Event.rate >= min_price)
-#         elif max_price is not None:
-#             query = query.filter(Event.rate <= max_price)
-
-#     if not all_day and start_date and end_date and start_time and end_time:
-#         subquery = db.session.query(Booking.event_id).filter(
-#             (Booking.start_date <= end_date) &
-#             (Booking.end_date >= start_date) &
-#             (Booking.start_time <= end_time) &
-#             (Booking.end_time >= start_time)
-#         ).distinct()
-
-#         query = query.filter(~Event.id.in_(subquery))
-
-#     results = query.all()
-#     user_location = (latitude, longitude)
-#     results_with_distance = []
-
-#     for event in results:
-#         if event.latitude is not None and event.longitude is not None:
-#             event_location = (event.latitude, event.longitude)
-#             distance = geodesic(event_location, user_location).kilometers <= 5
-#             results_with_distance.append((event, distance))
-
-#     sorted_results = sorted(results_with_distance, key=lambda x: Ratings.get_average_rating(x[0].id), reverse=True)
-
-#     # Serialize Event objects to a list of dictionaries
-#     serialized_results = []
-
-#     for event_tuple in sorted_results:
-#         event = event_tuple[0]
-#         vendor_details = []
-
-#         if event.latitude is not None and event.longitude is not None:
-#             event_location = (event.latitude, event.longitude)
-#             distance = geodesic(event_location, user_location).kilometers <= 4
-
-#             if distance:
-#                 for vendor_user in event.vendor.user:
-#                     vendor_details.append({
-#                         "vendor_profile_image": vendor_user.profile_image
-#                     })
-
-#                 event_rating = Ratings.get_average_rating(event.id)
-#                 distance_km = geodesic(event_location, user_location).kilometers
-
-#                 serialized_event = {
-#                     "id": event.id,
-#                     "vendor_id": event.vendor_id,
-#                     "vendor_id": event.vendor.full_name,
-#                     "vendor_id": event.vendor_id,
-#                     "vendor_id": event.vendor_id,
-#                     "vendor_id": event.vendor_id,
-#                     "event_type": event.event_type,
-#                     "location_name": event.location_name,
-#                     "rate": event.rate,
-#                     "thumbnail": event.thumbnail,
-#                     "event_rating": event_rating,
-#                     "distance_km": distance_km,
-#                     "vendor_details": vendor_details
-#                 }
-#                 serialized_results.append(serialized_event)
-
-#     return jsonify({
-#         "status": True,
-#         "Search Result Found": f"{len(serialized_results)} vendors found for {location_name} with {ratings} star rating",
-#         "Search results": serialized_results
-#     })
-
-
-
-# @app.route("/search_event", methods=["POST"])
-# @jwt_required()
-# def search_event():
-#     page_number = request.args.get('page', default=1, type=int)
-#     data = request.get_json()
-#     event_type = data.get("event_type")
-#     location_name = data.get("location_name")
-#     latitude = data.get("latitude")
-#     longitude = data.get("longitude")
-
-#     # Query based on event_type and location_name
-#     events_query = Event.query
-
-#     if event_type.lower() != "all":
-#         events_query = events_query.filter_by(event_type=event_type)
-
-#     if location_name:
-#         events_query = events_query.filter(or_(Event.location_name.ilike(f"%{location_name}%")))
-
-#     all_events = events_query.all()
-
-#     user_location = (latitude, longitude)
-#     results_with_distance = []
-
-#     for event in all_events:
-#         if event.latitude is not None and event.longitude is not None:
-#             event_location = (event.latitude, event.longitude)
-#             distance = geodesic(event_location, user_location).kilometers <= 10
-#             results_with_distance.append((event, distance))
-
-#     sorted_results = sorted(results_with_distance, key=lambda x: Ratings.get_average_rating(x[0].id), reverse=True)
-
-#     total_events_found = len(sorted_results)
-#     events_per_page = 5
-#     offset = (page_number - 1) * events_per_page
-#     end_index = min(offset + events_per_page, len(sorted_results))
-
-#     paginated_results = sorted_results[offset:end_index]
-#     event_list = []
-
-#     for result in paginated_results:
-#         event = result[0]
-#         within_radius = result[1]
-
-#         vendor_details = {
-#             "vendor_profile_image": event.vendor.user[0].profile_image,  # Assuming only one user for the vendor
-#             "vendor_id": event.vendor.id
-#         }
-
-#         event_info = {
-#             "id": event.id,
-#             "thumbnail": event.thumbnail,
-#             "event_type": event.event_type,
-#             "rate": event.rate,
-#             "event_rating": Ratings.get_average_rating(event.id),
-#             "fixed_price": event.fixed_price,
-#             "distance_km": geodesic((event.latitude, event.longitude), user_location).kilometers,
-#             "address": event.vendor.location,  
-#             "location_name":event.location_name,
-#             "vendor_details": vendor_details
-#         }
-#         event_list.append(event_info)
-
-#     return jsonify({
-#         "status": True,
-#         "Total_Events": total_events_found,
-#         "Events": event_list
-#     }), 200
-
-
-# @app.route("/search_event", methods=["POST"])
-# @jwt_required()
-# def search_event():
-#     page_number = request.args.get('page', default=1, type=int)
-#     data = request.get_json()
-#     event_type = data.get("event_type")
-#     location_name = data.get("location_name")
-#     latitude = data.get("latitude")
-#     longitude = data.get("longitude")
-
-#     # Query based on event_type and location_name
-#     events_query = Event.query
-
-#     if event_type and event_type.lower() != "all":
-#         events_query = events_query.filter_by(event_type=event_type)
-
-#     if location_name:
-#         events_query = events_query.filter(or_(Event.location_name.ilike(f"%{location_name}%")))
-
-#     all_events = events_query.all()
-
-#     user_location = (latitude, longitude)
-#     results_with_distance = []
-
-#     for event in all_events:
-#         if event.latitude is not None and event.longitude is not None:
-#             event_location = (event.latitude, event.longitude)
-#             distance = geodesic(event_location, user_location).kilometers
-#             # Ensure distance is less than or equal to 10km
-#             if distance <= 1000000:  # Change the distance limit here
-#                 results_with_distance.append((event, distance))
-
-
-#     sorted_results = sorted(results_with_distance, key=lambda x: x[1])
-
-#     total_events_found = len(sorted_results)
-#     events_per_page = 5
-#     offset = (page_number - 1) * events_per_page
-#     end_index = min(offset + events_per_page, len(sorted_results))
-
-#     paginated_results = sorted_results[offset:end_index]
-#     event_list = []
-
-#     for result in paginated_results:
-#         event = result[0]
-#         within_radius = result[1]
-
-#         vendor_details = {
-#             "vendor_profile_image": event.vendor.user[0].profile_image,  # Assuming only one user for the vendor
-#             "vendor_id": event.vendor.id
-#         }
-
-#         event_info = {
-#             "id": event.id,
-#             "thumbnail": event.thumbnail,
-#             "event_type": event.event_type,
-#             "rate": event.rate,
-#             "event_rating": Ratings.get_average_rating(event.id),
-#             "fixed_price": event.fixed_price,
-#             "distance_km": geodesic((event.latitude, event.longitude), user_location).kilometers,
-#             "address": event.vendor.location,  
-#             "location_name": event.location_name,
-#             "vendor_details": vendor_details
-#         }
-#         event_list.append(event_info)
-
-#     return jsonify({
-#         "status": True,
-#         "Total_Events": total_events_found,
-#         "Events": event_list
-#     }), 200
-
-# correctly working 
-# @app.route("/search_event", methods=["POST"])
-# @jwt_required()
-# def search_event():
-#     page_number = request.args.get('page', default=1, type=int)
-#     data = request.get_json()
-#     event_type = data.get("event_type")
-#     location_name = data.get("location_name")
-#     latitude = data.get("latitude")
-#     longitude = data.get("longitude")
-
-#     # Query based on event_type and location_name
-#     events_query = Event.query
-
-#     if event_type and event_type.lower() != "all":
-#         events_query = events_query.filter_by(event_type=event_type)
-
-#     if location_name:
-#         events_query = events_query.filter(or_(Event.location_name.ilike(f"%{location_name}%")))
-
-#     all_events = events_query.all()
-
-#     user_location = (latitude, longitude)
-#     results_within_range = []
-
-#     for event in all_events:
-#         if event.latitude is not None and event.longitude is not None:
-#             event_location = (event.latitude, event.longitude)
-#             distance = geodesic(event_location, user_location).kilometers
-#             # Ensure distance is less than or equal to 10km
-#             if distance <= 10:  # Change the distance limit here
-#                 results_within_range.append((event, distance))
-
-#     # Sort events within range by event rating
-#     sorted_within_range = sorted(results_within_range, key=lambda x: Ratings.get_average_rating(x[0].id), reverse=True)
-
-#     total_events_found = len(sorted_within_range)
-#     events_per_page = 5
-#     offset = (page_number - 1) * events_per_page
-#     end_index = min(offset + events_per_page, len(sorted_within_range))
-
-#     paginated_results = sorted_within_range[offset:end_index]
-#     event_list = []
-
-#     for result in paginated_results:
-#         event = result[0]
-#         within_radius = result[1]
-
-#         vendor_details = {
-#             "vendor_profile_image": event.vendor.user[0].profile_image,  # Assuming only one user for the vendor
-#             "vendor_id": event.vendor.id
-#         }
-
-#         event_info = {
-#             "id": event.id,
-#             "thumbnail": event.thumbnail,
-#             "event_type": event.event_type,
-#             "rate": event.rate,
-#             "event_rating": Ratings.get_average_rating(event.id),
-#             "fixed_price": event.fixed_price,
-#             "distance_km": geodesic((event.latitude, event.longitude), user_location).kilometers,
-#             "address": event.vendor.location,
-#             "location_name": event.location_name,
-#             "vendor_details": vendor_details
-#         }
-#         event_list.append(event_info)
-
-#     return jsonify({
-#         "status": True,
-#         "Total_Events": total_events_found,
-#         "Events": event_list
-#     }), 200
-
-
-# @app.route("/search_event", methods=["POST"])
-# @jwt_required()
-# def search_event():
-#     page_number = request.args.get('page', default=1, type=int)
-#     data = request.get_json()
-#     event_type = data.get("event_type")
-#     location_name = data.get("location_name")
-#     latitude = data.get("latitude")
-#     longitude = data.get("longitude")
-#     distance_limit = data.get("distance_km", 10)  # Default to 10km if distance_km is not provided
-
-#     # Query based on event_type and location_name
-#     events_query = Event.query
-
-#     if event_type and event_type.lower() != "all":
-#         events_query = events_query.filter_by(event_type=event_type)
-
-#     if location_name:
-#         events_query = events_query.filter(or_(Event.location_name.ilike(f"%{location_name}%")))
-
-#     all_events = events_query.all()
-
-#     user_location = (latitude, longitude)
-#     results_within_range = []
-
-#     for event in all_events:
-#         if event.latitude is not None and event.longitude is not None:
-#             event_location = (event.latitude, event.longitude)
-#             distance = geodesic(event_location, user_location).kilometers
-#             # Ensure distance is less than or equal to the specified or default distance limit
-#             if distance <= distance_limit:
-#                 results_within_range.append((event, distance))
-
-#     # Sort events within range by event rating
-#     sorted_within_range = sorted(results_within_range, key=lambda x: Ratings.get_average_rating(x[0].id), reverse=True)
-
-#     total_events_found = len(sorted_within_range)
-#     events_per_page = 5
-#     offset = (page_number - 1) * events_per_page
-#     end_index = min(offset + events_per_page, len(sorted_within_range))
-
-#     paginated_results = sorted_within_range[offset:end_index]
-#     event_list = []
-
-#     for result in paginated_results:
-#         event = result[0]
-#         within_radius = result[1]
-
-#         vendor_details = {
-#             "vendor_profile_image": event.vendor.user[0].profile_image,
-#             "vendor_id": event.vendor.id
-#         }
-
-#         event_info = {
-#             "id": event.id,
-#             "thumbnail": event.thumbnail,
-#             "event_type": event.event_type,
-#             "rate": event.rate,
-#             "event_rating": Ratings.get_average_rating(event.id),
-#             "fixed_price": event.fixed_price,
-#             "distance_km": geodesic((event.latitude, event.longitude), user_location).kilometers,
-#             "address": event.vendor.location,
-#             "location_name": event.location_name,
-#             "vendor_details": vendor_details
-#         }
-#         event_list.append(event_info)
-
-#     return jsonify({
-#         "status": True,
-#         "Total_Events": total_events_found,
-#         "Events": event_list
-#     }), 200
 
 @app.route("/search_event", methods=["POST"])
 @jwt_required()
@@ -1513,7 +1062,7 @@ def search_event():
     location_name = data.get("location_name")
     latitude = data.get("latitude")
     longitude = data.get("longitude")
-    distance_limit = data.get("distance_km", 10)  # Default to 10km if distance_km is not provided
+    distance_limit = data.get("distance_km", 3)  # Default to 10km if distance_km is not provided
 
     # Query based on event_type
     events_query = Event.query
@@ -1630,7 +1179,7 @@ def custom_event_search():
     for event in results:
         if event.latitude is not None and event.longitude is not None:
             event_location = (event.latitude, event.longitude)
-            distance = geodesic(event_location, user_location).kilometers <= 5
+            distance = geodesic(event_location, user_location).kilometers <= 3
             results_with_distance.append((event, distance))
 
     sorted_results = sorted(results_with_distance, key=lambda x: Ratings.get_average_rating(x[0].id), reverse=True)
@@ -1643,7 +1192,7 @@ def custom_event_search():
 
         if event.latitude is not None and event.longitude is not None:
             event_location = (event.latitude, event.longitude)
-            distance = geodesic(event_location, user_location).kilometers <= 4
+            distance = geodesic(event_location, user_location).kilometers <= 3
 
             if distance:
                 vendor_profile_image = event.vendor.user[0].profile_image  # Assuming only one user for the vendor
