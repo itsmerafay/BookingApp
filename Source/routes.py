@@ -963,13 +963,20 @@ def get_my_favorite_event():
 
     favorites = Favorites.query.filter_by(id = favorite_id ,user_id = user.id).first()
 
-    # coverting each instance of the data to dictionary with key value -- present in the model.py
-    favorite_events = [favorites.event.as_dict()]
+    if favorites:
+        # coverting each instance of the data to dictionary with key value -- present in the model.py
+        favorite_events = [favorites.event.as_dict()]
 
-    return jsonify({
-        "status":True,
-        "favorite_events":favorite_events
-    }), 200
+        return jsonify({
+            "status":True,
+            "favorite_events":favorite_events
+        }), 200
+    
+    else:
+        return jsonify({
+            "status":False,
+            "message":"Favorite id not found !"
+        }), 404
     
 
 
