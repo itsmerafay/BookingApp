@@ -798,6 +798,93 @@ def set_user_preference():
 ################### Home Events ###############################
 
 
+# # corrected home_events
+# @app.route("/home_events", methods=["POST"])
+# @jwt_required()
+# def home_events():
+#     try:
+#         data = request.get_json()
+#         user = get_current_user()
+
+#         if not user:
+#             return jsonify({
+#                 "status": False,
+#                 "message": "User not authenticated !!"
+#             }), 401
+
+#         requested_availability = data.get("is_available")
+#         user_location = (data.get("latitude"), data.get("longitude"))  # Retrieve user's location from request data
+#         max_distance = 3
+
+#         event_types = Event.query.with_entities(Event.event_type).distinct().all()
+
+#         events_by_types = {}
+#         for event_type in event_types:
+#             events = (
+#                 Event.query.join(Event.vendor)
+#                     .join(Vendor.user)
+#                     .filter(Event.event_type == event_type[0])
+#                     .order_by(func.random())
+#                     .limit(15)
+#                     .all()
+#             )
+
+#             events_data = []
+#             for event in events:
+#                 current_date_time = datetime.now()
+
+#                 if requested_availability:
+#                     is_event_available = any(
+#                         BookingAvailability.check_availability(booking, current_date_time)
+#                         for booking in event.bookings
+#                         if not booking.all_day
+#                     )
+
+#                     if not is_event_available:
+#                         continue
+
+#                 # Check the condition from Booking table before adding to the response
+#                 if not any(booking.all_day for booking in event.bookings):
+#                     continue  # Skip this event if the condition is met
+
+#                 # Calculate total bookings
+#                 # total_bookings = sum(1 for booking in event.bookings)
+#                 total_bookings = sum(1 for booking in event.bookings)
+
+#                 serialized_event = {
+#                     "event_id": event.id,
+#                     "vendor_id": event.vendor_id,
+#                     "event_type": event.event_type,
+#                     "event_rate": event.rate,
+#                     "event_address": event.address,
+#                     "event_latitude":event.latitude,
+#                     "event_longitude":event.longitude,
+#                     "event_ratings": Ratings.get_average_rating(event.id),
+#                     "total_bookings": total_bookings  # Include total bookings in the response
+#                     # Add other necessary event details
+#                 }
+#                 events_data.append(serialized_event)
+
+#             prefered_filter = data.get("prefered_filter")
+#             if prefered_filter:
+#                 events_data = Filterations.apply_filters(events_data, prefered_filter, user_location, max_distance)
+
+#             else:
+#                 continue
+            
+#             events_by_types[event_type[0]] = events_data
+
+#         return jsonify({
+#             "status": True,
+#             "events_by_events_types": events_by_types
+#         }), 200
+
+#     except Exception as e:
+#         return jsonify({
+#             "status": False,
+#             "message": str(e)
+#         }), 500
+
 # corrected home_events
 @app.route("/home_events", methods=["POST"])
 @jwt_required()
@@ -834,10 +921,12 @@ def home_events():
                 current_date_time = datetime.now()
 
                 if requested_availability:
+                    # Check event availability considering booking and cancellation
                     is_event_available = any(
                         BookingAvailability.check_availability(booking, current_date_time)
                         for booking in event.bookings
-                        if not booking.all_day
+                        if not booking.all_day and not booking.cancelled
+                        or (booking.start_datetime <= current_date_time <= booking.end_datetime)
                     )
 
                     if not is_event_available:
@@ -848,7 +937,6 @@ def home_events():
                     continue  # Skip this event if the condition is met
 
                 # Calculate total bookings
-                # total_bookings = sum(1 for booking in event.bookings)
                 total_bookings = sum(1 for booking in event.bookings)
 
                 serialized_event = {
@@ -857,8 +945,8 @@ def home_events():
                     "event_type": event.event_type,
                     "event_rate": event.rate,
                     "event_address": event.address,
-                    "event_latitude":event.latitude,
-                    "event_longitude":event.longitude,
+                    "event_latitude": event.latitude,
+                    "event_longitude": event.longitude,
                     "event_ratings": Ratings.get_average_rating(event.id),
                     "total_bookings": total_bookings  # Include total bookings in the response
                     # Add other necessary event details
@@ -868,7 +956,6 @@ def home_events():
             prefered_filter = data.get("prefered_filter")
             if prefered_filter:
                 events_data = Filterations.apply_filters(events_data, prefered_filter, user_location, max_distance)
-
             else:
                 continue
             
@@ -884,6 +971,12 @@ def home_events():
             "status": False,
             "message": str(e)
         }), 500
+
+
+
+
+
+
 
 ##################################################            Favorites             #############################################################
     
@@ -1060,6 +1153,27 @@ def delete_my_favorite_event():
 
 # ################### Custom Event Search ###########################
 
+# # Event Category titles/labels:
+# Party Event (Birthday, Baby Shower, Day Party, Bar mitzvah etc)
+# Wedding
+# Workshop
+# Networking
+# Business/Corporate 
+# Pop-Up Shop
+# Fitness Class
+# Meeting
+# Reunion
+# Creative Event (Photoshoot, Makeup class, Yoga, Dance etc)
+# Other
+# We can include these 5 categories first (Party Event, Networking, 
+# Business, Workshop, Creative Event), then add everything else under 
+# “More”
+# Browsing listing titles
+# ‘Vendor Locations’ should say “Explore 
+# our Venues”, and the following should be the sub categories for the venues. 
+# Instead of favorites, wedding etc, it should say these: Trending, Favorites, 
+# Lounge, House, Bar, Restaurant, Studio, Event Space, Meeting, All.
+
 @app.route("/search_event", methods=["POST"])
 @jwt_required()
 def search_event():
@@ -1133,6 +1247,9 @@ def search_event():
         "Total_Events": total_events_found,
         "Events": event_list
     }), 200
+
+
+
 
 
 
@@ -2071,98 +2188,6 @@ def pending_reviews():
 
 
 ##############################     All Rated Reviews      ####################################
-
-
-# @app.route('/all_reviews', methods=["GET"])
-# @jwt_required()
-# def all_reviews():
-#     try:
-#         email = get_jwt_identity()
-#         user = User.query.filter_by(email=email).first()
-
-#         if user.role == "user":
-#             # Fetch all reviews given by the user
-#             reviews = (
-#                 db.session.query(Review, Event, Vendor)
-#                 .join(Event, Review.event_id == Event.id)
-#                 .join(Vendor, Event.vendor_id == Vendor.id)
-#                 .filter(Review.user_id == user.id)
-#                 .all()
-#             )
-#         elif user.role == "vendor":
-#             reviews = (
-#                 db.session.query(Review, Event, Vendor)
-#                 .join(Event, Review.event_id == Event.id)
-#                 .join(Vendor, Event.vendor_id == Vendor.id)
-#                 .filter(Event.vendor_id == user.vendor_id)
-#                 .all()
-#             )
-#         else:
-#             return jsonify({"message": "Invalid user role."}), 400
-
-#         if not reviews:
-#             return jsonify({"message": "Reviews Not Found !!"}), 400
-
-#         review_data = []
-
-#         for review, event, vendor in reviews:
-#             vendor_user = User.query.filter_by(vendor_id=vendor.id).first()
-#             vendor_profile_image = getattr(vendor_user, 'profile_image', None)
-#             review_user = User.query.get(review.user_id)
-#             user_profile_image = getattr(review_user ,"profile_image", None)
-#             print(review_user)
-
-#             # Fetch all bookings for this event
-#             bookings = Booking.query.filter_by(event_id=event.id).all()
-
-#             # Calculate total amount earned for the event
-#             total_amount = 0
-#             for booking in bookings:
-#                 # Calculate event hours for each booking
-#                 event_hours = DateTimeConversions.calculate_event_hours(
-#                     booking.start_date, booking.end_date,
-#                     booking.start_time, booking.end_time,
-#                     booking.all_day
-#                 )
-
-#                 subtotal = event.rate * event_hours
-#                 print(f"Subtotal : {subtotal}")
-#                 tax_percentage = 0.15
-#                 tax_amount = subtotal * tax_percentage
-#                 print(f"tax amount : {tax_amount}")
-#                 total_price = subtotal + tax_amount
-#                 total_amount += total_price
-#                 print(f"Total amount : {total_amount}")
-
-#                 print(total_amount)
-
-#             review_data.append({
-#                 "event_id": event.id,
-#                 "event_thumbnail": event.thumbnail,
-#                 "event_name": event.location_name,
-#                 "event_rate": event.rate,
-#                 "total_event_hours": event_hours,
-#                 "total_amount_earned_by_the_vendor": total_amount,
-#                 "tax_amount": tax_amount, 
-#                 "event_address": event.address,
-#                 "user_profile_image":user_profile_image,
-#                 # "event_icon": booking.event_icon,
-#                 "vendor_profile_image": vendor_profile_image,
-#                 "user_review": review.user_review,
-#                 "cleanliness_rating": review.cleanliness_rating,
-#                 "price_value_rating": review.price_value_rating,
-#                 "service_value_rating": review.service_value_rating,
-#                 "location_rating": review.location_rating
-#             })
-
-#         return jsonify({
-#             "rated_reviews": review_data,
-#             "total_rated_reviews": len(review_data)
-#         })
-    
-#     except Exception as e:
-#         print(f"Error in fetching rated reviews: {str(e)}")
-#         return jsonify({"error": "An error occurred while fetching rated reviews."}), 500
 
 
 @app.route('/all_reviews', methods=["GET"])

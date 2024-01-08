@@ -170,15 +170,32 @@ class DateTimeConversions:
         return event_hours
 
 
-class BookingAvailability:
-    def check_availability(booking, current_date_time):
-        start_datetime = datetime.combine(booking.start_date, booking.start_time)
-        end_datetime = datetime.combine(booking.end_date , booking.end_time)
+# class BookingAvailability:
+#     def check_availability(booking, current_date_time):
+#         start_datetime = datetime.combine(booking.start_date, booking.start_time)
+#         end_datetime = datetime.combine(booking.end_date , booking.end_time)
 
-        if start_datetime <= current_date_time <= end_datetime:
+#         if start_datetime <= current_date_time <= end_datetime:
+#             return True
+#         else:
+#             return False
+
+# class BookingAvailability:
+#     def check_availability(booking, current_date_time):
+#         start_datetime = datetime.combine(booking.start_date, booking.start_time)
+#         end_datetime = datetime.combine(booking.end_date, booking.end_time)
+
+#         if start_datetime <= current_date_time <= end_datetime:
+#             return True
+#         else:
+#             return False
+
+class BookingAvailability:
+    @staticmethod
+    def check_availability(booking, current_date_time):
+        if booking.all_day or booking.cancelled or (booking.start_datetime <= current_date_time <= booking.end_datetime):
             return True
-        else:
-            return False
+        return False
 
 
 class Filterations:
