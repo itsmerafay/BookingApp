@@ -6,7 +6,7 @@ from geopy.distance import geodesic
 from app import app, db, mail
 from flask import request, jsonify, url_for, current_app, send_file, send_from_directory
 from datetime import datetime, timedelta
-from model import User, PasswordResetToken, Vendor, Event, Booking , Review, Preferences, Favorites
+from model import User, PasswordResetToken, Vendor, Event, Booking , Review, Preferences, Favorites, eventtiming
 import secrets
 from sqlalchemy.exc import IntegrityError
 import uuid
@@ -15,7 +15,7 @@ from flask_mail import Message
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, decode_token
 from model import bcrypt   
 from werkzeug.utils import secure_filename
-import os
+import os, json
 
 
 import sys
@@ -277,7 +277,7 @@ app.config["VENDOR_IMAGES_FOLDER"] = VENDOR_IMAGES_FOLDER
 
 @app.route("/create_event", methods=["POST"])
 @jwt_required()
-def create_event():
+def create_event():     
     data = request.get_json()
     user = get_current_user()
     # print(data)
@@ -314,6 +314,7 @@ def create_event():
     event_type = data.get("event_type")
     latitude=   data.get("latitude")
     longitude = data.get("longitude")
+    timings_data = data.get("timings")
 
     # Create an event for the vendor
     event = Event(
@@ -325,8 +326,8 @@ def create_event():
         rate=rate,
         fixed_price=fixed_price,
         details=details,
-        services=services,
-        facilities=facilities,
+        services = json.dumps(services),
+        facilities = facilities,
         description=description,
         event_type=event_type,
         latitude=latitude,
@@ -343,15 +344,46 @@ def create_event():
 
     # Handle other images if provided
     if other_images:
-        event.other_images = save_multiple_images_from_base64(other_images)
+        other_images_str = json.dumps(save_multiple_images_from_base64(other_images))
+        event.other_images = other_images_str
 
     if facilities:
-        event.facilities = save_multiple_images_from_base64(facilities)
+        facilities_str = json.dumps(save_multiple_images_from_base64(facilities))
+        event.facilities = facilities_str
 
     db.session.add(event)  # Add the event to the session
     db.session.commit()  # Commit the transaction
 
+    if timings_data:
+        print(f"Timings Data : {timings_data}")
+        for day, timings in timings_data.items():
+            start_time = timings.get("start_time")
+            end_time = timings.get("end_time")
+
+            # Ensure start_time and end_time are in the correct format
+            start_time_obj = datetime.strptime(start_time, "%H:%M:%S").time()
+            end_time_obj = datetime.strptime(end_time, "%H:%M:%S").time()
+
+            # Check if the timings are valid before storing them
+            if start_time_obj and end_time_obj:
+                event_timing = eventtiming(
+                    day_of_week=day,
+                    start_time=start_time_obj,
+                    end_time=end_time_obj,
+                    event=event
+                )
+                db.session.add(event_timing)
+        db.session.commit()
+
+
+
     return jsonify({"status":True,"message": "Event created successfully"})
+
+
+
+
+
+
 
 
 ###############################     Get My Events     ######################################
@@ -1412,19 +1444,38 @@ def create_booking():
         event_id = data.get('event_id')
         event_type = data.get("event_type")
 
+        desired_day_of_week = datetime.strptime(start_date, "%Y-%m-%d").strftime("%A")
+        event_timings = eventtiming.query.filter_by(event_id=event_id, day_of_week=desired_day_of_week).first()
+
+        if not event_timings:
+            return jsonify({
+                "status":False,
+                "message": "Event timings not found. Unable to create booking !!"
+            }), 400
+
         if not all([full_name, email, guest_count, start_date, end_date, event_id,event_type]):
             return jsonify({
                 "status":False,
                 "message": "All necessary fields must be set !!"
             })
 
+        start_time = datetime.strptime(data.get("start_time", str(event_timings.start_time)), "%H:%M:%S").time()
+        end_time = datetime.strptime(data.get("end_time", str(event_timings.end_time)), "%H:%M:%S").time()
+
+        if start_time < event_timings.start_time or end_time > event_timings.end_time:
+            return jsonify({
+                "status": False,
+                "message": "Booking timings out of range for this day."
+            }), 400
+
+
         # If it's an all-day event, set start_time and end_time accordingly
         if all_day:
-            start_time = "00:00:00"
-            end_time = "23:59:59"
+            start_time = event_timings.start_time
+            end_time = event_timings.end_time
         else:
-            start_time = data.get('start_time', "00:00:00")
-            end_time = data.get('end_time', "23:59:59")
+            start_time = data.get('start_time', event_timings.start_time)
+            end_time = data.get('end_time', event_timings.end_time)
 
         # Calculate total event hours
         event_hours = DateTimeConversions.calculate_event_hours(start_date, end_date, start_time, end_time, all_day)
@@ -1497,6 +1548,53 @@ def create_booking():
 
 
 
+@app.route('/update_event_hours', methods=["POST"])
+@jwt_required()
+def update_event_hours():
+    try:
+        data = request.get_json()
+        user = get_current_user()
+
+        if not user:
+            return jsonify({
+                "status":False,
+                "message": "User not authenticated !!"
+            }), 401
+            
+        if user.role != "vendor":
+            return jsonify({
+                "status": False,
+                "message": "Unauthorized access: Only users can create bookings."
+            })
+        
+        event_id = data.get("event_id")
+        start_time = data.get("start_time")
+        end_time = data.get("end_time")
+        day_of_week = data.get("day_of_week")
+
+        event_timings = eventtiming.query.filter_by(event_id=event_id, day_of_week=day_of_week).first()
+        
+        if not event_timings:
+            return jsonify({
+                "status":False,
+                "message":"Event or event day of week not found !!"
+            }), 400
+        
+        event_timings.start_time = start_time
+        event_timings.end_time = end_time
+
+        db.session.commit()
+
+        return jsonify({
+            "status":True,
+            "message":"Successfully updated the working hours !!"
+        }),200
+
+    except Exception as e:
+        return jsonify({
+            "status":False,
+            "message": str(e)
+        }), 500
 
 ###############################   Upload Event Icon   ######################################
 

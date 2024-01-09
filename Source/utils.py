@@ -132,10 +132,6 @@ class Ratings:
 class DateTimeConversions:
     
     @staticmethod
-    def convert_to_datetime(date_str, time_str):
-        return datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %H:%M:%S")
-
-    @staticmethod
     def calculate_hours_for_duration(start_datetime, end_datetime):
         return (end_datetime - start_datetime).total_seconds() / 3600
 
@@ -144,31 +140,26 @@ class DateTimeConversions:
         return (end_datetime.date() - start_datetime.date()).days + 1
 
     @staticmethod
+    def convert_to_datetime(date_str, time_str):
+        return datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %H:%M:%S")
+
+    @staticmethod
     def calculate_event_hours(start_date, end_date, start_time, end_time, all_day):
-        # If it's an all-day event, set start_time and end_time accordingly
         if all_day:
-            start_time = "00:00:00"
-            end_time = "23:59:59"
+            # For all-day events, calculate the duration as the full day
+            start_datetime = DateTimeConversions.convert_to_datetime(start_date, "00:00:00")
+            end_datetime = DateTimeConversions.convert_to_datetime(end_date, "23:59:59")
+        else:
+            start_datetime = DateTimeConversions.convert_to_datetime(start_date, start_time)
+            end_datetime = DateTimeConversions.convert_to_datetime(end_date, end_time)
 
-        # Convert start and end dates/times to datetime objects
-        start_datetime = DateTimeConversions.convert_to_datetime(start_date, start_time)
-        end_datetime = DateTimeConversions.convert_to_datetime(end_date, end_time)
+        # Calculate the duration in seconds
+        duration_seconds = (end_datetime - start_datetime).total_seconds()
 
-        # If it's an all-day event, set end_datetime to 23:59:59 of the end_date
-        if all_day:
-            end_datetime = datetime.combine(end_datetime.date(), datetime.max.time())
-
-        # Calculate total event hours for the specified time duration
-        total_hours_for_duration = DateTimeConversions.calculate_hours_for_duration(start_datetime, end_datetime)
-
-        # Calculate the number of days involved
-        total_days_involved = DateTimeConversions.calculate_days_involved(start_datetime, end_datetime)
-
-        # Use the minimum of total_hours_for_duration and total_days_involved as event_hours
-        event_hours = max(total_hours_for_duration, total_days_involved * 24)
+        # Convert duration to hours
+        event_hours = duration_seconds / 3600
 
         return event_hours
-
 
 # class BookingAvailability:
 #     def check_availability(booking, current_date_time):
@@ -180,22 +171,18 @@ class DateTimeConversions:
 #         else:
 #             return False
 
-# class BookingAvailability:
-#     def check_availability(booking, current_date_time):
-#         start_datetime = datetime.combine(booking.start_date, booking.start_time)
-#         end_datetime = datetime.combine(booking.end_date, booking.end_time)
-
-#         if start_datetime <= current_date_time <= end_datetime:
-#             return True
-#         else:
-#             return False
 
 class BookingAvailability:
-    @staticmethod
     def check_availability(booking, current_date_time):
-        if booking.all_day or booking.cancelled or (booking.start_datetime <= current_date_time <= booking.end_datetime):
+        start_datetime = datetime.combine(booking.start_date, booking.start_time)
+        end_datetime = datetime.combine(booking.end_date, booking.end_time)
+
+        if start_datetime <= current_date_time <= end_datetime:
             return True
-        return False
+        else:
+            return False
+
+
 
 
 class Filterations:

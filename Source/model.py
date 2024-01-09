@@ -3,8 +3,11 @@ from flask_bcrypt import Bcrypt
 from geopy.distance import geodesic
 from datetime import datetime, timedelta,date, time
 from sqlalchemy import UniqueConstraint, func
+from sqlalchemy.exc import IntegrityError
 from collections import defaultdict
+from sqlalchemy import event
 import sys
+
 sys.dont_write_bytecode = True
 
 bcrypt = Bcrypt()
@@ -89,7 +92,7 @@ class Event(db.Model):
     services = db.Column(db.String(1024), nullable=True)
 
     # For services and facilities, use a JSON field for multiple images
-    facilities = db.Column(db.JSON, nullable=True)
+    facilities = db.Column(db.String(1024), nullable=True)
     description = db.Column(db.String(1024), nullable=True)
     event_type = db.Column(db.String(255), nullable =  True)
     latitude = db.Column(db.Float, nullable =  True)
@@ -97,6 +100,9 @@ class Event(db.Model):
     vendor = db.relationship("Vendor", back_populates="event")
     # favorites = db.relationship("Favorites", backref="event")  # Relationship to the 'Favorites' model
 
+    # relationship 
+    # describing each object in event table must have timings obj
+    event_timing = db.relationship("eventtiming", back_populates="event")
 
     vendor_id = db.Column(db.Integer, db.ForeignKey("vendor.id"), nullable = False)
     def as_dict(self):
@@ -277,3 +283,18 @@ class Favorites(db.Model):
     event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
 
     event = db.relationship("Event", backref="favorites")  # Relationship to the 'Event' model
+
+
+class eventtiming(db.Model): 
+    id = db.Column(db.Integer, primary_key=True)
+    event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
+    day_of_week = db.Column(db.String(10), nullable=False)
+    start_time = db.Column(db.Time, nullable=False)
+    end_time = db.Column(db.Time, nullable=False)
+
+    event = db.relationship('Event', back_populates='event_timing')
+
+# @event.listens_for(eventtiming, "before_insert")  
+# def validate_timings(mapper, connection, target):
+#     if target.start_time >= target.end_time:
+#         raise IntegrityError("End time should be after start time.")

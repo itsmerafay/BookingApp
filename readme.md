@@ -1,3 +1,13 @@
+1/9/2024 6:50
+
+Timings Functionality Added In:
+    ~ create_event
+    ~ create_booking
+new api :
+~ update_event_hours
+
+
+
 1/8/2024 6:50
 refactoring and optimization of some apis
 
