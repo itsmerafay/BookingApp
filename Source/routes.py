@@ -442,8 +442,11 @@ def create_event():
 def getmyevents():
     try:
         user = get_current_user()
+        print(user)
         vendor = user.vendor
+        print(vendor)  # Check if vendor is retrieved successfully
         events = Event.query.filter_by(vendor=vendor).all()
+        print(events)  # Check if events are retrieved for the given vendor
         events_data = []
 
         for event in events:
@@ -455,11 +458,54 @@ def getmyevents():
             event_dict['event_type'] = event.bookings[0].event_type if event.bookings else None
 
             events_data.append(event_dict)
+            
 
         return jsonify({"status": True, "events": events_data})
     except Exception as e:
         print(e)
         return jsonify({"status": False, "events": []})
+
+# from sqlalchemy import inspect
+
+# @app.route("/get_my_events", methods=["GET"])
+# @jwt_required()
+# def getmyevents():
+#     try:
+#         user = get_current_user()
+#         print(user)
+#         vendor = user.vendor
+#         print(vendor.id)
+#         events = Event.query.filter_by(vendor_id=vendor.id).all()
+#         print("-----------")
+#         print(f"Events : {events}")
+#         print("-----------")
+
+#         events_data = []
+
+#         for event in events:
+#             event_dict = {c.key: getattr(event, c.key) for c in inspect(event).mapper.column_attrs}
+#             event_dict['total_bookings'] = event.get_total_bookings()
+#             event_dict['total_bookings_value'] = event.earnings_per_month()  # Total earnings for the current month
+
+#             # Try to access event bookings
+#             try:
+#                 event_dict['bookings'] = [booking.as_dict() for booking in event.bookings]
+#             except Exception as ex:
+#                 event_dict['bookings_error'] = str(ex)
+
+#             events_data.append(event_dict)
+#             print(events_data)
+
+#         return jsonify({"status": True, "events": events_data})
+    
+#     except Exception as e:
+#         print(e)
+#         return jsonify({"status": False, "error": str(e)})
+
+
+
+
+
 
 
 ###############################     Update My Event     ######################################
@@ -599,7 +645,7 @@ def delete_event(event_id):
 
 
 
-###############################     Get Event     ######################################
+###############################     Booking Details     ######################################
 
 @app.route("/booking_details/<int:booking_id>", methods=["GET"])
 @jwt_required()
@@ -637,7 +683,7 @@ def get_event(event_id):
                 "message": "Unauthorized access: Only users can get events."
             })
     event = Event.query.get(event_id) 
-    
+
     if event:
         event_details = {
             "id": event.id,
@@ -655,9 +701,23 @@ def get_event(event_id):
             "vendor_id": event.vendor_id,  # You can include vendor details if needed
             "location_name":event.location_name,
             "longitude":event.longitude,
-            "latitude":event.latitude,
-            "event_icon":event.event_icon
+            "latitude":event.latitude
+            # "event_icon":event.event_icon
         }
+
+        event_timings = event.event_timing
+        print(event_timings)
+        if event_timings:
+            event_details["event_timings"] = {
+                timing.day_of_week : {
+                    "start_time":timing.start_time.isoformat(),
+                    "end_time":timing.end_time.isoformat()
+                }
+            for timing in event_timings}
+        else:
+            event_details["event_timings"] = {}
+
+
         # Fetch vendor details
         if event.vendor:
             vendor = event.vendor
@@ -680,6 +740,64 @@ def get_event(event_id):
             "status":False,
             "message":"Event not Found !!"
         })
+
+
+# @app.route("/get_event/<int:event_id>", methods=["GET"])
+# @jwt_required()
+# def get_event(event_id):
+#     user = get_current_user()
+
+#     if not user:
+#         return jsonify({
+#             "status": False,
+#             "message": "User not authenticated !!"
+#         }), 401
+
+#     if user.role != "user":
+#         return jsonify({
+#             "status": False,
+#             "message": "Unauthorized access: Only users can get events."
+#         })
+
+#     event = Event.query.get(event_id)
+
+#     if event:
+#         event_details = {
+#             "id": event.id,
+#             # ... (other event details) ...
+#         }
+
+#         event_timings = event.event_timing  # Check the event_timing relationship directly
+
+#         if event_timings:
+#             timings = {
+#                 timing.day_of_week: {
+#                     "start_time": timing.start_time.isoformat(),
+#                     "end_time": timing.end_time.isoformat()
+#                 } for timing in event_timings
+#             }
+#             event_details["event_timings"] = timings
+#         else:
+#             event_details["event_timings"] = {}
+
+#         # Fetch vendor details
+#         if event.vendor:
+#             vendor = event.vendor
+#             vendor_details = {
+#                 "id": vendor.id,
+#                 # ... (other vendor details) ...
+#             }
+
+#             event_details['vendor_details'] = vendor_details
+
+#         return jsonify({"status": True, "Event Details": event_details})
+#     else:
+#         return jsonify({
+#             "status": False,
+#             "message": "Event not Found !!"
+#         })
+
+
 
 # decoding image
 

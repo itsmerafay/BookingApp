@@ -1,4 +1,8 @@
 
+1/10/2024 6:19
+
+updated some apis to return the operating hours in responses
+
 1/10/2024 12:52
 
 model and create_event api changes 

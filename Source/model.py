@@ -111,11 +111,11 @@ class Event(db.Model):
     def as_dict(self):
 
         # converting event objects into dictionary , extracting name and values of the columns by getattr
-        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
-        # event_timings = eventtiming.query.filter_by(event_id = self.id).all()
-        # event_dict["event_timings"] = {timing.day_of_week : {"start_time":timing.start_time.isoformat(),
-        #                                                     "end_time":timing.end_time.isoformat()}
-        #                                                     for timing in event_timings }
+        event_dict =  {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        event_timings = eventtiming.query.filter_by(event_id = self.id).all()
+        event_dict["event_timings"] = {timing.day_of_week : {"start_time":timing.start_time.isoformat(),
+                                                            "end_time":timing.end_time.isoformat()}
+                                                            for timing in event_timings }
         
         return event_dict
 
@@ -243,8 +243,8 @@ class Booking(db.Model):
         hourly_rate = self.event.rate
         total_price = duration_hours * hourly_rate
         return total_price
-
-    def get_booking_with_event_details(self):
+    
+    def get_booking_with_event_details(self, include_event_timings=False):
         booking_dict = {c.name: getattr(self, c.name) for c in self.__table__.columns}
         for c in self.__table__.columns:
             value = getattr(self, c.name)
@@ -259,8 +259,16 @@ class Booking(db.Model):
 
         if self.user:
             booking_dict['user_profile_image'] = self.user.profile_image
+
         # Include total paid price
         booking_dict['total_paid_price'] = self.calculate_total_price()
+
+        # Remove event_timings if not required
+        # if not include_event_timings and 'event' in booking_dict and 'event_timings' in booking_dict['event']:
+        #     del booking_dict['event']['event_timings']
+
+        if not include_event_timings and "event" in booking_dict and "event_timings" in booking_dict["event"]:
+            del booking_dict["event"]["event_timings"]
 
         return booking_dict
 
