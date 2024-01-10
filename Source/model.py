@@ -92,7 +92,9 @@ class Event(db.Model):
     services = db.Column(db.String(1024), nullable=True)
 
     # For services and facilities, use a JSON field for multiple images
-    facilities = db.Column(db.String(1024), nullable=True)
+    # facilities = db.Column(db.String(1024), nullable=True)  # Change JSON to String
+    facilities = db.Column(db.JSON, nullable=True)
+
     description = db.Column(db.String(1024), nullable=True)
     event_type = db.Column(db.String(255), nullable =  True)
     latitude = db.Column(db.Float, nullable =  True)
@@ -105,8 +107,17 @@ class Event(db.Model):
     event_timing = db.relationship("eventtiming", back_populates="event")
 
     vendor_id = db.Column(db.Integer, db.ForeignKey("vendor.id"), nullable = False)
+
     def as_dict(self):
+
+        # converting event objects into dictionary , extracting name and values of the columns by getattr
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        # event_timings = eventtiming.query.filter_by(event_id = self.id).all()
+        # event_dict["event_timings"] = {timing.day_of_week : {"start_time":timing.start_time.isoformat(),
+        #                                                     "end_time":timing.end_time.isoformat()}
+        #                                                     for timing in event_timings }
+        
+        return event_dict
 
     def get_total_bookings(self):
         return len(self.bookings)

@@ -326,7 +326,7 @@ def create_event():
         rate=rate,
         fixed_price=fixed_price,
         details=details,
-        services = json.dumps(services),
+        services =services,
         facilities = facilities,
         description=description,
         event_type=event_type,
@@ -342,14 +342,16 @@ def create_event():
         save_image_from_base64(thumbnail, thumbnail_path)
         event.thumbnail = thumbnail_filename
 
-    # Handle other images if provided
     if other_images:
-        other_images_str = json.dumps(save_multiple_images_from_base64(other_images))
-        event.other_images = other_images_str
+        other_image_filenames = save_multiple_images_from_base64(other_images)
+        event.other_images = other_image_filenames
 
     if facilities:
-        facilities_str = json.dumps(save_multiple_images_from_base64(facilities))
-        event.facilities = facilities_str
+        facility_image_filenames = save_multiple_images_from_base64(facilities)
+        event.facilities = facility_image_filenames
+
+
+
 
     db.session.add(event)  # Add the event to the session
     db.session.commit()  # Commit the transaction
@@ -434,7 +436,7 @@ def create_event():
 #         print(e)
 #         return jsonify({"status": False, "events": []})
 
-
+# for vendor 
 @app.route("/get_my_events", methods=["GET"])
 @jwt_required()
 def getmyevents():
