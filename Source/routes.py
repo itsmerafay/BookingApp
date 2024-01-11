@@ -6,7 +6,7 @@ from geopy.distance import geodesic
 from app import app, db, mail
 from flask import request, jsonify, url_for, current_app, send_file, send_from_directory
 from datetime import datetime, timedelta
-from model import User, PasswordResetToken, Vendor, Event, Booking , Review, Preferences, Favorites, eventtiming
+from model import User, PasswordResetToken, Vendor, Event, Booking , Review, Preferences, Favorites, eventtiming, Inquiry
 import secrets
 from sqlalchemy.exc import IntegrityError
 import uuid
@@ -2643,6 +2643,38 @@ def create_inquiry():
                 "status": False,
                 "message": "Unauthorized access: Only users can create bookings."
             }), 401
+
+        event_id = data.get("event_id")
+
+        event = Event.query.filter_by(id = event_id)
+        if not event:
+            return jsonify({
+                "status":False,
+                "message":"Event doesn't exist !!"
+            }), 404
+        
+        new_inquiry = Inquiry(
+            event_id = event_id,
+            user_id = user.id,
+            full_name=data.get("full_name"),
+            email=data.get("email"),
+            guest_count=data.get("guest_count"),
+            additional_notes=data.get("additional_notes"),
+            start_date = data.get("start_date"),
+            end_date = data.get("end_date"),
+            start_time = data.get("start_time"),
+            end_time = data.get("end_time"),
+            all_day = data.get("all_day", False),
+            event_type = data.get("event_type"),
+        )
+        db.session.add(new_inquiry)
+        db.session.commit()
+
+        return jsonify({
+            "status":True,
+            "message":"Successfully submitted the inquiry !!"
+        }), 200
+
     
     
     except Exception as e:
@@ -2652,6 +2684,103 @@ def create_inquiry():
         }), 500
 
 
+
+# for user
+@app.route("/get_all_my_inquiries_user", methods = ["GET"])
+@jwt_required()
+def get_all_my_inquiries_user():
+    try:
+        user = get_current_user()
+
+        if not user:
+            return jsonify({
+                "status":False,
+                "message": "User not authenticated !!"
+            }), 401
+            
+        if user.role != "user":
+            return jsonify({
+                "status": False,
+                "message": "Unauthorized access: Only vendors can create inquiries."
+            }), 401
+
+        user_id = user.id
+
+        inquiry = Inquiry.query.filter_by(user_id = user_id).all()
+    
+        if not inquiry:
+            return jsonify({
+                "status":False,
+                "message":"Inquiry doesn't exist !!"
+            }), 404
+
+        inquiries_data = [inquiries.as_dict() for inquiries in inquiry]
+        
+        
+        return jsonify({
+            "status":True,
+            "inquiries_data":inquiries_data
+        }), 200
+
+    
+    
+    except Exception as e:
+        return jsonify({
+            "status":False,
+            "message": str(e)
+        }), 500
+
+
+
+
+# for vendor getting specifc inquiries for events
+    
+@app.route("/get_my_inquiry_vendor/<int:event_id>", methods = ["GET"])
+@jwt_required()
+def get_my_inquiry_vendor(event_id):
+    try:
+        data = request.get_json()
+        user = get_current_user()
+
+        if not user:
+            return jsonify({
+                "status":False,
+                "message": "User not authenticated !!"
+            }), 401
+            
+        if user.role != "vendor":
+            return jsonify({
+                "status": False,
+                "message": "Unauthorized access: Only vendors can create inquiries."
+            }), 401
+
+        # inquiry_id = data.get("inquiry_id")
+        vendor_id = user.vendor.id
+
+
+        inquiries = Inquiry.query.join(Event).filter(Event.vendor_id == vendor_id, Event.id == event_id).all()
+    
+        if not inquiries:
+            return jsonify({
+                "status":False,
+                "message":"Inquiry doesn't exist !!"
+            }), 404
+
+        inquiries_data = [inquiry.as_dict() for inquiry in inquiries]
+        
+        
+        return jsonify({
+            "status":True,
+            "inquiries_data":inquiries_data
+        }), 200
+
+    
+    
+    except Exception as e:
+        return jsonify({
+            "status":False,
+            "message": str(e)
+        }), 500
 
 
 

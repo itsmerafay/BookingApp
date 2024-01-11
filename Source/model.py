@@ -25,7 +25,9 @@ class User(db.Model):
     vendor_id = db.Column(db.Integer, db.ForeignKey('vendor.id'), unique=True, nullable=True)
     vendor = db.relationship('Vendor', back_populates='user')
 
-    # inquiries = db.relationship("Inquiry", backref = "user")
+    # inquiries = db.relationship("Inquiry", back_populates="user", overlaps="inquiries_user")
+    inquiries = db.relationship("Inquiry", back_populates="user")
+
     favorites = db.relationship("Favorites", backref="user")  # Relationship to the 'Favorites' model
 
     def __init__(self, email, password, role):
@@ -101,12 +103,13 @@ class Event(db.Model):
     latitude = db.Column(db.Float, nullable =  True)
     longitude = db.Column(db.Float, nullable =  True)
     vendor = db.relationship("Vendor", back_populates="event")
-    # inquiries = db.relationship("Inquiry", backref = "event")
+    # inquiries = db.relationship("Inquiry", back_populates="event")
     # favorites = db.relationship("Favorites", backref="event")  # Relationship to the 'Favorites' model
 
     # relationship 
     # describing each object in event table must have timings obj
     event_timing = db.relationship("eventtiming", back_populates="event")
+    inquiries = db.relationship("Inquiry", back_populates="event")
 
     vendor_id = db.Column(db.Integer, db.ForeignKey("vendor.id"), nullable = False)
 
@@ -327,6 +330,49 @@ class eventtiming(db.Model):
 
 
 
+class Inquiry(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    full_name = db.Column(db.String(255), nullable=False)
+    email = db.Column(db.String(255), nullable=False)
+    guest_count = db.Column(db.Integer, nullable=False)
+    additional_notes = db.Column(db.String(1024), nullable=True)
+    start_date = db.Column(db.Date, nullable=False)
+    end_date = db.Column(db.Date, nullable=False)
+    start_time = db.Column(db.Time, nullable=False)
+    end_time = db.Column(db.Time, nullable=False)
+    all_day = db.Column(db.Boolean, default=False)
+    event_type = db.Column(db.String(255), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    cancelled = db.Column(db.Boolean, default=False)
+
+    # event = db.relationship("Event", backref="inquiries")
+    # user = db.relationship("User", backref="inquiries_user")
+
+    event = db.relationship("Event", back_populates="inquiries")
+    user = db.relationship("User", back_populates="inquiries")
+
+
+    # event = db.relationship('Event', back_populates='event_timing')
+
+    # event_timing = db.relationship("eventtiming", back_populates="event")
+
+
+
+
+    def as_dict(self):
+        inquiry_dict = {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        # converting time objects into string
+        for key, value in inquiry_dict.items():
+            if isinstance(value,time):
+                inquiry_dict[key] = value.strftime("%H:%M:%S") if value else None 
+        return inquiry_dict
+
+
+
+
+
 # class Inquiry(db.Model):
 #     id = db.Column(db.Integer, primary_key=True)
 #     event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
@@ -344,10 +390,9 @@ class eventtiming(db.Model):
 #     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 #     cancelled = db.Column(db.Boolean, default=False)
 
-#     event = db.relationship("Event", backref="inquiries")
-#     user = db.relationship("User", backref="inquiries")
+#     event = db.relationship("Event", back_populates="inquiries")
+#     user = db.relationship("User", back_populates="inquiries")
 
 #     def as_dict(self):
 #         inquiry_dict = {c.name: getattr(self, c.name) for c in self.__table__.columns}
 #         return inquiry_dict
-

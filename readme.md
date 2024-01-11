@@ -1,4 +1,17 @@
 
+1/11/2024 7:06
+
+APIS done :
+~ update_event_hours
+
+~ create_inquiry
+~ get_my_inquiry_vendor/<int:event_id>
+~ get_all_my_inquiries_user 
+changes on commit
+ 
+
+
+
 1/11/2024 3:32
 
 updated:
