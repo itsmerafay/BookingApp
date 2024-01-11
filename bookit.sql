@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 21, 2023 at 09:17 AM
+-- Generation Time: Jan 11, 2024 at 11:30 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -36,7 +36,7 @@ CREATE TABLE `alembic_version` (
 --
 
 INSERT INTO `alembic_version` (`version_num`) VALUES
-('dec34a441880');
+('e885497c5747');
 
 -- --------------------------------------------------------
 
@@ -83,27 +83,25 @@ INSERT INTO `booking` (`id`, `event_id`, `user_id`, `full_name`, `email`, `guest
 (14, 3, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:26:15', 'Workshop', 1),
 (15, 4, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:26:21', 'Network', 0),
 (16, 5, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:26:27', 'Workshop', 0),
-(17, 6, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:26:32', 'Charity', 0),
+(17, 6, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2022-12-21', '2022-12-22', '14:00:00', '15:00:00', 0, '2023-12-06 08:26:32', 'Charity', 0),
 (18, 7, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:26:38', 'Network', 0),
 (19, 8, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:26:44', 'Wedding', 0),
 (20, 9, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:26:50', 'Wedding', 0),
 (21, 10, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:26:56', 'Wedding', 0),
 (22, 11, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:27:01', 'Workshop', 0),
 (23, 12, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:27:05', 'Wedding', 0),
-(24, 13, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2023-12-21', '2023-12-21', '14:00:00', '15:00:00', 0, '2023-12-06 08:27:09', 'Wedding', 0),
+(24, 13, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2023-12-22', '2023-12-22', '14:00:00', '15:00:00', 0, '2023-12-06 08:27:09', 'Network', 0),
 (25, 14, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:27:13', 'Wedding', 0),
 (26, 15, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:27:17', 'Charity', 0),
 (27, 16, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:27:22', 'Charity', 0),
 (28, 17, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:27:25', 'Network', 0),
 (29, 18, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:27:41', 'Wedding', 0),
-(30, 19, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:27:45', 'Network', 0),
 (31, 20, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:27:51', 'Network', 0),
 (32, 21, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:27:54', 'Wedding', 0),
-(33, 22, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:27:58', 'Wedding', 0),
-(34, 22, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2025-01-25', '2025-01-25', '14:00:00', '15:00:00', 0, '2023-12-06 08:47:28', 'Wedding', 0),
+(33, 22, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2024-01-08', '2024-01-08', '14:00:00', '22:00:00', 0, '2023-12-06 08:27:58', 'Wedding', 0),
 (35, 21, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:47:33', 'Wedding', 0),
 (36, 20, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:47:47', 'Network', 0),
-(37, 19, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:48:53', 'Wedding', 0),
+(37, 19, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2024-01-08', '2024-01-08', '12:00:00', '13:00:00', 0, '2023-12-06 08:48:53', 'Wedding', 0),
 (38, 18, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:49:09', 'Network', 0),
 (39, 17, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:49:15', 'Wedding', 0),
 (40, 16, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:49:20', 'Network', 0),
@@ -116,18 +114,19 @@ INSERT INTO `booking` (`id`, `event_id`, `user_id`, `full_name`, `email`, `guest
 (47, 9, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:49:50', 'Birthday', 0),
 (48, 8, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:49:55', 'Birthday', 0),
 (49, 7, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:50:00', 'Function', 0),
-(50, 6, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:50:06', 'Birthday', 0),
+(50, 6, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2023-12-11', '2023-12-01', '14:00:00', '15:00:00', 0, '2023-12-06 08:50:06', 'Birthday', 0),
 (51, 5, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:50:10', 'Function', 0),
 (52, 4, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:50:14', 'Function', 0),
 (53, 3, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:50:18', 'Charity', 1),
 (54, 2, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:50:21', 'Function', 0),
 (55, 1, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:50:25', 'Function', 1),
-(56, 26, 51, 'Abdul Rafay Atiq 124', 'just1.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-07 11:41:07', 'Function', 0),
+(56, 26, 51, 'Abdul Rafay Atiq 124', 'just1.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-07 11:41:07', 'Function', 1),
 (57, 27, 51, 'Abdul Rafay Atiq 124', 'just1.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-29', '2004-06-30', '14:00:00', '15:00:00', 1, '2023-12-07 11:41:19', 'Function', 0),
-(58, 27, 51, 'Muhammad Ahsan Bin Abdul Aziz', 'nothing.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-20 08:16:43', NULL, 0),
+(58, 27, 51, 'Muhammad Ahsan Bin Abdul Aziz', 'nothing.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-20 08:16:43', 'Birthday', 0),
 (59, 27, 51, 'Muhammad Ahsan Bin Abdul Aziz', 'nothing.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-29', '2004-06-30', '16:00:00', '17:00:00', 0, '2023-12-20 08:19:14', 'Birthday', 0),
 (60, 27, 51, 'Muhammad Ahsan Bin Abdul Aziz', 'nothing.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-01', '2004-06-02', '16:00:00', '17:00:00', 0, '2023-12-20 08:24:04', 'Wedding', 1),
-(85, 27, 51, 'Muhammad Ahsan Bin Abdul Aziz', 'nothing.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-01', '2004-06-02', '17:00:00', '18:00:00', 0, '2023-12-20 11:27:28', 'NeTwOrk', 0);
+(85, 27, 51, 'Muhammad Ahsan Bin Abdul Aziz', 'nothing.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2024-01-08', '2024-01-08', '14:00:00', '18:00:00', 1, '2023-12-20 11:27:28', 'NeTwOrk', 1),
+(97, 70, 55, 'Rafay and Rafay', 'johndoe@example.com', 5, 'Special requests for the event.', '2024-01-13', '2024-01-13', '12:00:00', '13:20:23', 0, '2024-01-11 10:17:13', 'Bussiness Meeting', 0);
 
 -- --------------------------------------------------------
 
@@ -137,7 +136,7 @@ INSERT INTO `booking` (`id`, `event_id`, `user_id`, `full_name`, `email`, `guest
 
 CREATE TABLE `event` (
   `id` int(11) NOT NULL,
-  `thumbnail` varchar(255) NOT NULL,
+  `thumbnail` varchar(255) DEFAULT NULL,
   `other_images` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`other_images`)),
   `video_showcase` varchar(255) DEFAULT NULL,
   `address` varchar(255) NOT NULL,
@@ -161,18 +160,18 @@ CREATE TABLE `event` (
 INSERT INTO `event` (`id`, `thumbnail`, `other_images`, `video_showcase`, `address`, `rate`, `fixed_price`, `details`, `facilities`, `description`, `event_type`, `vendor_id`, `services`, `latitude`, `longitude`, `location_name`) VALUES
 (1, '18fabf02-221b-401c-90a6-dc5d012b73ab.png', '[\"9b056398-ec4a-4522-8dce-0b6e4ee650da.png\", \"db1c10fd-e7b9-466a-a5af-0112824c36c6.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 10, 1, 'details', '[\"06ad8829-280d-43b6-9483-1a097ad48e33.png\"]', 'description', 'Birthday', 10, NULL, 24.929, 67.0971, 'Delizia'),
 (2, 'b0af4b12-aa95-4218-a9a5-13d36579180b.png', '[\"69166b02-97f6-411b-b6f2-bd4e57b520c6.png\", \"cd836160-67b0-4813-beac-b5009264a378.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"4007c72c-be69-4fc9-b41f-6f3882a463f2.png\"]', 'description', 'wedding', 10, NULL, 24.9289, 67.097, 'Pieinthesky'),
-(3, '629ff76a-073d-45a0-92ff-87610a85cb4e.png', '[\"30efaa63-18fc-4bba-b8a2-41cfe88ccb96.png\", \"53f520a1-e644-42d7-824f-79d1074820df.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 10000, 1, 'details', '[\"3ed2dadc-3829-4f11-86e6-3a41b495e70f.png\"]', 'Birthday', 'birthday', 10, NULL, 24.9288, 67.0969, 'Kaybees'),
-(4, '5b49050f-167f-4218-a1f6-6d88580549ec.png', '[\"5214eb22-c75a-42fd-af1a-ed39694fc7b5.png\", \"5b57d947-c14d-486d-8ecd-444715395d3b.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"0b0ae605-cdff-4c74-85de-0635975db9cf.png\"]', 'Birthday', 'Wedding', 10, NULL, 24.9287, 67.0968, 'Kababjees'),
-(5, '749e744c-6b1b-4415-9c8c-a0d4a3c8dcd7.png', '[\"009ffe35-818c-4ef3-8c1c-22877797d546.png\", \"1091ac8c-414a-4973-bc50-10357985cc1b.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 1000, 1, 'details', '[\"decf26e4-bfa3-4fc4-8c36-c7de3855677b.png\"]', 'Birthday', 'Wedding', 10, NULL, 24.9286, 67.0967, 'The Bakers'),
-(6, '45a3259a-6963-488a-9164-23d294c3af28.png', '[\"b05fbba7-d0d7-4a5b-8b9f-e87092493880.png\", \"b8f23972-4a41-45e5-ad0f-927464abd858.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"1b643bb6-3537-4d5c-b220-d1480c1fcca1.png\"]', 'Meeting', 'Wedding', 10, NULL, 24.9285, 67.0966, 'Delicacy'),
-(7, '7a9d4ecf-6861-4ba4-aa04-594c365e9665.png', '[\"4ff2ae06-a1f9-4912-94f8-6ea073961e0f.png\", \"3858aea0-ae4f-48bd-b5d0-a030fa8e5d29.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 1000, 1, 'details', '[\"7cd2599c-0ad7-4bc7-be80-572c602e02a4.png\"]', 'Birthday', 'Wedding', 10, NULL, 24.9284, 67.0965, 'Delizia'),
+(3, '629ff76a-073d-45a0-92ff-87610a85cb4e.png', '[\"30efaa63-18fc-4bba-b8a2-41cfe88ccb96.png\", \"53f520a1-e644-42d7-824f-79d1074820df.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 10000, 1, 'details', '[\"3ed2dadc-3829-4f11-86e6-3a41b495e70f.png\"]', 'Birthday', 'Lounge', 10, NULL, 24.9288, 67.0969, 'Kaybees'),
+(4, '5b49050f-167f-4218-a1f6-6d88580549ec.png', '[\"5214eb22-c75a-42fd-af1a-ed39694fc7b5.png\", \"5b57d947-c14d-486d-8ecd-444715395d3b.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"0b0ae605-cdff-4c74-85de-0635975db9cf.png\"]', 'Its a shop', 'Workshop', 10, NULL, 24.9287, 67.0968, 'Kababjees'),
+(5, '749e744c-6b1b-4415-9c8c-a0d4a3c8dcd7.png', '[\"009ffe35-818c-4ef3-8c1c-22877797d546.png\", \"1091ac8c-414a-4973-bc50-10357985cc1b.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 1000, 1, 'details', '[\"decf26e4-bfa3-4fc4-8c36-c7de3855677b.png\"]', 'Birthday', 'House', 10, NULL, 24.9286, 67.0967, 'The Bakers'),
+(6, '45a3259a-6963-488a-9164-23d294c3af28.png', '[\"b05fbba7-d0d7-4a5b-8b9f-e87092493880.png\", \"b8f23972-4a41-45e5-ad0f-927464abd858.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"1b643bb6-3537-4d5c-b220-d1480c1fcca1.png\"]', 'Meeting', 'Bar', 10, NULL, 24.9285, 67.0966, 'Delicacy'),
+(7, '7a9d4ecf-6861-4ba4-aa04-594c365e9665.png', '[\"4ff2ae06-a1f9-4912-94f8-6ea073961e0f.png\", \"3858aea0-ae4f-48bd-b5d0-a030fa8e5d29.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 1000, 1, 'details', '[\"7cd2599c-0ad7-4bc7-be80-572c602e02a4.png\"]', 'Birthday', 'Restaurant', 10, NULL, 24.9284, 67.0965, 'Delizia'),
 (8, '7a8ec041-ec14-4885-aee3-7ec282b4f09a.png', '[\"ce7ece10-aa97-418e-b999-0c92ce5f15e0.png\", \"a83681a6-3d58-46a1-8e2e-bd8b11f78b05.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"0b2957d2-fa5d-452e-b022-15b6f216f0b1.png\"]', 'Birthday', 'Wedding', 10, NULL, 24.9283, 67.0964, 'Pieinthesky'),
-(9, 'ba0f8d0a-bded-429b-8b7b-240bf8bd2c9c.png', '[\"fa3ce8ff-93d6-479c-a8de-64fe2b77928e.png\", \"cb45790d-b17e-40fe-93d9-bfe2daf79759.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"9100c354-957b-43c7-8a16-9fd249b40b69.png\"]', 'Birthday', 'Wedding', 10, NULL, 24.9282, 67.0963, 'The Bakers'),
+(9, 'ba0f8d0a-bded-429b-8b7b-240bf8bd2c9c.png', '[\"fa3ce8ff-93d6-479c-a8de-64fe2b77928e.png\", \"cb45790d-b17e-40fe-93d9-bfe2daf79759.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"9100c354-957b-43c7-8a16-9fd249b40b69.png\"]', 'Birthday', 'Event Space', 10, NULL, 24.9282, 67.0963, 'The Bakers'),
 (10, '20b49afa-f623-4a96-af57-587a42ab7aeb.png', '[\"e2eb7bc0-4336-4546-a2b3-644133263bb3.png\", \"4ae0480a-7b73-49cb-836e-d4cc743357ae.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"9197f633-784b-41e3-b75d-51cfea8e2678.png\"]', 'Birthday', 'Wedding', 10, NULL, 24.9281, 67.0962, 'Delicacy'),
 (11, '1ec67c4f-248c-44e6-9c3c-383e639bbf14.png', '[\"c08d3a06-3be1-4c16-862a-d2025c303098.png\", \"7fa9945c-a061-481b-a648-c6f1d9538223.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100000, 1, 'details', '[\"a6315cab-15a6-4037-865d-48f3bc01ce91.png\"]', 'Birthday', 'Wedding', 10, NULL, 24.928, 67.0961, 'Kababjees'),
-(12, 'd9613205-0dfc-4b33-afa1-99685d5d632f.png', '[\"d05367b8-0fb1-45af-87f1-84e3f4f55055.png\", \"bf2859fe-d4b3-45b6-b499-cd38f3a2696b.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"85d61838-c292-47e2-9f09-186bbc263a20.png\"]', 'Birthday', 'office meeting', 10, NULL, 24.9279, 67.096, 'The sweets'),
-(13, 'dba59259-f5eb-4ac2-9065-064dfd2b7b00.png', '[\"e04f0374-5263-4e79-be9f-38e66ed6d258.png\", \"b0b83840-172e-4929-a5aa-cae2e82b8e81.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"bfee9161-7a20-4044-910e-78cb002ace5e.png\"]', 'Birthday', 'Wedding', 6, NULL, 24.9278, 67.0959, 'KFC'),
-(14, 'cc6245d4-ad5c-4705-bcdd-403e8a5c12e2.png', '[\"d371dc37-3c08-43f3-867b-8af51879ff14.png\", \"d17d4d39-d24c-47ad-b8fb-f339ee9b2277.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"cf0c295a-9444-4f51-a8a4-4087d4f4c9e4.png\"]', 'Testing Birthday', 'Test Wedding', 11, NULL, 24.9277, 67.0958, 'Mc Donald'),
+(12, 'd9613205-0dfc-4b33-afa1-99685d5d632f.png', '[\"d05367b8-0fb1-45af-87f1-84e3f4f55055.png\", \"bf2859fe-d4b3-45b6-b499-cd38f3a2696b.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"85d61838-c292-47e2-9f09-186bbc263a20.png\"]', 'Birthday', 'Studio', 10, NULL, 24.9279, 67.096, 'The sweets'),
+(13, 'dba59259-f5eb-4ac2-9065-064dfd2b7b00.png', '[\"e04f0374-5263-4e79-be9f-38e66ed6d258.png\", \"b0b83840-172e-4929-a5aa-cae2e82b8e81.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"bfee9161-7a20-4044-910e-78cb002ace5e.png\"]', 'Birthday', 'Wedding1', 6, NULL, 24.9278, 67.0959, 'KFC'),
+(14, 'cc6245d4-ad5c-4705-bcdd-403e8a5c12e2.png', '[\"d371dc37-3c08-43f3-867b-8af51879ff14.png\", \"d17d4d39-d24c-47ad-b8fb-f339ee9b2277.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"cf0c295a-9444-4f51-a8a4-4087d4f4c9e4.png\"]', 'Testing Birthday', 'Meeting', 11, NULL, 24.9277, 67.0958, 'Mc Donald'),
 (15, 'a1869d44-adbd-46fa-ba9a-4377a21c8f28.png', '[\"e055ac08-98dc-42bc-af7b-ea06d47cab1f.png\", \"f4e2e5ce-9655-4026-9ba5-9b253c3b13c0.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"2bd0ebe3-9532-4078-a195-9e35b06f47a5.png\"]', 'Testing Birthday', 'Test Wedding', 11, NULL, 24.9276, 67.0957, 'Delizia'),
 (16, '6416f843-cecf-4928-a582-edd0d89734ba.png', '[\"596984ea-94c5-41ab-bb49-47f65f620e9e.png\", \"9dfd7d0b-0720-47ef-aefc-c7512b4e6294.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"0e4fbc35-34c1-4122-a2f2-2a7f474b288a.png\"]', 'Testing Birthday', 'Test Wedding', 11, 'bn das', 24.9275, 67.0956, 'Kababjees'),
 (17, '4a91a0bc-8215-4418-a185-0201bcde6f88.png', '[\"e857f928-257a-4919-ace8-a31171a7a35d.png\", \"b468da9b-e5aa-4dd2-ac50-15be0d534083.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"4cde4a15-9d54-447a-880a-c3578f9d478d.png\"]', 'Testing Birthday', 'Test Wedding', 11, 'serepuveicew', 24.9274, 67.0955, 'KFC'),
@@ -181,11 +180,65 @@ INSERT INTO `event` (`id`, `thumbnail`, `other_images`, `video_showcase`, `addre
 (20, '28df872a-7ef8-498a-8d49-a9d9260c7d36.png', '[\"29f33dd7-e16b-4440-986f-6e42c295bf61.png\", \"ba6297f9-de35-493e-858c-30fade31b458.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 10, 1, 'details', '[\"1ae10cb7-e473-4fbb-9e3c-77b54eea7c68.png\"]', 'Testing Birthday', 'Test Wedding', 11, 'nas f sdk', 24.9271, 67.0953, 'Burger o  clock'),
 (21, 'f1e0a15b-bc89-4258-b36a-f92b5d2c73cf.png', '[\"fa4b5430-af8d-4fc8-b0bc-a2832c3abc49.png\", \"1e52ab04-bdcc-49b4-9b6d-cbaa66345759.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"6b2b535c-1c3c-4630-a039-24e4ce9f9c6a.png\"]', 'Testing Birthday', 'Test Birthday', 11, 'nsjidfb', 24.927, 67.0952, 'Subway'),
 (22, 'bafa61f0-4dcd-4d73-96dd-19f92e9b13a8.png', '[\"dc8a689e-4cf4-4c08-9a72-c8d1d3bd42db.png\", \"7696a7dc-798d-48c1-aec5-4acffc038cce.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"5c803a90-c387-487b-8d37-f3b81560858d.png\"]', 'Testing Birthday', 'Birthday', 11, 'Wow !!', 24.9268, 67.095, 'Delizia'),
-(26, 'd7d929e3-48c8-42f6-895c-86f971f9a5e4.png', '[\"92487783-1796-47cd-9a1d-007521fff100.png\", \"1887b593-4d46-4a58-b6f1-454b430c2729.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"30385e1c-c3fb-4b91-8097-1b72f02f0834.png\"]', 'Birthday', 'Wedding', 6, 'A class service', 24.9266, 67.0949, 'Pieinthesky'),
-(27, '4db7cc10-36e5-4b89-b9e4-d1b19c7b3648.png', '[\"7f4ee5ba-534f-4a8e-815a-55973d41fe79.png\", \"9061c89e-7031-4340-bf22-f66f9f5a57e1.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"2d82d838-acbd-43f0-9874-3a69a209a6ca.png\"]', 'Birthday', 'Test Birthday', 6, 'A class service', 24, 67, 'Burger o  clock'),
-(28, '54a2033b-f307-4028-8fa6-a6edea487f73.png', '[\"eafdd5ad-31e6-44d7-9399-92e764e8a403.png\", \"cd731e9c-8ca7-4cb8-b634-f41010666c01.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 10000000, 1, 'details', '[\"4cd0f039-cb39-4042-8b2a-cd722ea54950.png\"]', 'Birthday', 'Birthday', 6, 'A class service', 24.6, 64.1, 'Delizia'),
+(26, 'd7d929e3-48c8-42f6-895c-86f971f9a5e4.png', '[\"92487783-1796-47cd-9a1d-007521fff100.png\", \"1887b593-4d46-4a58-b6f1-454b430c2729.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"30385e1c-c3fb-4b91-8097-1b72f02f0834.png\"]', 'Birthday', 'concert', 6, 'A class service', 24.0123, 67.0123, 'the maze'),
+(27, '4db7cc10-36e5-4b89-b9e4-d1b19c7b3648.png', '[\"7f4ee5ba-534f-4a8e-815a-55973d41fe79.png\", \"9061c89e-7031-4340-bf22-f66f9f5a57e1.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"2d82d838-acbd-43f0-9874-3a69a209a6ca.png\"]', 'Birthday', 'concert', 6, 'A class service', 24, 67, 'The maze'),
+(28, '54a2033b-f307-4028-8fa6-a6edea487f73.png', '[\"eafdd5ad-31e6-44d7-9399-92e764e8a403.png\", \"cd731e9c-8ca7-4cb8-b634-f41010666c01.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 10000000, 1, 'details', '[\"4cd0f039-cb39-4042-8b2a-cd722ea54950.png\"]', 'Birthday', 'Birthday', 6, 'A class service', 24.927, 67.0951, 'Delizia'),
 (31, '57258934-a0f0-4ded-94fe-db0abc7f2639.png', '[\"58697109-9ab4-469e-b687-5d379dadf748.png\", \"0cfe7348-1720-4348-a4e0-65e835a5ea4c.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"4eb19179-aa37-4416-b174-8e3daf6ce66f.png\"]', 'Birthday', 'Testing Birthday', 15, 'A class service', 24.6, 64.2, 'Kababjees Bakers'),
-(35, 'd9aa7422-40f6-4f09-8da4-f188679e98b9.png', '[\"61f70f88-1019-4f78-9325-8c5d0510944c.png\", \"a66d1336-ed79-46bc-b7d9-7f73d51d7fd9.png\"]', 'base64_encoded_video', 'Sample Address', 1000000, 1, 'Event details...', '[\"4ce57aaf-183c-4e00-993c-bd30f839815d.png\"]', 'Event description...', 'Birthday', 15, 'A class service', 123.456, 78.9, 'Tassaract');
+(35, 'd9aa7422-40f6-4f09-8da4-f188679e98b9.png', '[\"61f70f88-1019-4f78-9325-8c5d0510944c.png\", \"a66d1336-ed79-46bc-b7d9-7f73d51d7fd9.png\"]', 'base64_encoded_video', 'Sample Address', 1000000, 1, 'Event details...', '[\"4ce57aaf-183c-4e00-993c-bd30f839815d.png\"]', 'Event description...', 'Birthday', 15, 'A class service', 123.456, 78.9, 'Tassaract'),
+(57, 'b37c97f1-c011-4f4a-84fa-4ad07b329b9c.png', '[\"0fc9501e-bba8-4396-b7f6-9568d80a26fd.png\", \"d3d5a31e-9a4e-41c8-b53c-22f635b96331.png\"]', 'youtube.com', 'Gulshan block 6', 50, 1, 'Event details 123123', '[\"5b2d257a-1702-48c2-95b4-f8d4ea41eaeb.png\", \"dc1ad8e0-fdc0-4a0f-b8c2-6c6582a43d25.png\"]', 'Event description', 'Event Type', 16, 'General', 24.11, 67.11, 'Tassaract'),
+(58, '2567eb1b-35e4-4dcd-93ff-6abf00f4fa01.png', '[\"929b5602-7b17-4dcc-aac3-3ded0c70c960.png\", \"51c75bc8-8b3d-470b-9a79-a48034aa5df6.png\"]', 'youtube.com', 'Gulshan block 6', 500, 1, 'Event details 123123', '[\"5616d729-e317-4aa0-968d-3d6692d420fe.png\", \"b260cad2-3726-408c-824e-bb3f0ee60226.png\"]', 'Event description', 'Event Type', 16, 'General', 24.11, 67.11, 'Tassaract'),
+(59, '2cf6c14a-f1a5-45f5-9713-14b1c46cc934.png', '[\"adae9f03-dabb-4059-8905-c26561663129.png\", \"c9e1d265-6929-42f8-ba4d-da807957a050.png\"]', 'youtube.com', 'Gulshan block 6', 500, 1, 'Event details 123123', '[\"d188da07-5307-4b48-b208-060f97a00c92.png\", \"32789744-7700-46e0-9372-65e35c847309.png\"]', 'Event description', 'Event Type', 16, 'General', 24.11, 67.11, 'Tassaract'),
+(60, 'bc610554-225a-4b03-ae41-4e2aa13192a7.png', '[\"8b0777df-adc7-4b17-a455-93cdf9110fe3.png\", \"130017d8-2492-4779-b3e7-0523397d8fdc.png\"]', 'youtube.com', 'Gulshan block 6', 500, 1, 'Event details 123123', '[\"659ef286-cd03-45bb-91db-38b5ec78a49f.png\", \"0fc1558d-6362-4d59-ac6a-141c526b2742.png\"]', 'Event description', 'Event Type', 16, 'General', 24.11, 67.11, 'Tassaract'),
+(61, '5f00fef3-3abf-4a71-9ba7-ff7ef0232ed2.png', '[\"a278eef5-ca3d-4ae5-bdea-0999fc0ffaa3.png\", \"3301ff72-fdba-4394-bcea-1fdf3d2e8be1.png\"]', 'youtube.com', 'Gulshan block 6', 500, 1, 'Event details 123123', '[\"9fa0f89b-3d16-48d3-807c-4c344660f41e.png\", \"686ac33d-914e-46c2-bc82-0eb11834703c.png\"]', 'Event description', 'Event Type', 16, 'General', 24.11, 67.11, 'Tassaract'),
+(62, 'ef6be7c1-e869-457b-a56d-be7814144750.png', '[\"304ee178-35c2-489e-bbd7-2967ff138e18.png\", \"a29dd544-1ccb-4ed9-814c-e3b3c3db4fe2.png\"]', 'youtube.com', 'Gulshan block 6', 500, 1, 'Event details 123123', '[\"9b7560d4-c8e8-4c2a-a959-45c6b24d4660.png\", \"e5a35f9e-9539-4f97-8a25-2483d6e0d523.png\"]', 'Event description', 'Event Type', 16, 'General', 24.11, 67.11, 'Tassaract'),
+(63, '13a43530-02e6-4a85-9e17-5c7fd5ab9576.png', '[\"a4962fa8-2b5f-4b4d-b070-5078adfe3893.png\", \"f1b94a9b-8927-449a-969a-0592ea62f10f.png\"]', 'youtube.com', 'Gulshan block 6', 500, 1, 'Event details 123123', '[\"35101962-58b1-42a0-8740-be3960e85496.png\", \"bdafa16e-211f-49bf-87ad-fc1628c23549.png\"]', 'Event description', 'Event Type', 16, 'General', 24.11, 67.11, 'Tassaract'),
+(64, '16ac297f-b705-48d4-90fe-12f508506e00.png', '[\"772807e1-6d8a-4bde-b14d-7d4c5ed60938.png\", \"33432356-1b1f-49d1-9528-d2851827785b.png\"]', 'youtube.com', 'Gulshan block 6', 500, 1, 'Event details 123123', '[\"903062ae-9c5c-4e54-b520-86fd176a0c3e.png\", \"dc70829b-d986-4e39-a602-55534cb15d68.png\"]', 'Event description', 'Event Type', 16, 'General', 24.11, 67.11, 'Tassaract'),
+(65, 'fa91da15-3fdd-4b9f-bf5f-1165a838f1cf.png', '[\"8e3505ba-f33c-438d-8896-2631981802b5.png\", \"b8163bcd-e903-42e2-a115-00e7195c49d8.png\"]', 'youtube.com', 'Gulshan block 6', 500, 1, 'Event details 123123', '[\"f9a47477-9558-44c9-8f10-305f433e593b.png\", \"c9e16b7e-45fd-4c36-9805-29fbffd806fc.png\"]', 'Event description', 'Event Type', 16, 'General', 24.11, 67.11, 'Tassaract'),
+(66, 'c5f47585-ca9a-49d5-921b-f8d88a3720f4.png', '[\"eafd8dec-5891-4235-a646-46d5d250bfa4.png\", \"4f1fa2bd-f32d-423a-a64a-1512fdb14521.png\"]', 'youtube.com', 'Gulshan block 6', 500, 1, 'Event details 123123', '[\"76deeb43-0771-47b3-a5bf-cfed6809946f.png\", \"8e8cd11a-35f0-4f4d-a1c4-2a543a77df7e.png\"]', 'Event description', 'Event Type', 16, 'General', 24.11, 67.11, 'Tassaract'),
+(67, '5a08084b-66ee-4283-9ed9-e1337b14888b.png', '[\"548287ed-aab1-402c-b329-b6cb6300738e.png\", \"5132b8d0-9c7b-42dc-9ac0-2fd4aa87c8ab.png\"]', 'youtube.com', 'Gulshan block 6', 500, 1, 'Event details 123123', '[\"57f1b4ae-c8bf-4ead-9e08-7bbc59125e2b.png\", \"4b00c6d6-085a-4ada-94eb-d86fb9e42c37.png\"]', 'Event description', 'Event Type', 16, 'General', 24.11, 67.11, 'Tassaract'),
+(68, 'ef9e58b9-fee5-473f-a6e8-ff8891a32ff0.png', '[\"ca8e32eb-43de-4a2d-8137-f20f3f823ffd.png\", \"4d4b66fe-b30a-499a-805a-8ca9aa55a6dd.png\"]', 'youtube.com', 'Gulshan block 6', 500, 1, 'Event details 123123', '[\"0dfd141d-1356-4fce-bd55-27514f2193bd.png\", \"46fdb0e0-a9f7-48c9-b95a-2914c72e61f6.png\"]', 'Event description', 'Event Type', 16, 'General', 24.11, 67.11, 'Tassaract'),
+(69, '35ff3611-65dd-456a-aca0-ee3912f59e08.png', '[\"81e4010a-97f9-494c-8604-c3f3d8ef3a33.png\", \"35a1ddb4-f12e-43b5-826e-fea1e6a565c4.png\"]', 'youtube.com', 'Gulshan block 6', 500, 1, 'Event details 123123', '[\"b79e486e-8f74-46ee-95c4-4301aa7d31f8.png\", \"68f136ee-8081-4e66-8b12-05aa8bb24df2.png\"]', 'Event description', 'Event Type', 16, 'General', 24.11, 67.11, 'Tassaract'),
+(70, '9d017ee3-1abe-4a2b-9d5e-cc67ac7021f2.png', '[\"2067ce7e-8977-42ea-88a8-cb202f720ae1.png\", \"cba83637-4425-4440-9266-4b9b9e3757e7.png\"]', 'youtube.com', 'Gulshan block 6', 500, 1, 'Event details 123123', '[\"f0a6b122-0d44-47b6-9c0a-5e9d8260d2dc.png\", \"124fdbdf-fedd-4822-b6d5-1b8d810ddb64.png\"]', 'Event description', 'Event Type', 16, 'General', 24.11, 67.11, 'Tassaract');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `eventtiming`
+--
+
+CREATE TABLE `eventtiming` (
+  `id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `day_of_week` varchar(10) DEFAULT NULL,
+  `start_time` time DEFAULT NULL,
+  `end_time` time DEFAULT NULL,
+  `available` tinyint(1) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `eventtiming`
+--
+
+INSERT INTO `eventtiming` (`id`, `event_id`, `day_of_week`, `start_time`, `end_time`, `available`) VALUES
+(35, 70, 'Monday', '12:00:00', '23:00:00', 1),
+(36, 70, 'Tuesday', '12:00:00', '23:00:00', 1),
+(37, 70, 'Wednesday', '12:00:00', '23:00:00', 1),
+(38, 70, 'Thursday', '12:00:00', '23:00:00', 1),
+(39, 70, 'Friday', '00:00:00', '00:00:00', 0),
+(40, 70, 'Saturday', '12:00:00', '23:00:00', 1),
+(41, 70, 'Sunday', '12:00:00', '23:00:00', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `favorites`
+--
+
+CREATE TABLE `favorites` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -288,7 +341,7 @@ INSERT INTO `review` (`id`, `booking_id`, `event_id`, `user_id`, `cleanliness_ra
 (36, 51, 5, 51, 0.5, 4.5, 5, 0.5, 'The event was very boring', 4.9),
 (37, 52, 4, 51, 0.5, 4.5, 5, 0.5, 'The event was very boring', 5),
 (38, 53, 3, 51, 0.5, 4.5, 5, 0.5, 'The event was very boring', 5),
-(39, 54, 2, 51, 0.5, 4.5, 5, 0.5, 'The event was very boring', 5),
+(39, 54, 2, 51, 0.5, 4.5, 5, 0.5, 'The event was very boring', 3),
 (40, 55, 1, 51, 0.5, 4.5, 5, 0.5, 'The event was very boring', 0),
 (41, 56, 26, 51, 0.5, 4.5, 5, 0.5, 'The event was very boring', 5),
 (42, 57, 27, 51, 0.5, 4.5, 5, 0.5, 'The event was very boring', 5);
@@ -331,7 +384,7 @@ INSERT INTO `user` (`id`, `email`, `password_hash`, `access_token`, `role`, `pro
 (18, 'abdulrafayatiq11a.03@gmail.com', '$2b$12$zR80Qz5RO.211daR6hkPZeGQrh3TbK8a3i488q/pSYwar3OQN47ve', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTY5ODA2NDU3OCwianRpIjoiY2ZkNWNiMmYtZTA1MS00ZWFiLWI3NTktNDk5MWFmMmNkY2ZhIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFiZHVscmFmYXlhdGlxMTFhLjAzQGdtYWlsLmNvbSIsIm5iZiI6MTY5ODA2NDU3OCwiZXhwIjoxNjk4MDY1ND', 'vendor', '33df98c4-34ec-414a-b3c3-689cc0c7fd01.png', NULL),
 (21, 'justrafay@gmail.com', '$2b$12$Qr5i/UxRLakF3ynvr69AE.tNBku/c9tXi0iV.cWq9DZR91q1glEKW', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTY5ODE0MDkzNCwianRpIjoiNmRmMjY0YjQtMzU4Yy00NjQ5LWEyN2ItMjMyZWQzYzBiZTY2IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6Imp1c3RyYWZheUBnbWFpbC5jb20iLCJuYmYiOjE2OTgxNDA5MzQsImV4cCI6MTY5ODE0MTgzNH0.RvPaPMpPX1', 'vendor', NULL, NULL),
 (22, 'justrafay1@gmail.com', '$2b$12$c5G1F52/34UzZIlJY7gHR.1v46kdvpwHSL/q2E2r/erX5ifI4ZJlu', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTY5ODE0MTUwNiwianRpIjoiMDk1NmI3ZDEtYWYwOS00NDJiLTkxNGUtMTU0ODQzOTMxZGRhIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6Imp1c3RyYWZheTFAZ21haWwuY29tIiwibmJmIjoxNjk4MTQxNTA2LCJleHAiOjE2OTgxNDI0MDZ9.MPGvkuyl2', 'vendor', NULL, NULL),
-(33, 'justrafay5@gmail.com', '$2b$12$oUuFZYigfJDaHmTP0zUgH.oxtN9OHh9M8hCECYlxxcdA.VPN.iy1S', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwMzE0NDA0MSwianRpIjoiNmE4ODM1YjMtZjA0My00ZmJjLTk5NGMtNWQ5YjE1ODNiNTI1IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6Imp1c3RyYWZheTVAZ21haWwuY29tIiwibmJmIjoxNzAzMTQ0MDQxLCJleHAiOjE3MDMxNDQ5NDF9.JRQyDDjxrfVxLbrkQyRbY6afJbi68-WVMlm-vIaFu9Q', 'vendor', 'ab7ebf3d-c31f-4e69-aff2-f126a22a8578.png', 6),
+(33, 'justrafay5@gmail.com', '$2b$12$oUuFZYigfJDaHmTP0zUgH.oxtN9OHh9M8hCECYlxxcdA.VPN.iy1S', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwMzIzNzQ4OCwianRpIjoiODNkODkwMzUtNDYyZC00MmMwLTg1MzctNGQ2MjI2N2U5ODNlIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6Imp1c3RyYWZheTVAZ21haWwuY29tIiwibmJmIjoxNzAzMjM3NDg4LCJleHAiOjE3MDMyMzgzODh9.hLaxDnqMOZbyaZ0y7cKGGvaFtUvaErHv1S9Ab2SaWy8', 'vendor', 'ab7ebf3d-c31f-4e69-aff2-f126a22a8578.png', 6),
 (34, 'justitsmerafay@gmail.com', '$2b$12$w0uEFtfx8I0uCUDP1hJqiOa8sZ3fwwahd92Tw3/lABqhHftqPnH2C', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTY5ODIyMTMyMywianRpIjoiZDQ2YWJkNjYtZmRkMy00ZDE3LTgzMjMtNWRlMThlNzIwZjQ5IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6Imp1c3RpdHNtZXJhZmF5QGdtYWlsLmNvbSIsIm5iZiI6MTY5ODIyMTMyMywiZXhwIjoxNjk4MjIyMjIzfQ.bGw', 'vendor', 'ab7ebf3d-c31f-4e69-aff2-f126a22a8578.png', 7),
 (35, 'justitsmerafay1@gmail.com', '$2b$12$9G/q3dDs2WUpl9VicjSQFesOnx6jdCcfjG2FLYkDi8an6na4iHA2y', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTY5ODIyMjMzNywianRpIjoiZDM4ZmE2OWYtYWMzNS00ZjI1LTg2NTgtYTg1ZmNhYjZjMzZhIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6Imp1c3RpdHNtZXJhZmF5MUBnbWFpbC5jb20iLCJuYmYiOjE2OTgyMjIzMzcsImV4cCI6MTY5ODIyMzIzN30.7V', 'vendor', 'ab7ebf3d-c31f-4e69-aff2-f126a22a8578.png', 8),
 (36, 'justitsmerafay2@gmail.com', '$2b$12$vJq3CG84rq55kHem5MBaqev6l2SX24iEN6jGnkh.LsVbuMgz6DRK2', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTY5ODIyMzI2OCwianRpIjoiZDBlZjE0ZTEtN2Y3Yy00MjcyLWIwM2EtNGE3YWJjZWZhMDEyIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6Imp1c3RpdHNtZXJhZmF5MkBnbWFpbC5jb20iLCJuYmYiOjE2OTgyMjMyNjgsImV4cCI6MTY5ODIyNDE2OH0.IV', 'vendor', NULL, NULL),
@@ -348,9 +401,11 @@ INSERT INTO `user` (`id`, `email`, `password_hash`, `access_token`, `role`, `pro
 (48, 'abdulrafayatiq.03@gmail.com', '$2b$12$Jg9mGzEYi6FI8eiBRDt18u8pBZ3ZG8AJSrSYl307SBRI9bJCFAv02', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwMTY5NTMzMSwianRpIjoiZjlmYTI3OWItNjIxMy00Y2U5LTlhMTYtZmRjYWU5ODFiYjMwIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFiZHVscmFmYXlhdGlxLjAzQGdtYWlsLmNvbSIsIm5iZiI6MTcwMTY5NTMzMSwiZXhwIjoxNzAxNjk2MjMxfQ', 'user', NULL, NULL),
 (49, 'abdulrafayatiqvendor.03@gmail.com', '$2b$12$K42Loxqxmdc.V/yM01a07eqkFAexDOAtRG6Wvfk8UKohNICRSQqhO', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwMjQ2OTU2NCwianRpIjoiNjE1MDhlYTQtZTE5MC00MzcwLWJjMjgtMDcyZjdhMTZhNDBlIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFiZHVscmFmYXlhdGlxdmVuZG9yLjAzQGdtYWlsLmNvbSIsIm5iZiI6MTcwMjQ2OTU2NCwiZXhwIjoxNzAyNDcwNDY0fQ.MbFkobOMC4Qyeo4h1L-liTcdf5uuPIL84894V7h_ppQ', 'vendor', 'ab7ebf3d-c31f-4e69-aff2-f126a22a8578.png', 13),
 (50, 'just.03@gmail.com', '$2b$12$a78hShATy819L7uX3QO2s.By24/3b2Ymp9hA22QZ1EyODuBVSO/Km', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwMTg1MTkwMywianRpIjoiMDY3ZmE0MjMtYWIxOS00ODZiLTgwYTktZTU1NjJmYjQzOTJiIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6Imp1c3QuMDNAZ21haWwuY29tIiwibmJmIjoxNzAxODUxOTAzLCJleHAiOjE3MDE4NTI4MDN9.NTRvqStH8RdPp', 'user', NULL, NULL),
-(51, 'just1.03@gmail.com', '$2b$12$nqXV2GHiaT9DodRwnNoEwe16cAPGh0K5/hy4CMSzPUrOM8f2M9jIG', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwMzE0NTQ4NiwianRpIjoiYzAxNTZkMTYtZWNhNi00NTBhLThkODUtZjZjNmY2YjA0ODUwIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6Imp1c3QxLjAzQGdtYWlsLmNvbSIsIm5iZiI6MTcwMzE0NTQ4NiwiZXhwIjoxNzAzMTQ2Mzg2fQ.rWWKyC2CQPqJXiPPBQ8ckRAOcg47ZW0cLXb88ZNPHno', 'user', 'ab7ebf3d-c31f-4e69-aff2-f126a22a8578.png', NULL),
+(51, 'just1.03@gmail.com', '$2b$12$nqXV2GHiaT9DodRwnNoEwe16cAPGh0K5/hy4CMSzPUrOM8f2M9jIG', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwMzIzOTU5MCwianRpIjoiZDliZDI2OGYtMTM3Zi00ZDAzLTk5MzgtMDM0YWExNTY5ZTY5IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6Imp1c3QxLjAzQGdtYWlsLmNvbSIsIm5iZiI6MTcwMzIzOTU5MCwiZXhwIjoxNzAzMjQwNDkwfQ.6YEevXnKorm1QmOC2FOnWMrFx1D3DTcAICFzAlhT7Rw', 'user', 'ab7ebf3d-c31f-4e69-aff2-f126a22a8578.png', NULL),
 (52, 'abdulrafayatiq@gmail.com.com', '$2b$12$6tmvlYLzyYiZtllws6mCwOHOK/gS3p1xkzyNWA1ZHDHKMJrwtUXBK', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwMTk0ODc1MywianRpIjoiZDY1ZjQxY2UtMzgyZS00NDZjLWJmZDYtYTE0OTk0ZWMxZDhiIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFiZHVscmFmYXlhdGlxQGdtYWlsLmNvbS5jb20iLCJuYmYiOjE3MDE5NDg3NTMsImV4cCI6MTcwMTk0OTY1M30.JZUjefQ0wz_uGzbZMISF8DV6a6huWpCi8UHZ0kXi6hQ', 'vendor', 'ab7ebf3d-c31f-4e69-aff2-f126a22a8578.png', 14),
-(53, 'justvendor.03@gmail.com', '$2b$12$45f9pZi8ic2dUAErRFN5CuLXd1AEuUkPhgr8f3K6zn6VUZ9aJqhaO', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwMjQ2NzQ1NCwianRpIjoiZTJlNTQ5NTEtODZjZS00MDIxLThkYTAtZjJhNmQ2YjJhOTYzIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6Imp1c3R2ZW5kb3IuMDNAZ21haWwuY29tIiwibmJmIjoxNzAyNDY3NDU0LCJleHAiOjE3MDI0NjgzNTR9.TNPyjVZ_GxTbK54DZA-Iv3omMS_wJGEikFWAvrZouR4', 'vendor', NULL, 15);
+(53, 'justvendor.03@gmail.com', '$2b$12$45f9pZi8ic2dUAErRFN5CuLXd1AEuUkPhgr8f3K6zn6VUZ9aJqhaO', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwMjQ2NzQ1NCwianRpIjoiZTJlNTQ5NTEtODZjZS00MDIxLThkYTAtZjJhNmQ2YjJhOTYzIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6Imp1c3R2ZW5kb3IuMDNAZ21haWwuY29tIiwibmJmIjoxNzAyNDY3NDU0LCJleHAiOjE3MDI0NjgzNTR9.TNPyjVZ_GxTbK54DZA-Iv3omMS_wJGEikFWAvrZouR4', 'vendor', NULL, 15),
+(54, 'abdulrafayatiq123.03@gmail.com', '$2b$12$h4.UeYCQDAPnOPIzHP0UN.qtKUjLu8qYA7L74D/0/.k7gX4B5eY0m', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwNDk2ODUyOSwianRpIjoiZDJjYzQwMjQtYjYzNi00ODdkLWI0NjUtNjYxMDMwYzA1NTllIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFiZHVscmFmYXlhdGlxMTIzLjAzQGdtYWlsLmNvbSIsIm5iZiI6MTcwNDk2ODUyOSwiZXhwIjoxNzA0OTY5NDI5fQ.2bxHLgjk496W1dkCJH1BGkqjmV7aQAEf3Y0xvwKR484', 'vendor', NULL, 16),
+(55, 'abdulrafayatiq123456.03@gmail.com', '$2b$12$09vHC2/suja0qn8kbJ.hmeNJLz9MCkiqOyCwlIn79XnxE7FSMVDAy', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwNDk2Nzg4OSwianRpIjoiYTU4ZGM5ZmUtN2Y0MC00NmJlLWI4ODQtMmRkYTVjZDBmNjcxIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFiZHVscmFmYXlhdGlxMTIzNDU2LjAzQGdtYWlsLmNvbSIsIm5iZiI6MTcwNDk2Nzg4OSwiZXhwIjoxNzA0OTY4Nzg5fQ.gG32YHwvDyumOXXDUeSsa5EghWcySNTKvXPHsEV7I-I', 'user', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -372,14 +427,15 @@ CREATE TABLE `vendor` (
 
 INSERT INTO `vendor` (`id`, `full_name`, `phone_number`, `location`, `biography`) VALUES
 (6, 'Abdul Rafay Atiq', '090078601', 'Karachi', 'Luxury Wedding Celebration Venue'),
-(7, 'Just Itsmerafay', '123-456-7890', 'City, Country', 'I am a talented vendor.'),
-(8, 'Just Itsmerafay', '123-456-7890', 'City, Country', 'I am a talented vendor.'),
-(9, 'djkgnsdkglsd Doe', '123-456-7890', 'Some Location', 'A short biography about the vendor'),
+(7, 'Just Itsmerafay', '123-456-7890', 'Karachi', 'I am a talented vendor.'),
+(8, 'Just Itsmerafay', '123-456-7890', 'Karachi', 'I am a talented vendor.'),
+(9, 'djkgnsdkglsd Doe', '123-456-7890', 'Karachi', 'A short biography about the vendor'),
 (10, 'Abdul Rafay Atiq 123', '090078601', 'Karachi', 'Luxury Wedding Celebration Venue 1'),
-(11, 'NO testing', '0823572347059237', 'London', 'Testing Biography 12312312312'),
-(13, 'Rafay The Vendor', '0900833922', 'Karachi', 'Just a common man'),
-(14, '', '', '', ''),
-(15, 'Just Vendor', '1234567890', 'NY, Newyork', 'Just a simple vendor.');
+(11, 'NO testing', '0823572347059237', 'Karachi', 'Testing Biography 12312312312'),
+(13, 'Rafay The Vendor', '0900833922', 'Karachi', 'Testing Biography'),
+(14, 'Bob The Builder', '', '', ''),
+(15, 'Just Vendor', '1234567890', 'Karachi', 'Just a simple vendor.'),
+(16, 'New doe', '1234567890', 'Karachi', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vitae ante sed urna euismod ultricies.');
 
 --
 -- Indexes for dumped tables
@@ -405,6 +461,21 @@ ALTER TABLE `booking`
 ALTER TABLE `event`
   ADD PRIMARY KEY (`id`),
   ADD KEY `vendor_id` (`vendor_id`);
+
+--
+-- Indexes for table `eventtiming`
+--
+ALTER TABLE `eventtiming`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `event_id` (`event_id`);
+
+--
+-- Indexes for table `favorites`
+--
+ALTER TABLE `favorites`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `event_id` (`event_id`),
+  ADD KEY `user_id` (`user_id`);
 
 --
 -- Indexes for table `password_reset_token`
@@ -453,13 +524,25 @@ ALTER TABLE `vendor`
 -- AUTO_INCREMENT for table `booking`
 --
 ALTER TABLE `booking`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=86;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=98;
 
 --
 -- AUTO_INCREMENT for table `event`
 --
 ALTER TABLE `event`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=71;
+
+--
+-- AUTO_INCREMENT for table `eventtiming`
+--
+ALTER TABLE `eventtiming`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
+
+--
+-- AUTO_INCREMENT for table `favorites`
+--
+ALTER TABLE `favorites`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `password_reset_token`
@@ -483,13 +566,13 @@ ALTER TABLE `review`
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
 
 --
 -- AUTO_INCREMENT for table `vendor`
 --
 ALTER TABLE `vendor`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- Constraints for dumped tables
@@ -507,6 +590,19 @@ ALTER TABLE `booking`
 --
 ALTER TABLE `event`
   ADD CONSTRAINT `event_ibfk_1` FOREIGN KEY (`vendor_id`) REFERENCES `vendor` (`id`);
+
+--
+-- Constraints for table `eventtiming`
+--
+ALTER TABLE `eventtiming`
+  ADD CONSTRAINT `eventtiming_ibfk_1` FOREIGN KEY (`event_id`) REFERENCES `event` (`id`);
+
+--
+-- Constraints for table `favorites`
+--
+ALTER TABLE `favorites`
+  ADD CONSTRAINT `favorites_ibfk_1` FOREIGN KEY (`event_id`) REFERENCES `event` (`id`),
+  ADD CONSTRAINT `favorites_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`);
 
 --
 -- Constraints for table `password_reset_token`

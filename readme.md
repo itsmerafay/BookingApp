@@ -1,4 +1,16 @@
 
+1/11/2024 3:32
+
+updated:
+model.py
+api : 
+    ~ create_event  (start_time and end_time will be set to 00:00:00 and availability will be set to false for passing null to any day of the week)         
+    ~ create_booking
+    ~ get_event/
+    ~ get_my_events
+and updated database
+
+
 1/10/2024 6:19
 
 updated some apis to return the operating hours in responses

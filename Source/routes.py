@@ -351,8 +351,6 @@ def create_event():
         event.facilities = facility_image_filenames
 
 
-
-
     db.session.add(event)  # Add the event to the session
     db.session.commit()  # Commit the transaction
 
@@ -362,22 +360,31 @@ def create_event():
             start_time = timings.get("start_time")
             end_time = timings.get("end_time")
 
-            # Ensure start_time and end_time are in the correct format
-            start_time_obj = datetime.strptime(start_time, "%H:%M:%S").time()
-            end_time_obj = datetime.strptime(end_time, "%H:%M:%S").time()
+            # Set a default day if it's not provided
+            day_of_week = day or "DefaultDay"
 
-            # Check if the timings are valid before storing them
-            if start_time_obj and end_time_obj:
+            if start_time is None or end_time is None:
+                available = False
+            else:
+                if start_time and end_time:
+                    # Ensure start_time and end_time are in the correct format
+                    start_time_obj = datetime.strptime(start_time, "%H:%M:%S").time()
+                    end_time_obj = datetime.strptime(end_time, "%H:%M:%S").time()
+                    available = True
+                else:
+                    available = False
+
+                # Check if the timings are valid before storing them
                 event_timing = eventtiming(
-                    day_of_week=day,
-                    start_time=start_time_obj,
-                    end_time=end_time_obj,
+                    day_of_week=day_of_week,
+                    start_time=start_time_obj if available else "00:00:00",
+                    end_time=end_time_obj if available else "00:00:00",
+                    available=available,
                     event=event
                 )
                 db.session.add(event_timing)
+
         db.session.commit()
-
-
 
     return jsonify({"status":True,"message": "Event created successfully"})
 
@@ -464,46 +471,6 @@ def getmyevents():
     except Exception as e:
         print(e)
         return jsonify({"status": False, "events": []})
-
-# from sqlalchemy import inspect
-
-# @app.route("/get_my_events", methods=["GET"])
-# @jwt_required()
-# def getmyevents():
-#     try:
-#         user = get_current_user()
-#         print(user)
-#         vendor = user.vendor
-#         print(vendor.id)
-#         events = Event.query.filter_by(vendor_id=vendor.id).all()
-#         print("-----------")
-#         print(f"Events : {events}")
-#         print("-----------")
-
-#         events_data = []
-
-#         for event in events:
-#             event_dict = {c.key: getattr(event, c.key) for c in inspect(event).mapper.column_attrs}
-#             event_dict['total_bookings'] = event.get_total_bookings()
-#             event_dict['total_bookings_value'] = event.earnings_per_month()  # Total earnings for the current month
-
-#             # Try to access event bookings
-#             try:
-#                 event_dict['bookings'] = [booking.as_dict() for booking in event.bookings]
-#             except Exception as ex:
-#                 event_dict['bookings_error'] = str(ex)
-
-#             events_data.append(event_dict)
-#             print(events_data)
-
-#         return jsonify({"status": True, "events": events_data})
-    
-#     except Exception as e:
-#         print(e)
-#         return jsonify({"status": False, "error": str(e)})
-
-
-
 
 
 
@@ -1628,37 +1595,46 @@ def create_booking():
         #         booking.event_icon = event_icon_filename
 
         # Create and save the booking
-        booking = Booking(
-            user_id=user.id,
-            full_name=full_name,
-            email=email,
-            guest_count=guest_count,
-            additional_notes=additional_notes,
-            start_date=start_date,
-            end_date=end_date,
-            start_time=start_time,
-            end_time=end_time,
-            all_day=all_day,
-            event_id=event_id,
-            event_type=event_type
-            # event_icon = event_icon_filename
-        )
+        if event and event_timings.available:
+
+            booking = Booking(
+                user_id=user.id,
+                full_name=full_name,
+                email=email,
+                guest_count=guest_count,
+                additional_notes=additional_notes,
+                start_date=start_date,
+                end_date=end_date,
+                start_time=start_time,
+                end_time=end_time,
+                all_day=all_day,
+                event_id=event_id,
+                event_type=event_type
+                # event_icon = event_icon_filename
+            )
 
 
-        db.session.add(booking)
-        db.session.commit()
+            db.session.add(booking)
+            db.session.commit()
 
-        return jsonify({
-            "status":True,
-            "Summary": {
-                "event_hours": f"{event_hours} Hours",
-                "guest_count": f"{guest_count}",
-                "event_rate": f"{event.rate}$",
-                "subtotal": f"{subtotal}$",
-                "tax": "15%",
-                "total_price": f"{total_price} $"
-            }
-        })
+            return jsonify({
+                "status":True,
+                "Summary": {
+                    "event_hours": f"{event_hours} Hours",
+                    "guest_count": f"{guest_count}",
+                    "event_rate": f"{event.rate}$",
+                    "subtotal": f"{subtotal}$",
+                    "tax": "15%",
+                    "total_price": f"{total_price} $"
+                }
+            }), 200
+        
+        else:
+            return jsonify({
+                "status":False,
+                "message":f"{event.location_name} is not operating today !!"
+            }), 400
+    
 
     except Exception as e:
         return jsonify({
@@ -2646,6 +2622,37 @@ def reset_password_request():
     except Exception as e:
         return jsonify({"message": f"Email sending failed: {str(e)}"}), 500
     
+
+###############################     Route For Inquiries     ######################################
+
+@app.route("/create_inquiry", methods = ["POST"])
+@jwt_required()
+def create_inquiry():
+    try:
+        data = request.get_json()
+        user = get_current_user()
+
+        if not user:
+            return jsonify({
+                "status":False,
+                "message": "User not authenticated !!"
+            }), 401
+            
+        if user.role != "user":
+            return jsonify({
+                "status": False,
+                "message": "Unauthorized access: Only users can create bookings."
+            }), 401
+    
+    
+    except Exception as e:
+        return jsonify({
+            "status":False,
+            "message": str(e)
+        }), 500
+
+
+
 
 
 ###############################     Route For Reset Password After Getting Token      ######################################
