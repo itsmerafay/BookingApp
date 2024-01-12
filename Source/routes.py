@@ -565,6 +565,8 @@ def update_event(event_id):
     })
 
 
+
+
 ###############################     Delete Event     ######################################
 
 
@@ -1644,6 +1646,54 @@ def create_booking():
 
 
 
+# @app.route('/update_event_hours', methods=["PUT"])
+# @jwt_required()
+# def update_event_hours():
+#     try:
+#         data = request.get_json()
+#         user = get_current_user()
+
+#         if not user:
+#             return jsonify({
+#                 "status":False,
+#                 "message": "User not authenticated !!"
+#             }), 401
+            
+#         if user.role != "vendor":
+#             return jsonify({
+#                 "status": False,
+#                 "message": "Unauthorized access: Only users can create bookings."
+#             })
+        
+#         event_id = data.get("event_id")
+#         start_time = data.get("start_time")
+#         end_time = data.get("end_time")
+#         day_of_week = data.get("day_of_week")
+
+#         event_timings = eventtiming.query.filter_by(event_id=event_id, day_of_week=day_of_week).first()
+        
+#         if not event_timings:
+#             return jsonify({
+#                 "status":False,
+#                 "message":"Event or event day of week not found !!"
+#             }), 400
+        
+#         event_timings.start_time = start_time
+#         event_timings.end_time = end_time
+
+#         db.session.commit()
+
+#         return jsonify({
+#             "status":True,
+#             "message":"Successfully updated the working hours !!"
+#         }),200
+
+#     except Exception as e:
+#         return jsonify({
+#             "status":False,
+#             "message": str(e)
+#         }), 500
+
 @app.route('/update_event_hours', methods=["POST"])
 @jwt_required()
 def update_event_hours():
@@ -1653,44 +1703,47 @@ def update_event_hours():
 
         if not user:
             return jsonify({
-                "status":False,
+                "status": False,
                 "message": "User not authenticated !!"
             }), 401
-            
+
         if user.role != "vendor":
             return jsonify({
                 "status": False,
-                "message": "Unauthorized access: Only users can create bookings."
+                "message": "Unauthorized access: Only vendors can create bookings."
             })
-        
-        event_id = data.get("event_id")
-        start_time = data.get("start_time")
-        end_time = data.get("end_time")
-        day_of_week = data.get("day_of_week")
 
-        event_timings = eventtiming.query.filter_by(event_id=event_id, day_of_week=day_of_week).first()
-        
-        if not event_timings:
-            return jsonify({
-                "status":False,
-                "message":"Event or event day of week not found !!"
-            }), 400
-        
-        event_timings.start_time = start_time
-        event_timings.end_time = end_time
+        event_id = data.get("event_id")
+        timings = data.get("timings")
+
+        for day_of_week, timing_data in timings.items():
+            start_time = timing_data.get("start_time")
+            end_time = timing_data.get("end_time")
+
+            event_timings = eventtiming.query.filter_by(event_id=event_id, day_of_week=day_of_week).first()
+
+            if event_timings:
+                if start_time is not None:
+                    event_timings.start_time = datetime.strptime(start_time, "%H:%M:%S").time()
+                if end_time is not None:
+                    event_timings.end_time = datetime.strptime(end_time, "%H:%M:%S").time()
 
         db.session.commit()
 
         return jsonify({
-            "status":True,
-            "message":"Successfully updated the working hours !!"
-        }),200
+            "status": True,
+            "message": "Successfully updated the working hours !!"
+        }), 200
 
     except Exception as e:
         return jsonify({
-            "status":False,
+            "status": False,
             "message": str(e)
         }), 500
+
+
+
+
 
 ###############################   Upload Event Icon   ######################################
 
