@@ -1,4 +1,11 @@
+1/12/2024 6:02
 
+1 - /create_inquiry (for user only)
+2 - /get_all_my_inquiries_user (for user to get all his/her inquiries irrespective of any event)
+3 - /get_specific_inquiry/<int:inquiry_id> (for both user and vendor (each one will get their own) )
+4 - /get_all_my_inquiries_vendor (for vendor , vendor can get all the inquiries, irrespective of the events)
+5 - /get_my_inquiry/<int:inquiry_id> (for both vendor and user, both will get the same inquiry details if inquiry id is passed )
+ 
 
 
 1/11/2024 2:49

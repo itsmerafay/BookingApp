@@ -1694,6 +1694,7 @@ def create_booking():
 #             "message": str(e)
 #         }), 500
 
+
 @app.route('/update_event_hours', methods=["POST"])
 @jwt_required()
 def update_event_hours():
@@ -2737,8 +2738,8 @@ def create_inquiry():
         }), 500
 
 
-
-# for user
+# new
+# for user -- all the inquiries for all the events
 @app.route("/get_all_my_inquiries_user", methods = ["GET"])
 @jwt_required()
 def get_all_my_inquiries_user():
@@ -2784,15 +2785,58 @@ def get_all_my_inquiries_user():
         }), 500
 
 
-
-
-# for vendor getting specifc inquiries for events
-    
-@app.route("/get_my_inquiry_vendor/<int:event_id>", methods = ["GET"])
+# new
+# for both user and vendor
+# get specific inquiry with inqiry_id for both user and vendor
+@app.route("/get_specific_inquiry/<int:inquiry_id>", methods = ["GET"])
 @jwt_required()
-def get_my_inquiry_vendor(event_id):
+def get_specific_inquiry(inquiry_id):
     try:
-        data = request.get_json()
+        user = get_current_user()
+
+        if not user:
+            return jsonify({
+                "status":False,
+                "message": "User not authenticated !!"
+            }), 401
+            
+        if user.role == "user":
+            inquiry = Inquiry.query.filter_by(user_id = user.id, id = inquiry_id).first()
+
+        elif user.role == "vendor":
+            inquiry = Inquiry.query.join(Event).filter(Event.vendor_id == user.vendor.id , Inquiry.id == inquiry_id).first()
+
+        if not inquiry:
+            return jsonify({
+                "status":False,
+                "message":"Inquiry doesn't exist !!"
+            }), 404
+
+        inquiries_data = inquiry.as_dict()
+        
+        
+        return jsonify({
+            "status":True,
+            "inquiries_data":inquiries_data
+        }), 200
+
+    
+    
+    except Exception as e:
+        return jsonify({
+            "status":False,
+            "message": str(e)
+        }), 500
+
+
+
+# new
+# for vendor
+# get all_inquiries for vendor irrespective of the event_id or inq.id
+@app.route("/get_all_my_inquiries_vendor", methods = ["GET"])
+@jwt_required()
+def get_all_my_inquiries():
+    try:
         user = get_current_user()
 
         if not user:
@@ -2806,13 +2850,52 @@ def get_my_inquiry_vendor(event_id):
                 "status": False,
                 "message": "Unauthorized access: Only vendors can create inquiries."
             }), 401
-
-        # inquiry_id = data.get("inquiry_id")
+        
         vendor_id = user.vendor.id
 
+        inquiries = Inquiry.query.join(Event).filter(Event.vendor_id == vendor_id).all()
 
-        inquiries = Inquiry.query.join(Event).filter(Event.vendor_id == vendor_id, Event.id == event_id).all()
-    
+        if not inquiries:
+            return jsonify({
+                "status":False,
+                "message":"Inquiries not found !!"
+            }), 404
+
+        inquiries_data = [inquiry.as_dict() for inquiry in inquiries]
+
+        return jsonify({
+            "status":False,
+            "inquiries_data":inquiries_data
+        }), 200
+
+    except Exception as e:
+        return jsonify({
+            "status":False,
+            "message": str(e)
+        }), 500
+
+
+# for both user and vendor
+# for vendor getting specifc inquiries for events
+@app.route("/get_my_inquiry/<int:event_id>", methods = ["GET"])
+@jwt_required()
+def get_my_inquiry(event_id):
+    try:
+        user = get_current_user()
+
+        if not user:
+            return jsonify({
+                "status":False,
+                "message": "User not authenticated !!"
+            }), 401
+            
+        if user.role == "vendor":
+            vendor_id = user.vendor.id
+            inquiries = Inquiry.query.join(Event).filter(Event.vendor_id == vendor_id, Event.id == event_id).all()
+        
+        if user.role == "user":
+            inquiries = Inquiry.query.filter_by(event_id = event_id , user_id = user.id).all()
+
         if not inquiries:
             return jsonify({
                 "status":False,
