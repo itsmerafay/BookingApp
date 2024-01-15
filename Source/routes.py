@@ -2812,6 +2812,8 @@ def get_specific_inquiry(inquiry_id):
                 "message":"Inquiry doesn't exist !!"
             }), 404
 
+            
+
         inquiries_data = inquiry.as_dict()
         
         

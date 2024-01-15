@@ -1,3 +1,7 @@
+1/12/2024 1:15
+
+updated event's location_name (event name) in the response for inquiry's apis
+
 1/12/2024 6:02
 
 1 - /create_inquiry (for user only)

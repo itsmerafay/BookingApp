@@ -367,6 +367,13 @@ class Inquiry(db.Model):
         for key, value in inquiry_dict.items():
             if isinstance(value,time):
                 inquiry_dict[key] = value.strftime("%H:%M:%S") if value else None 
+
+        event_details = {
+            "location_name":self.event.location_name if self.event else None,
+        }
+
+        inquiry_dict["event_details"] = event_details
+
         return inquiry_dict
 
 
