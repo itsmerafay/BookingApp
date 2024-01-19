@@ -6,7 +6,7 @@ from geopy.distance import geodesic
 from app import app, db, mail
 from flask import request, jsonify, url_for, current_app, send_file, send_from_directory
 from datetime import datetime, timedelta
-from model import User, PasswordResetToken, Vendor, Event, Booking , Review, Preferences, Favorites, eventtiming, Inquiry
+from model import User, PasswordResetToken, Vendor, Event, Booking , Review, Preferences, Favorites, eventtiming, Inquiry, ExtraFacility, Transaction
 import secrets
 from sqlalchemy.exc import IntegrityError
 import uuid
@@ -275,124 +275,164 @@ app.config["VENDOR_IMAGES_FOLDER"] = VENDOR_IMAGES_FOLDER
 ###############################     Create Event       ######################################
 
 
+
 @app.route("/create_event", methods=["POST"])
 @jwt_required()
-def create_event():     
-    data = request.get_json()
-    user = get_current_user()
-    # print(data)
+def create_event():    
+    try: 
+        data = request.get_json()
+        user = get_current_user()
+        # print(data)
 
-    if not user:
-        return jsonify({"status":False, "message": "User not found"}), 401
+        if not user:
+            return jsonify({"status":False, "message": "User not found"}), 401
 
-    if user.role != "vendor":
-        return jsonify({"status":False,"message": "User Auth Error, not a vendor"}), 401
+        if user.role != "vendor":
+            return jsonify({"status":False,"message": "User Auth Error, not a vendor"}), 401
 
-    # Ensure the user is associated with a vendor profile
-    if not user.vendor:
-        return jsonify({"status":False,"message": "User is not associated with a vendor profile"}), 400
+        # Ensure the user is associated with a vendor profile
+        if not user.vendor:
+            return jsonify({"status":False,"message": "User is not associated with a vendor profile"}), 400
 
-    vendor = user.vendor
+        vendor = user.vendor
 
-    # Fields for the event
-    thumbnail = data.get("thumbnail")
-    print(thumbnail)
-    other_images = data.get("other_images")
-    video_showcase = data.get("video_showcase")
-    location_name = data.get("location_name")
-    address = data.get("address")
-    rate = data.get("rate")
-    fixed_price = data.get("fixed_price")
+        # Fields for the event
+        thumbnail = data.get("thumbnail")
+        print(thumbnail)
+        other_images = data.get("other_images")
+        video_showcase = data.get("video_showcase")
+        location_name = data.get("location_name")
+        address = data.get("address")
+        rate = data.get("rate")
+        fixed_price = data.get("fixed_price")
 
-    # Additional fields
-    details = data.get("details")
-    services = data.get("services")
-    print(services)
+        # Additional fields
+        details = data.get("details")
+        services = data.get("services")
+        print(services)
 
-    facilities = data.get("facilities")
-    description = data.get("description")
-    event_type = data.get("event_type")
-    latitude=   data.get("latitude")
-    longitude = data.get("longitude")
-    timings_data = data.get("timings")
+        facilities = data.get("facilities")
+        description = data.get("description")
+        event_type = data.get("event_type")
+        latitude=   data.get("latitude")
+        longitude = data.get("longitude")
+        timings_data = data.get("timings")
+        extra_facility_data = data.get("extra_facility_data")
+    
 
-    # Create an event for the vendor
-    event = Event(
-        thumbnail=thumbnail,
-        other_images=other_images,
-        video_showcase=video_showcase,
-        location_name=location_name,
-        address=address,
-        rate=rate,
-        fixed_price=fixed_price,
-        details=details,
-        services =services,
-        facilities = facilities,
-        description=description,
-        event_type=event_type,
-        latitude=latitude,
-        longitude=longitude,
-        vendor=vendor  # Associate the event with the vendor
-    )
+        # Create an event for the vendor
+        event = Event(
+            thumbnail=thumbnail,
+            other_images=other_images,
+            video_showcase=video_showcase,
+            location_name=location_name,
+            address=address,
+            rate=rate,
+            fixed_price=fixed_price,
+            details=details,
+            services =services,
+            facilities = facilities,
+            description=description,
+            event_type=event_type,
+            latitude=latitude,
+            longitude=longitude,
+            vendor=vendor  # Associate the event with the vendor
+        )
 
-    # Handle thumbnail image if provided
-    if thumbnail:
-        thumbnail_filename = f"{uuid.uuid4()}.png"
-        thumbnail_path = os.path.join(app.config['VENDOR_IMAGES_FOLDER'], thumbnail_filename)
-        save_image_from_base64(thumbnail, thumbnail_path)
-        event.thumbnail = thumbnail_filename
+        # Handle thumbnail image if provided
+        if thumbnail:
+            thumbnail_filename = f"{uuid.uuid4()}.png"
+            thumbnail_path = os.path.join(app.config['VENDOR_IMAGES_FOLDER'], thumbnail_filename)
+            save_image_from_base64(thumbnail, thumbnail_path)
+            event.thumbnail = thumbnail_filename
 
-    if other_images:
-        other_image_filenames = save_multiple_images_from_base64(other_images)
-        event.other_images = other_image_filenames
+        if other_images:
+            other_image_filenames = save_multiple_images_from_base64(other_images)
+            event.other_images = other_image_filenames
 
-    if facilities:
-        facility_image_filenames = save_multiple_images_from_base64(facilities)
-        event.facilities = facility_image_filenames
+        if facilities:
+            facility_image_filenames = save_multiple_images_from_base64(facilities)
+            event.facilities = facility_image_filenames
+        
 
+# ... (previous code)
 
-    db.session.add(event)  # Add the event to the session
-    db.session.commit()  # Commit the transaction
+        if extra_facility_data:
+            for extra_facility_info in extra_facility_data:
+                image_filenames = extra_facility_info.get("image", [])
 
-    if timings_data:
-        print(f"Timings Data : {timings_data}")
-        for day, timings in timings_data.items():
-            start_time = timings.get("start_time")
-            end_time = timings.get("end_time")
+                # Handle image data for extra facility similar to other images
+                if image_filenames:
+                    image_paths = save_multiple_images_from_base64(image_filenames)
+                    extra_facility_info["image"] = image_paths
 
-            # Set a default day if it's not provided
-            day_of_week = day or "DefaultDay"
-
-            if start_time is None or end_time is None:
-                available = False
-            else:
-                if start_time and end_time:
-                    # Ensure start_time and end_time are in the correct format
-                    start_time_obj = datetime.strptime(start_time, "%H:%M:%S").time()
-                    end_time_obj = datetime.strptime(end_time, "%H:%M:%S").time()
-                    available = True
-                else:
-                    available = False
-
-                # Check if the timings are valid before storing them
-                event_timing = eventtiming(
-                    day_of_week=day_of_week,
-                    start_time=start_time_obj if available else "00:00:00",
-                    end_time=end_time_obj if available else "00:00:00",
-                    available=available,
+                extra_facilities = ExtraFacility(
+                    name=extra_facility_info.get("name"),
+                    image=image_paths,  # Update the comment to reflect image paths
+                    hourly_rate=extra_facility_info.get("hourly_rate"),
+                    complete_event_rate=extra_facility_info.get("complete_event_rate"),
+                    allow_extra_fac_complete_event=extra_facility_info.get("allow_extra_fac_complete_event", False),
+                    allow_extra_fac_per_hour=extra_facility_info.get("allow_extra_fac_per_hour", False),
+                    unit_price_enable=extra_facility_info.get("unit_price_enable", False),
+                    timings_enable=extra_facility_info.get("timings_enable", False),
+                    unit_price_amount=extra_facility_info.get("unit_price_amount", 0),
                     event=event
                 )
-                db.session.add(event_timing)
 
-        db.session.commit()
+                db.session.add(extra_facilities)
 
-    return jsonify({"status":True,"message": "Event created successfully"})
-
+            db.session.commit()
 
 
+            print(f" Extra Facilities : {extra_facilities}")
 
 
+        db.session.add(event)  # Add the event to the session
+        db.session.commit()  # Commit the transaction
 
+        if timings_data:
+            print(f"Timings Data : {timings_data}")
+            for day, timings in timings_data.items():
+                start_time = timings.get("start_time")
+                end_time = timings.get("end_time")
+
+                # Set a default day if it's not provided
+                day_of_week = day or "DefaultDay"
+
+                if start_time is None or end_time is None:
+                    available = False
+                else:
+                    if start_time and end_time:
+                        # Ensure start_time and end_time are in the correct format
+                        start_time_obj = datetime.strptime(start_time, "%H:%M:%S").time()
+                        end_time_obj = datetime.strptime(end_time, "%H:%M:%S").time()
+                        available = True
+                    else:
+                        available = False
+
+                    # Check if the timings are valid before storing them
+                    event_timing = eventtiming(
+                        day_of_week=day_of_week,
+                        start_time=start_time_obj if available else "00:00:00",
+                        end_time=end_time_obj if available else "00:00:00",
+                        available=available,
+                        event=event
+                    )
+                    db.session.add(event_timing)
+
+            db.session.commit()
+
+        return jsonify({"status":True,"message": "Event created successfully"})
+    
+    
+    except Exception as e:
+        return jsonify({
+            "status":False,
+            "message": str(e)
+        }), 500
+
+
+    
 
 
 ###############################     Get My Events     ######################################
@@ -481,88 +521,159 @@ def getmyevents():
 @app.route("/update_event/<int:event_id>", methods = ["PUT"])
 @jwt_required()
 def update_event(event_id):
-    data = request.get_json()
-    user = get_current_user()
+    try:
+        data = request.get_json()
+        user = get_current_user()
 
-    if not user:
-        return jsonify({
-            "status":False,
-            "message":"User Not Found !!"
-        }), 401
+        if not user:
+            return jsonify({
+                "status":False,
+                "message":"User Not Found !!"
+            }), 401
 
-    if user.role != "vendor":
+        if user.role != "vendor":
+            return jsonify({
+                "status":False,
+                "message":"User Authentication Error !!!"
+            })
+
+        # Ensuring that user is associated with a vendor profile
+        if not user.vendor:
+            return jsonify({
+                "status":False,
+                "message":"User is not associated with a vendor profile make sure to complete the vendor profile first !!! "
+            })
+
+        # Basically used this here so that we should know that the user is associated with a vendor profile or not
+        # Here we are actually retrieving the vendor profile associated with a user
+        vendor = user.vendor
+
+        # Giving the database two pieces of information to find the right event
+        # Here vendor is that vendor associated with a user profile
+
+        event = Event.query.filter_by(id = event_id, vendor = vendor).first()
+        if not event:   
+            return jsonify({
+                "status":False,
+                "message":"Event Doesn't Exist !!"
+            })
+
+        # Updating the fields
+        # How it works ? It will get the thumbnail value from field at the time of update but if we don't get the value then it will make it remain for the old value
+        event.thumbnail = data.get("thumbnail", event.thumbnail)
+        event.other_images = data.get("other_images", event.other_images)
+        event.video_showcase = data.get("video_showcase", event.video_showcase)
+        event.location_name = data.get("location_name", event.location_name)
+        event.address = data.get("address", event.address)
+        event.rate = data.get("rate", event.rate)
+        event.fixed_price = data.get("fixed_price", event.fixed_price)
+        event.details = data.get("details", event.details)
+        event.services = data.get("services", event.services)
+        event.facilities = data.get("facilities", event.facilities)
+        event.description = data.get("description", event.description)
+        event.event_type = data.get("event_type", event.event_type)
+        event.longitude = data.get("longitude", event.event_type)
+        event.latitude = data.get("latitude", event.event_type)
+
+
+        # Getting the byte codes for the images to be updated
+        if data.get("thumbnail"):
+            thumbnail_filename = f"{uuid.uuid4()}.png"
+            thumbnail_path = os.path.join(app.config["VENDOR_IMAGES_FOLDER"], thumbnail_filename)        
+            
+            # base 64 data and path to access image from the directory
+            # will return filename
+            
+            save_image_from_base64(data["thumbnail"],thumbnail_path )
+            
+            # will store the image name i.e, image.png to thumnail column
+
+            event.thumbnail = thumbnail_filename
+
+
+        if data.get("other_images"):
+            event.other_images = save_multiple_images_from_base64(data["other_images"])
+
+
+        if data.get("facilities"):
+            event.facilities = save_multiple_images_from_base64(data["facilities"])
+
+        db.session.commit()
+
         return jsonify({
-            "status":False,
-            "message":"User Authentication Error !!!"
+            "status":True,
+            "message":"Event Updated Successfully !!!"
         })
 
-    # Ensuring that user is associated with a vendor profile
-    if not user.vendor:
+
+    except Exception as e:
         return jsonify({
             "status":False,
-            "message":"User is not associated with a vendor profile make sure to complete the vendor profile first !!! "
+            "message": str(e)
+        }), 500
+
+
+@app.route("/update_event_extra_facility/<int:event_id>/<int:facility_id>", methods = ["PUT"])
+@jwt_required()
+def update_event_extra_facility(event_id, facility_id):
+    try:
+        data = request.get_json()
+        user = get_current_user()
+
+        if not user:
+            return jsonify({
+                "status":False,
+                "message":"User Not Found !!"
+            }), 401
+
+        if user.role != "vendor":
+            return jsonify({
+                "status":False,
+                "message":"User Authentication Error !!!"
+            })
+
+        # Ensuring that user is associated with a vendor profile
+        if not user.vendor:
+            return jsonify({
+                "status":False,
+                "message":"User is not associated with a vendor profile make sure to complete the vendor profile first !!! "
+            })
+                
+        event = Event.query.filter_by(id = event_id, vendor = user.vendor).first()        
+        extrafacility = ExtraFacility.query.filter_by(id = facility_id, event = event).first()
+
+
+        extrafacility.name = data.get("name",extrafacility.name)
+        extrafacility.image = data.get("image", extrafacility.image)
+
+        extrafacility.horuly_rate = data.get("hourly_rate",extrafacility.hourly_rate)
+        extrafacility.complete_event_rate = data.get("complete_event_rate",extrafacility.complete_event_rate)
+        extrafacility.allow_extra_fac_complete_event = data.get("allow_extra_fac_complete_event",extrafacility.allow_extra_fac_complete_event)
+        extrafacility.allow_extra_fac_per_hour = data.get("allow_extra_fac_per_hour",extrafacility.allow_extra_fac_per_hour)
+        extrafacility.unit_price_enable = data.get("unit_price_enable",extrafacility.unit_price_enable)
+        extrafacility.timings_enable = data.get("timings_enable",extrafacility.timings_enable)
+        extrafacility.unit_price_amount = data.get("unit_price_amount",extrafacility.unit_price_amount)
+
+
+        image = extrafacility.image
+
+        if image:
+            extra_facility_image_filenames = save_multiple_images_from_base64(image)
+            extrafacility.image = extra_facility_image_filenames
+
+        db.session.commit()
+
+        return jsonify({
+            "status": True,
+            "message": "Updated successfully !!"
         })
 
-    # Basically used this here so that we should know that the user is associated with a vendor profile or not
-    # Here we are actually retrieving the vendor profile associated with a user
-    vendor = user.vendor
-
-    # Giving the database two pieces of information to find the right event
-    # Here vendor is that vendor associated with a user profile
-
-    event = Event.query.filter_by(id = event_id, vendor = vendor).first()
-    if not event:   
+    except Exception as e:
         return jsonify({
             "status":False,
-            "message":"Event Doesn't Exist !!"
-        })
+            "message": str(e)
+        }), 500
 
-    # Updating the fields
-    # How it works ? It will get the thumbnail value from field at the time of update but if we don't get the value then it will make it remain for the old value
-    event.thumbnail = data.get("thumbnail", event.thumbnail)
-    event.other_images = data.get("other_images", event.other_images)
-    event.video_showcase = data.get("video_showcase", event.video_showcase)
-    event.location_name = data.get("location_name", event.location_name)
-    event.address = data.get("address", event.address)
-    event.rate = data.get("rate", event.rate)
-    event.fixed_price = data.get("fixed_price", event.fixed_price)
-    event.details = data.get("details", event.details)
-    event.services = data.get("services", event.services)
-    event.facilities = data.get("facilities", event.facilities)
-    event.description = data.get("description", event.description)
-    event.event_type = data.get("event_type", event.event_type)
-    event.longitude = data.get("longitude", event.event_type)
-    event.latitude = data.get("latitude", event.event_type)
-
-    # Getting the byte codes for the images to be updated
-    if data.get("thumbnail"):
-        thumbnail_filename = f"{uuid.uuid4()}.png"
-        thumbnail_path = os.path.join(app.config["VENDOR_IMAGES_FOLDER"], thumbnail_filename)        
-        
-        # base 64 data and path to access image from the directory
-        # will return filename
-        
-        save_image_from_base64(data["thumbnail"],thumbnail_path )
-        
-        # will store the image name i.e, image.png to thumnail column
-
-        event.thumbnail = thumbnail_filename
-
-
-    if data.get("other_images"):
-        event.other_images = save_multiple_images_from_base64(data["other_images"])
-
-
-    if data.get("facilities"):
-        event.facilities = save_multiple_images_from_base64(data["facilities"])
-
-
-    db.session.commit()
-
-    return jsonify({
-        "status":True,
-        "message":"Event Updated Successfully !!!"
-    })
 
 
 
@@ -605,6 +716,7 @@ def delete_event(event_id):
         "status":True,
         "message":"Event Deleted Successfully !!!"
         })
+    
     except Exception as e:
         print(e)
         return jsonify({
@@ -634,137 +746,115 @@ def booking_details(booking_id):
 
 
 
-
+# for user
 @app.route("/get_event/<int:event_id>", methods = ["GET"])
 @jwt_required()
 def get_event(event_id):
-    user = get_current_user()
+    try:
+        user = get_current_user()
 
-    if not user:
+        if not user:
+                return jsonify({
+                    "status":False,
+                    "message": "User not authenticated !!"
+                }), 401
+                
+        if user.role != "user":
+                return jsonify({
+                    "status": False,
+                    "message": "Unauthorized access: Only users can get events."
+                })
+        event = Event.query.get(event_id) 
+
+        if event:
+            event_details = {
+                "id": event.id,
+                "thumbnail": event.thumbnail,
+                "other_images": event.other_images,
+                "video_showcase": event.video_showcase,
+                "address": event.address,
+                "rate": event.rate,
+                "fixed_price": event.fixed_price,
+                "details": event.details,
+                "services": event.services,
+                "facilities": event.facilities,
+                "description": event.description,
+                "event_type": event.event_type,
+                "vendor_id": event.vendor_id,  # You can include vendor details if needed
+                "location_name":event.location_name,
+                "longitude":event.longitude,
+                "latitude":event.latitude
+                # "event_icon":event.event_icon
+            }
+        
+
+            event_timings = event.event_timing
+            print(event_timings)
+            if event_timings:
+                event_details["event_timings"] = {
+                    timing.day_of_week : {
+                        "start_time":timing.start_time.isoformat(),
+                        "end_time":timing.end_time.isoformat()
+                    }
+                for timing in event_timings}
+            else:
+                event_details["event_timings"] = {}
+
+
+            # Fetch vendor details
+            if event.vendor:
+                vendor = event.vendor
+                vendor_details = {
+                    "id": vendor.id,
+                    "full_name": vendor.full_name,
+                    "phone_number": vendor.phone_number,
+                    "location": vendor.location,
+                    "biography": vendor.biography,
+                    "email":vendor.user[0].email,
+                    "profile_image": vendor.user[0].profile_image
+                    # Include other vendor fields as necessary
+                }
+
+                event_details['vendor_details'] = vendor_details
+                        
+            user_bookings = Booking.query.filter_by(user = user, event = event).all()
+            extra_facility_list = []
+            for bookings in user_bookings:
+                if bookings.extra_facility:
+                    extra_fac_details = {
+                        "name":bookings.extra_facility.name,
+                        "image":bookings.extra_facility.image,
+                        "hourly_rate":bookings.extra_facility.hourly_rate,
+                        "complete_event_rate":bookings.extra_facility.complete_event_rate,
+                        "allow_extra_fac_complete_event":bookings.extra_facility.allow_extra_fac_complete_event,
+                        "allow_extra_fac_per_hour":bookings.extra_facility.allow_extra_fac_per_hour,
+                        "unit_price_enable":bookings.extra_facility.unit_price_enable,
+                        "timings_enable":bookings.extra_facility.timings_enable,
+                        "unit_price_amount":bookings.extra_facility.unit_price_amount
+                    }
+                    extra_facility_list.append(extra_fac_details)
+            print(extra_facility_list)
+            
+            event_details['extra_facility_list'] = extra_facility_list
+                    
+
+
+            return jsonify({"status":True,"Event Details":event_details})
+
+
+        else:
             return jsonify({
                 "status":False,
-                "message": "User not authenticated !!"
-            }), 401
-            
-    if user.role != "user":
-            return jsonify({
-                "status": False,
-                "message": "Unauthorized access: Only users can get events."
+                "message":"Event not Found !!"
             })
-    event = Event.query.get(event_id) 
-
-    if event:
-        event_details = {
-            "id": event.id,
-            "thumbnail": event.thumbnail,
-            "other_images": event.other_images,
-            "video_showcase": event.video_showcase,
-            "address": event.address,
-            "rate": event.rate,
-            "fixed_price": event.fixed_price,
-            "details": event.details,
-            "services": event.services,
-            "facilities": event.facilities,
-            "description": event.description,
-            "event_type": event.event_type,
-            "vendor_id": event.vendor_id,  # You can include vendor details if needed
-            "location_name":event.location_name,
-            "longitude":event.longitude,
-            "latitude":event.latitude
-            # "event_icon":event.event_icon
-        }
-
-        event_timings = event.event_timing
-        print(event_timings)
-        if event_timings:
-            event_details["event_timings"] = {
-                timing.day_of_week : {
-                    "start_time":timing.start_time.isoformat(),
-                    "end_time":timing.end_time.isoformat()
-                }
-            for timing in event_timings}
-        else:
-            event_details["event_timings"] = {}
-
-
-        # Fetch vendor details
-        if event.vendor:
-            vendor = event.vendor
-            vendor_details = {
-                "id": vendor.id,
-                "full_name": vendor.full_name,
-                "phone_number": vendor.phone_number,
-                "location": vendor.location,
-                "biography": vendor.biography,
-                "email":vendor.user[0].email,
-                "profile_image": vendor.user[0].profile_image
-                # Include other vendor fields as necessary
-            }
-
-            event_details['vendor_details'] = vendor_details
-        return jsonify({"status":True,"Event Details":event_details})
-
-    else:
+        
+    
+    except Exception as e:
         return jsonify({
             "status":False,
-            "message":"Event not Found !!"
-        })
+            "message": str(e)
+        }), 500
 
-
-# @app.route("/get_event/<int:event_id>", methods=["GET"])
-# @jwt_required()
-# def get_event(event_id):
-#     user = get_current_user()
-
-#     if not user:
-#         return jsonify({
-#             "status": False,
-#             "message": "User not authenticated !!"
-#         }), 401
-
-#     if user.role != "user":
-#         return jsonify({
-#             "status": False,
-#             "message": "Unauthorized access: Only users can get events."
-#         })
-
-#     event = Event.query.get(event_id)
-
-#     if event:
-#         event_details = {
-#             "id": event.id,
-#             # ... (other event details) ...
-#         }
-
-#         event_timings = event.event_timing  # Check the event_timing relationship directly
-
-#         if event_timings:
-#             timings = {
-#                 timing.day_of_week: {
-#                     "start_time": timing.start_time.isoformat(),
-#                     "end_time": timing.end_time.isoformat()
-#                 } for timing in event_timings
-#             }
-#             event_details["event_timings"] = timings
-#         else:
-#             event_details["event_timings"] = {}
-
-#         # Fetch vendor details
-#         if event.vendor:
-#             vendor = event.vendor
-#             vendor_details = {
-#                 "id": vendor.id,
-#                 # ... (other vendor details) ...
-#             }
-
-#             event_details['vendor_details'] = vendor_details
-
-#         return jsonify({"status": True, "Event Details": event_details})
-#     else:
-#         return jsonify({
-#             "status": False,
-#             "message": "Event not Found !!"
-#         })
 
 
 
@@ -821,26 +911,26 @@ def top_venues(vendor_id):
         venue_bookings = (db.session.query(
                                 Event.location_name,
                                 Event.thumbnail,
-                                func.count(Booking.id).label('booking_count'),
-                                Booking.event_icon
+                                func.count(Booking.id).label('booking_count')
+                                # Booking.event_icon
                             )
                             .join(Booking, Event.id == Booking.event_id)
                             .filter(Event.vendor_id == vendor_id)
-                            .group_by(Event.location_name, Event.thumbnail, Booking.event_icon)
+                            .group_by(Event.location_name, Event.thumbnail)
                             .order_by(func.count(Booking.id).desc())
                             .all()
                         )
 
         venues_list = []
 
-        for location_name, thumbnail, count, event_icon in venue_bookings:
+        for location_name, thumbnail, count in venue_bookings:
             percentage = (count / total_bookings) * 100 if total_bookings > 0 else 0
             venues_list.append({
                 "venue": location_name,
                 "thumbnail": thumbnail,
                 "bookings": count,
                 "percentage": round(percentage, 2),
-                "event_icon": event_icon
+                # "event_icon": event_icon
             })
 
         return jsonify({"status": True, "top_venues": venues_list})
@@ -1006,6 +1096,8 @@ def set_user_preference():
 #             "message": str(e)
 #         }), 500
 
+
+
 # corrected home_events
 @app.route("/home_events", methods=["POST"])
 @jwt_required()
@@ -1042,13 +1134,14 @@ def home_events():
                 current_date_time = datetime.now()
 
                 if requested_availability:
-                    # Check event availability considering booking and cancellation
+                                        # Check event availability considering booking and cancellation
                     is_event_available = any(
                         BookingAvailability.check_availability(booking, current_date_time)
                         for booking in event.bookings
                         if not booking.all_day and not booking.cancelled
-                        or (booking.start_datetime <= current_date_time <= booking.end_datetime)
+                        or (booking.start_date <= current_date_time.date() <= booking.end_date)
                     )
+
 
                     if not is_event_available:
                         continue
@@ -1092,9 +1185,6 @@ def home_events():
             "status": False,
             "message": str(e)
         }), 500
-
-
-
 
 
 
@@ -1473,37 +1563,6 @@ def custom_event_search():
 
 ###############################   Create Booking      #####################################
 
-# @app.route('/send_notification', methods=['POST'])
-# def send_notification():
-#     data = request.get_json()
-#     device_token = data.get("device_token")
-#     title = data.get("title")
-#     body = data.get("body")
-
-#     if not all([device_token, title, body]):
-#         return jsonify({
-#             "status": False,
-#             "message": "Missing parameters !!"
-#         }), 400
-    
-#     success = Notification.send_push_notification(device_token, title, body)
-
-#     if success:
-#         return jsonify({
-#             "status": True,
-#             "message": "Message sent successfully!!"
-#         }), 200
-#     else:
-#         return jsonify({
-#             "status": False,
-#             "message": "Failed to send notifications !!"
-#         }), 500
-
-
-
-
-###############################   Create Booking      ######################################
-
 @app.route('/create_booking', methods=["POST"])
 @jwt_required()
 def create_booking():
@@ -1513,10 +1572,10 @@ def create_booking():
 
         if not user:
             return jsonify({
-                "status":False,
+                "status": False,
                 "message": "User not authenticated !!"
             }), 401
-            
+
         if user.role != "user":
             return jsonify({
                 "status": False,
@@ -1532,19 +1591,21 @@ def create_booking():
         all_day = data.get('all_day')
         event_id = data.get('event_id')
         event_type = data.get("event_type")
+        extra_facility_id = data.get("extra_facility_id")
+        apply_extra_facility_for_complete_event = data.get("apply_extra_facility_for_complete_event", False)
 
         desired_day_of_week = datetime.strptime(start_date, "%Y-%m-%d").strftime("%A")
         event_timings = eventtiming.query.filter_by(event_id=event_id, day_of_week=desired_day_of_week).first()
 
         if not event_timings:
             return jsonify({
-                "status":False,
+                "status": False,
                 "message": "Event timings not found. Unable to create booking !!"
             }), 400
 
-        if not all([full_name, email, guest_count, start_date, end_date, event_id,event_type]):
+        if not all([full_name, email, guest_count, start_date, end_date, event_id, event_type]):
             return jsonify({
-                "status":False,
+                "status": False,
                 "message": "All necessary fields must be set !!"
             })
 
@@ -1557,7 +1618,6 @@ def create_booking():
                 "message": "Booking timings out of range for this day."
             }), 400
 
-
         # If it's an all-day event, set start_time and end_time accordingly
         if all_day:
             start_time = event_timings.start_time
@@ -1565,6 +1625,25 @@ def create_booking():
         else:
             start_time = data.get('start_time', event_timings.start_time)
             end_time = data.get('end_time', event_timings.end_time)
+
+        # Check if the selected extra facility is associated with the correct event
+        selected_extra_facility = None
+
+        if extra_facility_id:
+            selected_extra_facility = ExtraFacility.query.filter_by(id=extra_facility_id, event_id=event_id).first()
+
+        if not selected_extra_facility:
+            if data.get("extra_facility_hours") or data.get("apply_extra_facility_for_complete_event"):
+                return jsonify({
+                    "status": False,
+                    "message": "Selected extra facility is not available for the specified event !!"
+                }), 400
+        
+        elif not selected_extra_facility.unit_price_enable:
+            return jsonify({
+                "status":False,
+                "message":"Can't apply for extra facility , for this facility, the unit price criteria is not available"
+            }), 400
 
         # Calculate total event hours
         event_hours = DateTimeConversions.calculate_event_hours(start_date, end_date, start_time, end_time, all_day)
@@ -1579,22 +1658,42 @@ def create_booking():
 
         if overlapping_booking:
             return jsonify({
-                "status":False,
-                "message": "Event Is already booked !!"
-            })
+                "status": False,
+                "message": "Event is already booked !!"
+                    })
+        
+        unit_price_enable = selected_extra_facility.unit_price_enable
+        unit_price_amount = selected_extra_facility.unit_price_amount if unit_price_enable else data.get("unit_price_amount")
+        unit_price_count = data.get("unit_price")
 
-
-        # Calculate the rate and other values
         event = Event.query.filter_by(id=event_id).first()
         subtotal = event_hours * event.rate
-        tax_percentage = 0.15
-        total_price = subtotal + (subtotal * tax_percentage)
 
-        # if event_type:
-        #     event_icon_filename = f"{event_type.lower()}_icon_{uuid.uuid4()}.png"
-        #     event_icon_path = os.path.join(app.config["EVENT_ICON_FOLDER"], event_icon_filename)
-        #     if os.path.exists(event_icon_path):
-        #         booking.event_icon = event_icon_filename
+        extra_facility_cost = 0
+        # Check if extra_facility_hours is provided and is not None
+        extra_facility_hours = data.get("extra_facility_hours")
+
+        if selected_extra_facility:
+            if selected_extra_facility.timings_enable:
+                if selected_extra_facility.timings_enable and selected_extra_facility.allow_extra_fac_per_hour and extra_facility_hours is not None:
+                    extra_facility_cost = selected_extra_facility.hourly_rate * extra_facility_hours
+                
+                elif selected_extra_facility.timings_enable and selected_extra_facility.allow_extra_fac_complete_event and apply_extra_facility_for_complete_event:
+                    extra_facility_cost = selected_extra_facility.complete_event_rate * event_hours
+
+            elif unit_price_enable and isinstance(unit_price_count, int):
+                # Correcting the calculation here
+                extra_facility_cost = unit_price_count * unit_price_amount
+
+
+        subtotal += extra_facility_cost
+
+                # Calculate tax (15% of the subtotal, not including extra_facility_cost)
+        tax_percentage = 0.15
+        tax_amount = subtotal * tax_percentage
+
+        # Calculate the final total price
+        total_price = subtotal + tax_amount
 
         # Create and save the booking
         if event and event_timings.available:
@@ -1611,88 +1710,43 @@ def create_booking():
                 end_time=end_time,
                 all_day=all_day,
                 event_id=event_id,
-                event_type=event_type
-                # event_icon = event_icon_filename
+                event_type=event_type,
+                extra_facility_id=extra_facility_id
             )
-
-
             db.session.add(booking)
             db.session.commit()
 
+            vendor = Vendor.query.filter_by(id=event.vendor_id).first()
+            if vendor:
+                vendor.wallet += subtotal
+            db.session.commit()
+
             return jsonify({
-                "status":True,
+                "status": True,
                 "Summary": {
                     "event_hours": f"{event_hours} Hours",
                     "guest_count": f"{guest_count}",
                     "event_rate": f"{event.rate}$",
                     "subtotal": f"{subtotal}$",
-                    "tax": "15%",
+                    "extra_facility_cost": f"{extra_facility_cost}",
+                    "tax": f"{tax_amount}$ (15%)",
                     "total_price": f"{total_price} $"
                 }
             }), 200
-        
+
         else:
             return jsonify({
-                "status":False,
-                "message":f"{event.location_name} is not operating today !!"
+                "status": False,
+                "message": f"{event.location_name} is not operating today !!"
             }), 400
-    
 
     except Exception as e:
         return jsonify({
-            "status":False,
+            "status": False,
             "message": str(e)
         }), 500
 
 
-
-# @app.route('/update_event_hours', methods=["PUT"])
-# @jwt_required()
-# def update_event_hours():
-#     try:
-#         data = request.get_json()
-#         user = get_current_user()
-
-#         if not user:
-#             return jsonify({
-#                 "status":False,
-#                 "message": "User not authenticated !!"
-#             }), 401
-            
-#         if user.role != "vendor":
-#             return jsonify({
-#                 "status": False,
-#                 "message": "Unauthorized access: Only users can create bookings."
-#             })
-        
-#         event_id = data.get("event_id")
-#         start_time = data.get("start_time")
-#         end_time = data.get("end_time")
-#         day_of_week = data.get("day_of_week")
-
-#         event_timings = eventtiming.query.filter_by(event_id=event_id, day_of_week=day_of_week).first()
-        
-#         if not event_timings:
-#             return jsonify({
-#                 "status":False,
-#                 "message":"Event or event day of week not found !!"
-#             }), 400
-        
-#         event_timings.start_time = start_time
-#         event_timings.end_time = end_time
-
-#         db.session.commit()
-
-#         return jsonify({
-#             "status":True,
-#             "message":"Successfully updated the working hours !!"
-#         }),200
-
-#     except Exception as e:
-#         return jsonify({
-#             "status":False,
-#             "message": str(e)
-#         }), 500
 
 
 @app.route('/update_event_hours', methods=["POST"])
@@ -1796,157 +1850,6 @@ def upload_event_icon():
         }), 500
 
 
-
-
-
-###############################    Cancel Booking By User      ######################################
-
-# @app.route("/cancel_booking", methods = ["POST"])
-# @jwt_required()
-# def cancel_booking():
-#     try:
-#         data = request.get_json()
-#         user = get_current_user()
-
-#         if not user:
-#             return jsonify({
-#                 "status":False,
-#                 "message": "User not authenticated !!"
-#             }), 401
-            
-#         if user.role != "user":
-#             return jsonify({
-#                 "status": False,
-#                 "message": "Unauthorized access: Only users can cancel bookings."
-#             })
-
-#         booking_id = data.get("booking_id")
-
-#         booking_to_cancel = Booking.query.filter_by(id=booking_id, user_id = user.id).first()
-
-#         if not booking_to_cancel:
-#             return jsonify({
-#                 "message":"Booking not found"
-#             })
-        
-#         booking_to_cancel.cancelled = True  
-#         db.session.commit()
-
-#         return jsonify({
-#             "status":True,
-#             "message":"Booking cancelled successfully !!",
-#             "event_id":Booking.event_id,
-#             # "event_icon":Booking.even,
-#             "vendor_id":Booking.event.vendor.id
-#         })
-    
-#     except Exception as e:
-#         return jsonify({
-#             "status":False,
-#             "message": str(e)
-#         }), 500
-
-
-###############################    Cancel Booking By Vendor      ######################################
-
-
-# @app.route("/cancel_booking_by_vendor", methods = ["POST"])
-# @jwt_required()
-# def cancel_booking_by_vendor():
-#     try:
-#         data = request.get_json()
-#         user = get_current_user()
-
-#         if not user:
-#             return jsonify({
-#                 "status":False,
-#                 "message": "User not authenticated !!"
-#             }), 401
-            
-#         if user.role != "vendor":
-#             return jsonify({
-#                 "status": False,
-#                 "message": "Unauthorized access: Only vendors can cancel bookings."
-#             })
-        
-#         booking_id = data.get("booking_id")
-
-#         booking_to_cancel = Booking.query.filter_by(id=booking_id).first()
-
-#         if booking_to_cancel.cancelled == 1:
-#             return jsonify({
-#                 "message":"Booking is already cancelled !1"
-#         })
-
-#         if not booking_to_cancel or booking_to_cancel.event.vendor.id != user.vendor.id:
-#             return jsonify({
-#                 "message":"Booking not found or unauthorized to cancel"})
-
-#         booking_to_cancel.cancelled = True  
-#         db.session.commit()
-
-#         return jsonify({
-#             "status":True,
-#             "message":"Successfully cancelled the booking !!",
-#             "event_id":booking_to_cancel.event_id,
-#             "vendor_id":booking_to_cancel.event.vendor.id
-#         })
-    
-#     except Exception as e:
-#         return jsonify({
-#             "status":False,
-#             "message": str(e)
-#         }), 500
-
-
-
-
-###############################    Cancel Booking By User      ######################################
-
-# @app.route("/cancel_booking", methods = ["POST"])
-# @jwt_required()
-# def cancel_booking():
-#     try:
-#         data = request.get_json()
-#         user = get_current_user()
-
-#         if not user:
-#             return jsonify({
-#                 "status":False,
-#                 "message": "User not authenticated !!"
-#             }), 401
-            
-#         if user.role != "user":
-#             return jsonify({
-#                 "status": False,
-#                 "message": "Unauthorized access: Only users can cancel bookings."
-#             })
-
-#         booking_id = data.get("booking_id")
-
-#         booking_to_cancel = Booking.query.filter_by(id=booking_id, user_id = user.id).first()
-
-#         if not booking_to_cancel:
-#             return jsonify({
-#                 "message":"Booking not found"
-#             })
-        
-#         booking_to_cancel.cancelled = True  
-#         db.session.commit()
-
-#         return jsonify({
-#             "status":True,
-#             "message":"Booking cancelled successfully !!",
-#             "event_id":Booking.event_id,
-#             # "event_icon":Booking.even,
-#             "vendor_id":Booking.event.vendor.id
-#         })
-    
-#     except Exception as e:
-#         return jsonify({
-#             "status":False,
-#             "message": str(e)
-#         }), 500
 
 
 @app.route("/cancel_booking", methods=["POST"])
@@ -2094,7 +1997,7 @@ def cancel_booking_by_vendor():
 # calender
 # Bookings
 # Events taking place 
-
+# for vendor_events event
 @app.route("/vendor_events", methods=["POST"])
 @jwt_required()
 def vendor_events():
@@ -2159,7 +2062,7 @@ def vendor_events():
             events_dict = {
                 "location_name":booking.event.location_name,
                 "event_thumbnail":booking.event.thumbnail,
-                "event_icon":booking.event_icon,
+                # "event_icon":booking.event_icon,
                 "booking_event_type":booking.event_type,
                 "booking_id":booking.id,
                 "user_profile_image":booking.user.profile_image,
@@ -2919,6 +2822,117 @@ def get_my_inquiry(event_id):
             "status":False,
             "message": str(e)
         }), 500
+
+########################### Withdraw #################################
+    
+@app.route("/withdraw", methods = ["POST"])
+@jwt_required()
+def withdraw():
+    try:
+        user = get_current_user()
+        data = request.get_json()
+
+        if not user:
+            return jsonify({
+                "status":False,
+                "message": "User not authenticated !!"
+            }), 401
+            
+        if user.role == "vendor":
+            vendor = Vendor.query.filter_by(id=user.vendor_id).first()
+
+            if vendor and vendor.wallet >= 30:
+                withdrawal_amount = data.get("withdrawal_amount")
+                if withdrawal_amount > 30:
+                    vendor.wallet -= withdrawal_amount
+                    transaction = Transaction(user_id = user.id , user_type = "vendor", transaction_amount = withdrawal_amount)
+                    db.session.add(transaction)
+                    db.session.commit()
+
+                    return jsonify({
+                        "status":True,
+                        "message": "Withdrawal success!!",
+                        "new_wallet_balance":vendor.wallet
+                    }), 200
+            
+                else:
+                    return jsonify({
+                    "status":False,
+                    "message": "Amount should be greater than 30!!"
+                }), 400
+
+            else:
+                return jsonify({
+                    "status":False,
+                    "message":"The amount should be greater than 30 for making any withdrawal"
+                }), 404
+        else:
+            return jsonify({
+                    "status":False,
+                    "message":"Only vendors are allowed for making the withdrawal !!"
+                }), 404    
+        
+    except Exception as e:
+        return jsonify({
+            "status":False,
+            "message": str(e)
+        }), 500
+
+
+
+# @app.route("/withdraw", methods=["POST"])
+# @jwt_required()
+# def withdraw():
+#     try:
+#         user = get_current_user()
+#         data = request.get_json()
+
+#         if not user:
+#             return jsonify({
+#                 "status": False,
+#                 "message": "User not authenticated !!"
+#             }), 401
+
+#         if user.role == "vendor":
+#             vendor = Vendor.query.filter_by(id=user.vendor_id).first()
+
+#             if vendor and vendor.wallet >= 30:
+#                 withdrawal_amount = data.get("withdrawal_amount")
+#                 if withdrawal_amount > 0:
+#                     vendor.wallet -= withdrawal_amount
+#                     transaction = Transaction(
+#                         user_id=user.id, user_type="vendor", transaction_amount=withdrawal_amount)
+#                     db.session.add(transaction)
+#                     db.session.commit()
+
+#                     return jsonify({
+#                         "status": True,
+#                         "message": "Withdrawal success!!",
+#                         "new_wallet_balance": vendor.wallet
+#                     }), 200
+
+#                 else:
+#                     return jsonify({
+#                         "status": False,
+#                         "message": "Amount should be greater than 0!!"
+#                     }), 400
+
+#             else:
+#                 return jsonify({
+#                     "status": False,
+#                     "message": "The amount should be greater than 30 for making any withdrawal"
+#                 }), 404
+#         else:
+#             return jsonify({
+#                 "status": False,
+#                 "message": "Only vendors are allowed for making the withdrawal !!"
+#             }), 404
+
+#     except Exception as e:
+#         return jsonify({
+#             "status": False,
+#             "message": str(e)
+#         }), 500
 
 
 

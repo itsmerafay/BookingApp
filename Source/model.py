@@ -61,13 +61,33 @@ class User(db.Model):
         return bcrypt.check_password_hash(self.password_hash, password)
 
 
-class Vendor(db.Model):
+class ExtraFacility(db.Model):
+    __tablename__ = 'extra_facility'  # Specify the table name
+
     id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(1024), nullable=True)
+    image = db.Column(db.JSON, nullable=True)
+    hourly_rate = db.Column(db.Float, nullable=True, server_default='0')
+    complete_event_rate = db.Column(db.Float, nullable=True, server_default='0')
     
+    allow_extra_fac_complete_event = db.Column(db.Boolean, server_default='0')
+    allow_extra_fac_per_hour = db.Column(db.Boolean, server_default='0')
+    unit_price_enable = db.Column(db.Boolean, server_default = '0')
+    timings_enable = db.Column(db.Boolean, server_default = '0')
+    unit_price_amount = db.Column(db.Float, nullable = True, server_default = '0')
+
+    event_id = db.Column(db.Integer, db.ForeignKey("event.id"), nullable=False)
+    event = db.relationship("Event", back_populates="extra_facilities")
+    
+
+class Vendor(db.Model):
+    id = db.Column(db.Integer, primary_key=True)    
     full_name = db.Column(db.String(255), nullable=False)
     phone_number = db.Column(db.String(255), nullable=False)
     location = db.Column(db.String(255), nullable=False)
     biography = db.Column(db.String(1024), nullable=False)
+    wallet = db.Column(db.Float, server_default = '0.0' ,default = 0.0)
+
     # Define the reverse relationship from Vendor to User
     user = db.relationship('User', back_populates='vendor')
     event = db.relationship('Event', back_populates='vendor')
@@ -80,12 +100,13 @@ class Vendor(db.Model):
         return all(field is not None and field.strip() != '' for field in required_fields)
 
 
+
 class Event(db.Model):
     id = db.Column(db.Integer, primary_key = True)
+
     thumbnail = db.Column(db.String(255), nullable=True)
     other_images = db.Column(db.JSON, nullable=True)
     video_showcase = db.Column(db.String(255), nullable=True)
-    # location_name = db.Column(db.String(255), nullable=False)
     address = db.Column(db.String(255), nullable=False)
     rate = db.Column(db.Float, nullable=False)
     fixed_price = db.Column(db.Boolean, nullable=True)
@@ -102,9 +123,9 @@ class Event(db.Model):
     event_type = db.Column(db.String(255), nullable =  True)
     latitude = db.Column(db.Float, nullable =  True)
     longitude = db.Column(db.Float, nullable =  True)
+
     vendor = db.relationship("Vendor", back_populates="event")
-    # inquiries = db.relationship("Inquiry", back_populates="event")
-    # favorites = db.relationship("Favorites", backref="event")  # Relationship to the 'Favorites' model
+    extra_facilities = db.relationship("ExtraFacility", back_populates="event", lazy='joined')
 
     # relationship 
     # describing each object in event table must have timings obj
@@ -113,17 +134,33 @@ class Event(db.Model):
 
     vendor_id = db.Column(db.Integer, db.ForeignKey("vendor.id"), nullable = False)
 
+
     def as_dict(self):
         # converting event objects into a dictionary, extracting name and values of the columns by getattr
         event_dict = {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
         event_timings = eventtiming.query.filter_by(event_id=self.id).all()
+        
         event_dict["event_timings"] = {
             timing.day_of_week: {
                 "start_time": timing.start_time.isoformat() if timing.start_time else None,
                 "end_time": timing.end_time.isoformat() if timing.end_time else None
             } for timing in event_timings
         }
+
+        # extra facilities
+        event_dict["extra_facilities"] = [{
+            "name":facility.name,
+            "image":facility.image,
+            "hourly_rate":facility.hourly_rate,
+            "complete_event_rate":facility.complete_event_rate,
+            "allow_extra_fac_complete_event":facility.allow_extra_fac_complete_event,
+            "allow_extra_fac_per_hour":facility.allow_extra_fac_per_hour,
+            "unit_price_enable":facility.unit_price_enable,
+            "timings_enable":facility.timings_enable,
+            "unit_price_amount":facility.unit_price_amount,
+            
+        } for facility in self.extra_facilities]
 
         return event_dict
 
@@ -142,6 +179,7 @@ class Event(db.Model):
                 total_earnings += booking.calculate_total_cost()
 
         return total_earnings
+    
 
 
 class Review(db.Model):
@@ -165,6 +203,7 @@ class Booking(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    extra_facility_id = db.Column(db.Integer, db.ForeignKey("extra_facility.id"))
     full_name = db.Column(db.String(255), nullable = False)
     email = db.Column(db.String(255), nullable = False)
     guest_count = db.Column(db.Integer, nullable = False)
@@ -181,8 +220,10 @@ class Booking(db.Model):
 
     # bookings instead of booking bcz of many relations
     # backref used is bcz of bi-directional relationship 
-    event = db.relationship("Event", backref = "bookings")
-    user = db.relationship("User", backref = "bookings")
+    event = db.relationship("Event", backref="bookings")
+    user = db.relationship("User", backref="bookings")
+    extra_facility = db.relationship("ExtraFacility", backref="bookings")
+
 
     def calculate_total_cost(self):
         start_datetime = datetime.combine(self.start_date, self.start_time)
@@ -190,7 +231,27 @@ class Booking(db.Model):
         duration = end_datetime - start_datetime
         duration_hours = duration.total_seconds() / 3600  # Convert duration to hours
         # Calculate total cost based on hourly rate
-        return duration_hours * self.event.rate
+        total_cost = duration_hours * self.event.rate
+
+        if self.extra_facility:
+            if self.all_day:
+                if self.allow_extra_facility_for_complete_event:
+                    total_cost += self.extra_facility.complete_event_rate * duration_hours
+                else:
+                    total_cost += self.extra_facility.hourly_rate * self.extra_facility_hours
+
+        return total_cost
+
+    def calculate_total_price(self):
+        total_cost = self.calculate_total_cost()
+
+        # Calculate the tax
+        tax_percentage = 0.15
+        tax = total_cost * tax_percentage
+
+        # Calculate the total price including tax
+        total_price = total_cost + tax
+        return total_price
 
     def as_dict_bk(self):
         booking_dict = {}
@@ -281,7 +342,6 @@ class Booking(db.Model):
 
         return booking_dict
 
-
 class PasswordResetToken(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -346,19 +406,8 @@ class Inquiry(db.Model):
     event_type = db.Column(db.String(255), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     cancelled = db.Column(db.Boolean, default=False)
-
-    # event = db.relationship("Event", backref="inquiries")
-    # user = db.relationship("User", backref="inquiries_user")
-
     event = db.relationship("Event", back_populates="inquiries")
     user = db.relationship("User", back_populates="inquiries")
-
-
-    # event = db.relationship('Event', back_populates='event_timing')
-
-    # event_timing = db.relationship("eventtiming", back_populates="event")
-
-
 
 
     def as_dict(self):
@@ -377,29 +426,14 @@ class Inquiry(db.Model):
         return inquiry_dict
 
 
+class Transaction(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    user_id = db.Column(db.Integer, nullable = False)
+    user_type = db.Column(db.String(10), nullable = False)
+    transaction_time = db.Column(db.DateTime, default = datetime.utcnow(), nullable = False)
+    transaction_amount = db.Column(db.Float , nullable = False)
 
-
-
-# class Inquiry(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
-#     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-#     full_name = db.Column(db.String(255), nullable=False)
-#     email = db.Column(db.String(255), nullable=False)
-#     guest_count = db.Column(db.Integer, nullable=False)
-#     additional_notes = db.Column(db.String(1024), nullable=True)
-#     start_date = db.Column(db.Date, nullable=False)
-#     end_date = db.Column(db.Date, nullable=False)
-#     start_time = db.Column(db.Time, nullable=False)
-#     end_time = db.Column(db.Time, nullable=False)
-#     all_day = db.Column(db.Boolean, default=False)
-#     event_type = db.Column(db.String(255), nullable=True)
-#     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-#     cancelled = db.Column(db.Boolean, default=False)
-
-#     event = db.relationship("Event", back_populates="inquiries")
-#     user = db.relationship("User", back_populates="inquiries")
-
-#     def as_dict(self):
-#         inquiry_dict = {c.name: getattr(self, c.name) for c in self.__table__.columns}
-#         return inquiry_dict
+    def __init__(self, user_id , user_type , transaction_amount):
+        self.user_id = user_id
+        self.user_type = user_type
+        self.transaction_amount = transaction_amount
