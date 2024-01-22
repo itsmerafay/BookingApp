@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 11, 2024 at 11:30 AM
+-- Generation Time: Jan 22, 2024 at 02:01 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -36,7 +36,7 @@ CREATE TABLE `alembic_version` (
 --
 
 INSERT INTO `alembic_version` (`version_num`) VALUES
-('e885497c5747');
+('bb3c52776153');
 
 -- --------------------------------------------------------
 
@@ -59,74 +59,83 @@ CREATE TABLE `booking` (
   `all_day` tinyint(1) DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   `event_type` varchar(255) DEFAULT NULL,
-  `cancelled` tinyint(1) DEFAULT NULL
+  `cancelled` tinyint(1) DEFAULT NULL,
+  `extra_facility_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `booking`
 --
 
-INSERT INTO `booking` (`id`, `event_id`, `user_id`, `full_name`, `email`, `guest_count`, `additional_notes`, `start_date`, `end_date`, `start_time`, `end_time`, `all_day`, `created_at`, `event_type`, `cancelled`) VALUES
-(1, 1, 48, 'Abdul Rafay Atiq', 'abdulrafayatiq.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2025-06-18', '2025-06-19', '00:00:00', '23:59:59', 1, '2023-12-04 12:57:32', 'Birthday', 0),
-(2, 1, 48, 'Abdul Rafay Atiq', 'abdulrafayatiq.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2022-06-18', '2022-06-19', '14:00:00', '15:00:00', 0, '2023-12-04 12:58:51', 'Birthday', 0),
-(3, 1, 48, 'Abdul Rafay Atiq', 'abdulrafayatiq.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2021-06-18', '2021-06-19', '14:00:00', '15:00:00', 1, '2023-12-04 12:59:25', 'Wedding', 0),
-(4, 1, 48, 'Abdul Rafay Atiq', 'abdulrafayatiq.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2021-06-18', '2021-06-20', '14:00:00', '15:00:00', 0, '2023-12-04 12:59:57', 'Wedding', 0),
-(5, 1, 48, 'Abdul Rafay Atiq', 'abdulrafayatiq.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2020-06-18', '2020-06-20', '14:00:00', '15:00:00', 0, '2023-12-04 13:00:54', 'Business', 0),
-(6, 1, 48, 'Abdul Rafay Atiq', 'abdulrafayatiq.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2019-06-18', '2019-06-20', '14:00:00', '15:00:00', 0, '2023-12-04 13:01:01', 'Business', 0),
-(7, 1, 48, 'Abdul Rafay Atiq', 'abdulrafayatiq.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2018-06-18', '2018-06-20', '14:00:00', '15:00:00', 0, '2023-12-04 13:01:11', 'Charity', 0),
-(8, 1, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-18', '2005-06-20', '14:00:00', '15:00:00', 0, '2023-12-04 13:26:24', 'Charity', 0),
-(9, 1, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-21', '2005-06-22', '14:00:00', '15:00:00', 0, '2023-12-04 13:26:40', 'Workshop', 0),
-(10, 1, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-23', '2005-06-24', '14:00:00', '15:00:00', 0, '2023-12-04 13:26:46', 'Workshop', 0),
-(11, 1, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-25', '2005-06-26', '14:00:00', '15:00:00', 0, '2023-12-04 13:26:56', 'Wedding', 0),
-(12, 1, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-04 13:27:04', 'Network', 0),
-(13, 2, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 1, '2023-12-06 08:25:35', 'Network', 0),
-(14, 3, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:26:15', 'Workshop', 1),
-(15, 4, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:26:21', 'Network', 0),
-(16, 5, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:26:27', 'Workshop', 0),
-(17, 6, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2022-12-21', '2022-12-22', '14:00:00', '15:00:00', 0, '2023-12-06 08:26:32', 'Charity', 0),
-(18, 7, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:26:38', 'Network', 0),
-(19, 8, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:26:44', 'Wedding', 0),
-(20, 9, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:26:50', 'Wedding', 0),
-(21, 10, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:26:56', 'Wedding', 0),
-(22, 11, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:27:01', 'Workshop', 0),
-(23, 12, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:27:05', 'Wedding', 0),
-(24, 13, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2023-12-22', '2023-12-22', '14:00:00', '15:00:00', 0, '2023-12-06 08:27:09', 'Network', 0),
-(25, 14, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:27:13', 'Wedding', 0),
-(26, 15, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:27:17', 'Charity', 0),
-(27, 16, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:27:22', 'Charity', 0),
-(28, 17, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:27:25', 'Network', 0),
-(29, 18, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:27:41', 'Wedding', 0),
-(31, 20, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:27:51', 'Network', 0),
-(32, 21, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:27:54', 'Wedding', 0),
-(33, 22, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2024-01-08', '2024-01-08', '14:00:00', '22:00:00', 0, '2023-12-06 08:27:58', 'Wedding', 0),
-(35, 21, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:47:33', 'Wedding', 0),
-(36, 20, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:47:47', 'Network', 0),
-(37, 19, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2024-01-08', '2024-01-08', '12:00:00', '13:00:00', 0, '2023-12-06 08:48:53', 'Wedding', 0),
-(38, 18, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:49:09', 'Network', 0),
-(39, 17, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:49:15', 'Wedding', 0),
-(40, 16, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:49:20', 'Network', 0),
-(41, 15, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:49:24', 'Birthday', 0),
-(42, 14, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:49:29', 'Birthday', 0),
-(43, 13, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:49:34', 'Birthday', 0),
-(44, 12, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:49:39', 'Network', 0),
-(45, 11, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:49:42', 'Network', 0),
-(46, 10, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:49:46', 'Network', 0),
-(47, 9, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:49:50', 'Birthday', 0),
-(48, 8, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:49:55', 'Birthday', 0),
-(49, 7, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:50:00', 'Function', 0),
-(50, 6, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2023-12-11', '2023-12-01', '14:00:00', '15:00:00', 0, '2023-12-06 08:50:06', 'Birthday', 0),
-(51, 5, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:50:10', 'Function', 0),
-(52, 4, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:50:14', 'Function', 0),
-(53, 3, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:50:18', 'Charity', 1),
-(54, 2, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:50:21', 'Function', 0),
-(55, 1, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:50:25', 'Function', 1),
-(56, 26, 51, 'Abdul Rafay Atiq 124', 'just1.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-07 11:41:07', 'Function', 1),
-(57, 27, 51, 'Abdul Rafay Atiq 124', 'just1.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-29', '2004-06-30', '14:00:00', '15:00:00', 1, '2023-12-07 11:41:19', 'Function', 0),
-(58, 27, 51, 'Muhammad Ahsan Bin Abdul Aziz', 'nothing.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-20 08:16:43', 'Birthday', 0),
-(59, 27, 51, 'Muhammad Ahsan Bin Abdul Aziz', 'nothing.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-29', '2004-06-30', '16:00:00', '17:00:00', 0, '2023-12-20 08:19:14', 'Birthday', 0),
-(60, 27, 51, 'Muhammad Ahsan Bin Abdul Aziz', 'nothing.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-01', '2004-06-02', '16:00:00', '17:00:00', 0, '2023-12-20 08:24:04', 'Wedding', 1),
-(85, 27, 51, 'Muhammad Ahsan Bin Abdul Aziz', 'nothing.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2024-01-08', '2024-01-08', '14:00:00', '18:00:00', 1, '2023-12-20 11:27:28', 'NeTwOrk', 1),
-(97, 70, 55, 'Rafay and Rafay', 'johndoe@example.com', 5, 'Special requests for the event.', '2024-01-13', '2024-01-13', '12:00:00', '13:20:23', 0, '2024-01-11 10:17:13', 'Bussiness Meeting', 0);
+INSERT INTO `booking` (`id`, `event_id`, `user_id`, `full_name`, `email`, `guest_count`, `additional_notes`, `start_date`, `end_date`, `start_time`, `end_time`, `all_day`, `created_at`, `event_type`, `cancelled`, `extra_facility_id`) VALUES
+(1, 1, 48, 'Abdul Rafay Atiq', 'abdulrafayatiq.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2025-06-18', '2025-06-19', '00:00:00', '23:59:59', 1, '2023-12-04 12:57:32', 'Birthday', 0, NULL),
+(2, 1, 48, 'Abdul Rafay Atiq', 'abdulrafayatiq.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2022-06-18', '2022-06-19', '14:00:00', '15:00:00', 0, '2023-12-04 12:58:51', 'Birthday', 0, NULL),
+(3, 1, 48, 'Abdul Rafay Atiq', 'abdulrafayatiq.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2021-06-18', '2021-06-19', '14:00:00', '15:00:00', 1, '2023-12-04 12:59:25', 'Wedding', 0, NULL),
+(4, 1, 48, 'Abdul Rafay Atiq', 'abdulrafayatiq.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2021-06-18', '2021-06-20', '14:00:00', '15:00:00', 0, '2023-12-04 12:59:57', 'Wedding', 0, NULL),
+(5, 1, 48, 'Abdul Rafay Atiq', 'abdulrafayatiq.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2020-06-18', '2020-06-20', '14:00:00', '15:00:00', 0, '2023-12-04 13:00:54', 'Business', 0, NULL),
+(6, 1, 48, 'Abdul Rafay Atiq', 'abdulrafayatiq.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2019-06-18', '2019-06-20', '14:00:00', '15:00:00', 0, '2023-12-04 13:01:01', 'Business', 0, NULL),
+(7, 1, 48, 'Abdul Rafay Atiq', 'abdulrafayatiq.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2018-06-18', '2018-06-20', '14:00:00', '15:00:00', 0, '2023-12-04 13:01:11', 'Charity', 0, NULL),
+(8, 1, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-18', '2005-06-20', '14:00:00', '15:00:00', 0, '2023-12-04 13:26:24', 'Charity', 0, NULL),
+(9, 1, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-21', '2005-06-22', '14:00:00', '15:00:00', 0, '2023-12-04 13:26:40', 'Workshop', 0, NULL),
+(10, 1, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-23', '2005-06-24', '14:00:00', '15:00:00', 0, '2023-12-04 13:26:46', 'Workshop', 0, NULL),
+(11, 1, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-25', '2005-06-26', '14:00:00', '15:00:00', 0, '2023-12-04 13:26:56', 'Wedding', 0, NULL),
+(12, 1, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-04 13:27:04', 'Network', 0, NULL),
+(13, 2, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 1, '2023-12-06 08:25:35', 'Network', 0, NULL),
+(14, 3, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:26:15', 'Workshop', 1, NULL),
+(15, 4, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:26:21', 'Network', 0, NULL),
+(16, 5, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:26:27', 'Workshop', 0, NULL),
+(17, 6, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2022-12-21', '2022-12-22', '14:00:00', '15:00:00', 0, '2023-12-06 08:26:32', 'Charity', 0, NULL),
+(18, 7, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:26:38', 'Network', 0, NULL),
+(19, 8, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:26:44', 'Wedding', 0, NULL),
+(20, 9, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:26:50', 'Wedding', 0, NULL),
+(21, 10, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:26:56', 'Wedding', 0, NULL),
+(22, 11, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:27:01', 'Workshop', 0, NULL),
+(23, 12, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:27:05', 'Wedding', 0, NULL),
+(24, 13, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2023-12-22', '2023-12-22', '14:00:00', '15:00:00', 0, '2023-12-06 08:27:09', 'Network', 0, NULL),
+(25, 14, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:27:13', 'Wedding', 0, NULL),
+(26, 15, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:27:17', 'Charity', 0, NULL),
+(27, 16, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:27:22', 'Charity', 0, NULL),
+(28, 17, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:27:25', 'Network', 0, NULL),
+(29, 18, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:27:41', 'Wedding', 0, NULL),
+(31, 20, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:27:51', 'Network', 0, NULL),
+(32, 21, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2005-06-27', '2005-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:27:54', 'Wedding', 0, NULL),
+(33, 22, 50, 'Abdul Rafay Atiq 123', 'just.03@gmail.com', 10, 'Arrange birthday cakes and ballons', '2024-01-08', '2024-01-08', '14:00:00', '22:00:00', 0, '2023-12-06 08:27:58', 'Wedding', 0, NULL),
+(35, 21, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:47:33', 'Wedding', 0, NULL),
+(36, 20, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:47:47', 'Network', 0, NULL),
+(37, 19, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2024-01-08', '2024-01-08', '12:00:00', '13:00:00', 0, '2023-12-06 08:48:53', 'Wedding', 0, NULL),
+(38, 18, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:49:09', 'Network', 0, NULL),
+(39, 17, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:49:15', 'Wedding', 0, NULL),
+(40, 16, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:49:20', 'Network', 0, NULL),
+(41, 15, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:49:24', 'Birthday', 0, NULL),
+(42, 14, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:49:29', 'Birthday', 0, NULL),
+(43, 13, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:49:34', 'Birthday', 0, NULL),
+(44, 12, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:49:39', 'Network', 0, NULL),
+(45, 11, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:49:42', 'Network', 0, NULL),
+(46, 10, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:49:46', 'Network', 0, NULL),
+(47, 9, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:49:50', 'Birthday', 0, NULL),
+(48, 8, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:49:55', 'Birthday', 0, NULL),
+(49, 7, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:50:00', 'Function', 0, NULL),
+(50, 6, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2023-12-11', '2023-12-01', '14:00:00', '15:00:00', 0, '2023-12-06 08:50:06', 'Birthday', 0, NULL),
+(51, 5, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:50:10', 'Function', 0, NULL),
+(52, 4, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:50:14', 'Function', 0, NULL),
+(53, 3, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:50:18', 'Charity', 1, NULL),
+(54, 2, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:50:21', 'Function', 0, NULL),
+(55, 1, 51, 'Abdul Rafay Atiq 124', 'just.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-06 08:50:25', 'Function', 1, NULL),
+(56, 26, 51, 'Abdul Rafay Atiq 124', 'just1.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-07 11:41:07', 'Function', 1, NULL),
+(57, 27, 51, 'Abdul Rafay Atiq 124', 'just1.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-29', '2004-06-30', '14:00:00', '15:00:00', 1, '2023-12-07 11:41:19', 'Function', 0, NULL),
+(58, 27, 51, 'Muhammad Ahsan Bin Abdul Aziz', 'nothing.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-27', '2004-06-28', '14:00:00', '15:00:00', 0, '2023-12-20 08:16:43', 'Birthday', 0, NULL),
+(59, 27, 51, 'Muhammad Ahsan Bin Abdul Aziz', 'nothing.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-29', '2004-06-30', '16:00:00', '17:00:00', 0, '2023-12-20 08:19:14', 'Birthday', 0, NULL),
+(60, 27, 51, 'Muhammad Ahsan Bin Abdul Aziz', 'nothing.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2004-06-01', '2004-06-02', '16:00:00', '17:00:00', 0, '2023-12-20 08:24:04', 'Wedding', 1, NULL),
+(85, 27, 51, 'Muhammad Ahsan Bin Abdul Aziz', 'nothing.03@gmail.com', 11, 'Arrange birthday cakes and ballons', '2024-01-08', '2024-01-08', '14:00:00', '18:00:00', 1, '2023-12-20 11:27:28', 'NeTwOrk', 1, NULL),
+(106, 89, 55, 'Rafay and Rafay', 'johndoe@example.com', 5, 'Special requests for the event.', '2024-01-12', '2024-01-12', '12:00:00', '13:20:23', 0, '2024-01-17 13:13:07', 'Bussiness Meeting', 0, 5),
+(107, 89, 55, 'Rafay and Rafay', 'johndoe@example.com', 5, 'Special requests for the event.', '2024-02-12', '2024-02-12', '12:00:00', '13:20:23', 0, '2024-01-17 13:14:21', 'Bussiness Meeting', 0, 5),
+(110, 89, 55, 'Rafay and Rafay', 'johndoe@example.com', 5, 'Special requests for the event.', '2024-03-12', '2024-03-12', '12:00:00', '13:20:23', 0, '2024-01-17 13:17:50', 'Bussiness Meeting', 0, 5),
+(153, 88, 55, 'Rafay and Rafay', 'johndoe@example.com', 5, 'Special requests for the event.', '2025-06-09', '2025-06-09', '12:00:00', '15:00:00', 0, '2024-01-18 14:59:00', 'Business Meeting', 0, 5),
+(156, 109, 55, 'Alice Smith', 'alicesmith@example.com', 8, 'Special requests for the event.', '2024-01-19', '2024-01-19', '20:00:00', '22:00:00', 0, '2024-01-18 15:06:28', 'Business Meeting', 0, 6),
+(157, 118, 55, 'Alice Johnson', 'alice.johnson@example.com', 6, '', '2024-04-23', '2024-04-23', '09:00:00', '17:00:00', 1, '2024-01-22 10:49:56', 'Birthday Party', 0, 6),
+(159, 88, 55, 'Jane Smith', 'jane.smith@example.com', 10, '', '2024-02-06', '2024-02-06', '15:00:00', '17:00:00', 0, '2024-01-22 11:14:21', 'Wedding', 0, 6),
+(163, 118, 55, 'Alice Johnson', 'alice.johnson@example.com', 6, '', '2024-04-15', '2024-04-15', '12:00:00', '15:00:00', 0, '2024-01-22 11:48:01', 'Birthday Party', 0, 19),
+(167, 118, 55, 'Alice Johnson', 'alice.johnson@example.com', 6, '', '2024-04-15', '2024-04-15', '10:00:00', '18:00:00', 1, '2024-01-22 12:38:45', 'Birthday Party', 0, 19);
 
 -- --------------------------------------------------------
 
@@ -198,7 +207,32 @@ INSERT INTO `event` (`id`, `thumbnail`, `other_images`, `video_showcase`, `addre
 (67, '5a08084b-66ee-4283-9ed9-e1337b14888b.png', '[\"548287ed-aab1-402c-b329-b6cb6300738e.png\", \"5132b8d0-9c7b-42dc-9ac0-2fd4aa87c8ab.png\"]', 'youtube.com', 'Gulshan block 6', 500, 1, 'Event details 123123', '[\"57f1b4ae-c8bf-4ead-9e08-7bbc59125e2b.png\", \"4b00c6d6-085a-4ada-94eb-d86fb9e42c37.png\"]', 'Event description', 'Event Type', 16, 'General', 24.11, 67.11, 'Tassaract'),
 (68, 'ef9e58b9-fee5-473f-a6e8-ff8891a32ff0.png', '[\"ca8e32eb-43de-4a2d-8137-f20f3f823ffd.png\", \"4d4b66fe-b30a-499a-805a-8ca9aa55a6dd.png\"]', 'youtube.com', 'Gulshan block 6', 500, 1, 'Event details 123123', '[\"0dfd141d-1356-4fce-bd55-27514f2193bd.png\", \"46fdb0e0-a9f7-48c9-b95a-2914c72e61f6.png\"]', 'Event description', 'Event Type', 16, 'General', 24.11, 67.11, 'Tassaract'),
 (69, '35ff3611-65dd-456a-aca0-ee3912f59e08.png', '[\"81e4010a-97f9-494c-8604-c3f3d8ef3a33.png\", \"35a1ddb4-f12e-43b5-826e-fea1e6a565c4.png\"]', 'youtube.com', 'Gulshan block 6', 500, 1, 'Event details 123123', '[\"b79e486e-8f74-46ee-95c4-4301aa7d31f8.png\", \"68f136ee-8081-4e66-8b12-05aa8bb24df2.png\"]', 'Event description', 'Event Type', 16, 'General', 24.11, 67.11, 'Tassaract'),
-(70, '9d017ee3-1abe-4a2b-9d5e-cc67ac7021f2.png', '[\"2067ce7e-8977-42ea-88a8-cb202f720ae1.png\", \"cba83637-4425-4440-9266-4b9b9e3757e7.png\"]', 'youtube.com', 'Gulshan block 6', 500, 1, 'Event details 123123', '[\"f0a6b122-0d44-47b6-9c0a-5e9d8260d2dc.png\", \"124fdbdf-fedd-4822-b6d5-1b8d810ddb64.png\"]', 'Event description', 'Event Type', 16, 'General', 24.11, 67.11, 'Tassaract');
+(70, '9d017ee3-1abe-4a2b-9d5e-cc67ac7021f2.png', '[\"2067ce7e-8977-42ea-88a8-cb202f720ae1.png\", \"cba83637-4425-4440-9266-4b9b9e3757e7.png\"]', 'youtube.com', 'Gulshan block 6', 500, 1, 'Event details 123123', '[\"f0a6b122-0d44-47b6-9c0a-5e9d8260d2dc.png\", \"124fdbdf-fedd-4822-b6d5-1b8d810ddb64.png\"]', 'Event description', 'Event Type', 16, 'General', 24.11, 67.11, 'Tassaract'),
+(71, 'cd9fe236-be55-4171-b0fe-f4b26c8533a8.png', '[\"4f76be94-c983-4732-933a-5eb8a4e4b226.png\", \"16a8a930-6405-423c-8ccc-148981d0afaf.png\"]', 'youtube.com', 'Gulshan block 6', 500, 1, 'Event details 123123', '[\"59c04d5d-e589-408a-a805-74862a1a0ea1.png\", \"284b7bba-aa57-4db9-8ae5-b4088c38d768.png\"]', 'Event description', 'Event Type', 16, 'General', 24.11, 67.11, 'Tassaract'),
+(72, 'ff59826c-0ac2-4c0f-97af-88f44317b17d.png', '[\"9741c7e9-4f87-47c3-a555-02cf186ad087.png\", \"8ff955ce-04ff-4fe9-9588-ccb09bddbde8.png\"]', 'youtube.com', 'Gulshan block 6', 500, 1, 'Event details 123123', '[\"c04e601c-68ff-493b-8384-167afb8853c7.png\", \"72bb1dcc-6c34-4d32-adf6-e8e8d7eda953.png\"]', 'Event description', 'Event Type', 16, 'General', 24.11, 67.11, 'Tassaract'),
+(73, 'b85515d5-de73-459e-bf4a-a36daf015f14.png', '[\"65a4b7a0-5628-4666-92d7-cef8f038f1bb.png\", \"4c0d3e2f-818f-4bf8-9a27-fcc89557b5a6.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"9d2f159f-227d-4715-950c-b50a0d9bee0b.png\", \"79b93c2d-2c9c-478b-a78a-a5dd9d575430.png\"]', 'Event description', 'Event Type', 16, 'General', 24.11, 67.11, 'Tassaract'),
+(74, '281815d8-c9eb-4ca3-bf93-ec1a72a6a62e.png', '[\"2cd9ba04-d0cd-4a53-a186-aa5ffbdd81f1.png\", \"0275eafb-9246-412e-bfec-ad1991adeba0.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"06171d05-d071-4322-ae29-cdfd8efb1478.png\", \"55dd68a4-d318-48a3-82b1-2dd4de83f2c7.png\"]', 'Event description', 'Event Type', 16, 'General', 24.11, 67.11, 'Tassaract'),
+(75, '508320a5-5275-4433-a46a-1e10ff9b4c66.png', '[\"11dcf68e-984a-4c02-b9d5-6cde81441b55.png\", \"e415f6fc-3341-46d2-bd65-c02e80d79b7a.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"51f8d573-eba6-4cc1-9419-6c583dc60030.png\", \"761aa657-aa85-4324-b0e7-343881bc7f4f.png\"]', 'Event description', 'Event Type', 16, 'General', 24.11, 67.11, 'Tassaract'),
+(76, '19da535f-f3cb-4af2-9eac-3ab2f2e12ce5.png', '[\"17d039ce-7f95-4c79-b1b2-c2d0c5d79270.png\", \"89b2d7ae-3424-417f-ab63-19f03448f6fa.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"0ef1839b-ed06-4dcc-9cae-032e099164f8.png\", \"00ea1ce6-2d3a-44a8-b368-fc9de6b06a5d.png\"]', 'Event description', 'Event Type', 16, 'General', 24.11, 67.11, 'Tassaract'),
+(77, 'c4eadc7a-faa7-40bb-8dad-c20624f2b1a3.png', '[\"4e3f623b-1fc8-460c-9640-a0d36ed32e35.png\", \"a8a2941c-8fdb-4ed8-a351-64e9141850a2.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"2885ace8-9201-4722-b63d-1d2514faae62.png\", \"f755d9ee-7951-4a7f-ac46-6e87c43dd8fd.png\"]', 'Event description', 'Event Type', 16, 'General', 24.11, 67.11, 'Tassaract'),
+(78, 'f5851b9c-b6ce-47b9-905f-8a25254624ee.png', '[\"559bdc86-4cfc-474b-8711-de3dbcc5bf91.png\", \"2e7baa7e-d100-4d76-8a30-868cc195cf7b.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"e6dd4765-939b-4f45-bf5f-4386383daad4.png\", \"f1c708b9-6f88-4592-9f78-482621d69bc2.png\"]', 'Event description', 'Anything', 16, 'General', 24.11, 67.11, 'Tassaract'),
+(79, 'eee89261-0d6a-4972-ab0e-5b9311313fda.png', '[\"e8c9f42a-48fb-42b1-b10d-b16b491bd773.png\", \"67a6dcce-7b87-4b99-868c-157d1d514cef.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"fb344021-d972-45d5-9445-7deb2ab88e4d.png\", \"0e9f5ce9-093f-4d0b-9da7-cc9ce5100c17.png\"]', 'Event description', 'Anything', 16, 'General', 24.11, 67.11, 'Tassaract'),
+(80, '2a2277ef-b2fd-4347-a882-d787f5308e38.png', '[\"1bf21bfb-3fbc-49cc-971e-2e84f96b3bb0.png\", \"5743932d-5e09-4fcf-b09a-b00f969467cf.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"0e9f74cc-8bc6-4748-9b77-f7d0890a94be.png\", \"78e4224a-3650-468a-90a8-cb3a8a61df22.png\"]', 'Event description', 'Anything', 16, 'General', 24.11, 67.11, 'Tassaract'),
+(81, '67ca1db4-726d-4dd4-8fdb-c1ec44ec1ab0.png', '[\"846223f9-e690-4371-adcf-891a507270f6.png\", \"8813619c-d686-4ead-8b50-b5d07a08a0d1.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"ced6a109-25ed-4e63-9ab5-1926e80bcb0e.png\", \"1a470ce2-fcc5-4d5e-b29c-e8018540cb98.png\"]', 'Event description', 'Anything', 16, 'General', 24.11, 67.11, 'Tassaract'),
+(88, 'c6499078-9004-4541-b61e-88405003a0e8.png', '[\"9f234295-00db-437b-9788-917e034700e4.png\", \"8eed25f7-8cbe-4f98-91b5-ec339c49f060.png\"]', 'youtube112312312312.com', 'Gulshan block 1', 500, 1, 'Event details 123123', '[\"09780920-1aef-438e-8467-9b89b2448bda.png\", \"a7496042-6fb1-48d8-97dd-4856a1bdb8b1.png\"]', 'Event description', 'Anything', 16, 'General', 24.11, 67.11, 'Tassaract'),
+(89, 'c1936860-691a-4416-9040-2f8dfec2d9ff.png', '[\"ab0fb002-db90-4ff0-b962-24ea0ede90a4.png\", \"e8177fbe-78bb-471a-abb3-cced92004991.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"4df643a8-60b5-4393-ab0d-fc4173a6b209.png\", \"2508ac62-7336-4464-9e32-ea04923499ea.png\"]', 'Event description', 'Anything', 16, 'General', 24.11, 67.11, 'Tassaract'),
+(90, 'b519dee5-42a0-4b83-b184-fbe51ece182a.png', '[\"f94a03f2-ec64-42f6-8ce8-b153944855a1.png\", \"1dfe8cb5-3c47-4d98-9199-1d028e753131.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"ebfc5050-96e4-425a-b749-533493caa86a.png\", \"6496f1bf-746a-4705-ac55-840a02a929fa.png\"]', 'Event description', 'Anything', 16, 'General', 24.11, 67.11, 'Tassaract'),
+(91, 'eb136ce9-b2b0-496c-8c33-c8ed15a46bb2.png', '[\"b5ec7406-1210-4785-b488-798d5335406e.png\", \"5df3e277-2ebb-4b1b-b76e-cbef5ef34ff4.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"3fe0a1b9-100a-4f91-8173-69a4f3dbb0f2.png\", \"c977f023-7eae-4372-8618-1bec31a92ba9.png\"]', 'Event description', 'Anything', 16, 'General', 24.11, 67.11, 'Tassaract'),
+(92, 'f009db8d-f83c-4286-b08f-4502eac0280b.png', '[\"978a0c24-847e-4fdd-bd84-0c73bfef74ae.png\", \"fdd78bfa-84d0-46de-825b-3aa18c9299e2.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"0074fc93-e4e2-4fd3-b3a9-c171307444e2.png\", \"00ec510c-b897-45a5-be38-15f9bbdcf4db.png\"]', 'Event description', 'Anything', 16, 'General', 24.11, 67.11, 'Tassaract'),
+(93, '250c8f17-ff39-493e-b5ca-b3faec1bc89a.png', '[\"c143feae-d952-4ad1-85f5-13c727f4c478.png\", \"dbc836ba-cefe-4a26-88a1-b409a3c0febd.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"3a8e6be1-4f6b-4a39-80c7-d8afeceb67c4.png\", \"b6205e84-a619-42a8-8a8b-bd0b32adb30f.png\"]', 'Event description', 'Anything', 16, 'General', 24.11, 67.11, 'Tassaract'),
+(94, 'c3c56b61-cb28-43a4-923c-4c32f27e2df1.png', '[\"3f0e3afb-d2ab-4113-8914-9ecef2efe23e.png\", \"a97f287a-fa49-4af9-9186-3176e2f81f9d.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"2c1a1044-7f21-410d-8f36-0c987165e445.png\", \"4bd6d042-b37e-42d6-81cd-cb36f8f00460.png\"]', 'Event description', 'Anything', 16, 'General', 24.11, 67.11, 'Tassaract'),
+(95, 'dcfdb331-e3be-4b1f-9cd1-d33c6a6aace1.png', '[\"a33ade92-e523-4274-8f88-0a344aa73a2f.png\", \"3b140c89-db64-4a7b-8751-4316f2dbcee9.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"04aacce9-54f7-430e-9d64-2c28654e43b7.png\", \"838b31af-ee6f-4fd4-ade3-50adc1a37f37.png\"]', 'Event description', 'Anything', 16, 'General', 24.11, 67.11, 'Tassaract'),
+(96, 'c4434531-e1d3-4b01-ae40-ac734405eaba.png', '[\"5bab3e4b-d8f1-4232-aa1a-75fe3fe2d6ea.png\", \"81bbf65f-c8ee-4794-b85b-fadba3a3bca8.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"1ab0fe80-472f-485e-bf38-456949d06093.png\", \"0b46a00a-df65-4dad-a52c-c65f54ab9016.png\"]', 'Event description', 'Anything', 16, 'General', 24.11, 67.11, 'Tassaract'),
+(97, 'f1db03a2-dc6e-4352-8bf5-77da96b4bdf5.png', '[\"268c3a37-108b-4f5c-ad95-f0ed0e686311.png\", \"7b3277aa-c556-4439-aa23-5a652cec9c32.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"fe0eec55-b899-4272-b441-8d57e618e002.png\", \"6c8893d5-c0dc-4e75-89db-bd1fb1173976.png\"]', 'Event description', 'Anything', 16, 'General', 24.11, 67.11, 'Tassaract'),
+(98, '7846ea78-8c13-43fd-9673-aa4ebc7a2a16.png', '[\"fbc7112b-cffe-4ce6-af82-e26cb1d1509c.png\", \"d02a28ae-4ac7-4071-96c3-f09624cef4b8.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"a2285dec-9d85-4ba6-aa13-e2fa87a59401.png\", \"e8255571-c2c8-43ad-99ad-30b02922ce48.png\"]', 'Event description', 'Anything', 16, 'General', 24.11, 67.11, 'Tassaract'),
+(99, '84226ea2-76e5-4c9c-b4da-5b30bc6a227f.png', '[\"48f8fa7b-4900-462d-9f71-8d1ba2043aca.png\", \"4a4815e0-140b-41e8-91d8-85c9dc2c7705.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"d067bd32-ccfd-4b80-8428-caa6a24ebbac.png\", \"d886d0cf-44d1-490b-a460-993a66e7382f.png\"]', 'Event description', 'Anything', 16, 'General', 24.11, 67.11, 'Tassaract'),
+(109, '68c0adfc-d69c-4a3f-af89-5d2780350b08.png', '[\"f2fd9651-b550-4822-a732-dd3952053f87.png\", \"39b84b81-9fbd-4bae-84fa-5a646d54026b.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"d8fdc413-4f1b-4748-b0f8-148c8a888d47.png\", \"be9a7bc6-9f58-47dc-a702-8a7b5a43e34a.png\"]', 'Event description', 'Anything', 16, 'General', 24.11, 67.11, 'Tassaract'),
+(118, '33cfeba6-5178-472f-a88c-1c8165e00dd5.png', '[\"88fc8730-c741-4793-9e51-17c24048e6d0.png\", \"59aba01f-dab1-4f83-abb7-9168adc0958a.png\"]', 'base64_encoded_video', '123 Main Street, City', 50, 1, 'Event details go here', '[\"feff347b-7b7b-420f-acdc-2a1016adddbb.png\", \"7057a55a-f109-4b98-851c-894db5968c45.png\"]', 'Event description goes here', 'Party', 16, 'Service details go here', 40.7128, -74.006, 'Sample Location');
 
 -- --------------------------------------------------------
 
@@ -224,9 +258,103 @@ INSERT INTO `eventtiming` (`id`, `event_id`, `day_of_week`, `start_time`, `end_t
 (36, 70, 'Tuesday', '12:00:00', '23:00:00', 1),
 (37, 70, 'Wednesday', '12:00:00', '23:00:00', 1),
 (38, 70, 'Thursday', '12:00:00', '23:00:00', 1),
-(39, 70, 'Friday', '00:00:00', '00:00:00', 0),
+(39, 70, 'Friday', '11:00:00', '19:00:00', 0),
 (40, 70, 'Saturday', '12:00:00', '23:00:00', 1),
-(41, 70, 'Sunday', '12:00:00', '23:00:00', 1);
+(41, 70, 'Sunday', '12:00:00', '23:00:00', 1),
+(42, 71, 'Monday', '12:00:00', '23:00:00', 1),
+(43, 71, 'Tuesday', '12:00:00', '23:00:00', 1),
+(44, 71, 'Wednesday', '12:00:00', '23:00:00', 1),
+(45, 71, 'Thursday', '12:00:00', '23:00:00', 1),
+(46, 71, 'Saturday', '12:00:00', '23:00:00', 1),
+(47, 71, 'Sunday', '12:00:00', '23:00:00', 1),
+(48, 72, 'Monday', '12:00:00', '23:00:00', 1),
+(49, 72, 'Tuesday', '12:00:00', '23:00:00', 1),
+(50, 72, 'Wednesday', '12:00:00', '23:00:00', 1),
+(51, 72, 'Thursday', '12:00:00', '23:00:00', 1),
+(52, 72, 'Saturday', '12:00:00', '23:00:00', 1),
+(53, 72, 'Sunday', '12:00:00', '23:00:00', 1),
+(54, 73, 'Monday', '12:00:00', '23:00:00', 1),
+(55, 73, 'Tuesday', '12:00:00', '23:00:00', 1),
+(56, 73, 'Wednesday', '12:00:00', '23:00:00', 1),
+(57, 73, 'Thursday', '12:00:00', '23:00:00', 1),
+(58, 73, 'Saturday', '12:00:00', '23:00:00', 1),
+(59, 73, 'Sunday', '12:00:00', '23:00:00', 1),
+(60, 74, 'Monday', '10:00:00', '18:00:00', 1),
+(61, 74, 'Tuesday', '11:00:00', '19:00:00', 1),
+(62, 75, 'Monday', '10:00:00', '18:00:00', 1),
+(63, 75, 'Tuesday', '11:00:00', '19:00:00', 1),
+(64, 76, 'Monday', '10:00:00', '18:00:00', 1),
+(65, 76, 'Tuesday', '11:00:00', '19:00:00', 1),
+(66, 77, 'Monday', '10:00:00', '18:00:00', 1),
+(67, 77, 'Tuesday', '11:00:00', '19:00:00', 1),
+(68, 78, 'Monday', '10:00:00', '18:00:00', 1),
+(69, 78, 'Tuesday', '11:00:00', '19:00:00', 1),
+(70, 79, 'Monday', '10:00:00', '18:00:00', 1),
+(71, 79, 'Tuesday', '11:00:00', '19:00:00', 1),
+(72, 80, 'Monday', '10:00:00', '18:00:00', 1),
+(73, 80, 'Tuesday', '11:00:00', '19:00:00', 1),
+(74, 81, 'Monday', '10:00:00', '18:00:00', 1),
+(75, 81, 'Tuesday', '11:00:00', '19:00:00', 1),
+(88, 88, 'Monday', '10:00:00', '18:00:00', 1),
+(89, 88, 'Tuesday', '11:00:00', '19:00:00', 1),
+(90, 89, 'Monday', '10:00:00', '18:00:00', 1),
+(91, 89, 'Tuesday', '11:00:00', '19:00:00', 1),
+(92, 89, 'Wednesday', '08:00:00', '23:59:59', 1),
+(93, 89, 'Thursday', '08:00:00', '23:59:59', 1),
+(94, 89, 'Friday', '08:00:00', '23:59:59', 1),
+(95, 89, 'Saturday', '08:00:00', '23:59:59', 1),
+(96, 89, 'Sunday', '08:00:00', '23:59:59', 1),
+(97, 90, 'Monday', '10:00:00', '18:00:00', 1),
+(98, 90, 'Tuesday', '11:00:00', '19:00:00', 1),
+(99, 91, 'Monday', '10:00:00', '18:00:00', 1),
+(100, 91, 'Tuesday', '11:00:00', '19:00:00', 1),
+(101, 92, 'Monday', '10:00:00', '18:00:00', 1),
+(102, 92, 'Tuesday', '11:00:00', '19:00:00', 1),
+(103, 93, 'Monday', '10:00:00', '18:00:00', 1),
+(104, 93, 'Tuesday', '11:00:00', '19:00:00', 1),
+(105, 94, 'Monday', '10:00:00', '18:00:00', 1),
+(106, 94, 'Tuesday', '11:00:00', '19:00:00', 1),
+(107, 95, 'Monday', '10:00:00', '18:00:00', 1),
+(108, 95, 'Tuesday', '11:00:00', '19:00:00', 1),
+(109, 96, 'Monday', '10:00:00', '18:00:00', 1),
+(110, 96, 'Tuesday', '11:00:00', '19:00:00', 1),
+(111, 97, 'Monday', '10:00:00', '18:00:00', 1),
+(112, 97, 'Tuesday', '11:00:00', '19:00:00', 1),
+(113, 98, 'Monday', '10:00:00', '18:00:00', 1),
+(114, 98, 'Tuesday', '11:00:00', '19:00:00', 1),
+(115, 99, 'Monday', '10:00:00', '18:00:00', 1),
+(116, 99, 'Tuesday', '11:00:00', '19:00:00', 1),
+(135, 109, 'Monday', '10:00:00', '18:00:00', 1),
+(136, 109, 'Tuesday', '11:00:00', '19:00:00', 1),
+(137, 118, 'Monday', '10:00:00', '18:00:00', 1),
+(138, 118, 'Tuesday', '09:00:00', '17:00:00', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `extra_facility`
+--
+
+CREATE TABLE `extra_facility` (
+  `id` int(11) NOT NULL,
+  `name` varchar(1024) DEFAULT NULL,
+  `image` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`image`)),
+  `event_id` int(11) NOT NULL,
+  `rate` float DEFAULT 0,
+  `unit` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `extra_facility`
+--
+
+INSERT INTO `extra_facility` (`id`, `name`, `image`, `event_id`, `rate`, `unit`) VALUES
+(5, 'Valet Parking', '[\"9727f52f-8dc4-416a-bc24-a643022e5fd6.png\", \"9b378a69-71ea-41fb-bd36-db159b9b7f31.png\"]', 88, 100, 'hour'),
+(6, 'water bottle', '[\"a5d272fc-2c4f-408e-b5b9-6c574c2ac615.png\", \"e32c8129-de25-4234-a69a-3a42d35f0bc6.png\"]', 88, 200, 'unit'),
+(17, 'art galleries', '[\"61404a80-035d-4873-897d-b1fb1814229b.png\", \"956a2671-cfb9-420c-adcf-d99cceaf0b01.png\"]', 109, 50, 'hour'),
+(18, 'museums', '[\"94da3696-c2b9-42ed-b012-2258117a041b.png\", \"5d255696-ee8a-4397-a8e9-0bcec1870ec1.png\"]', 109, 80, 'hour'),
+(19, 'tissue massage', '[\"7fd89e82-14d3-444c-9459-0b5867a28895.png\", \"fc3533e2-7faf-4b5d-89a2-0157c9f6abc4.png\"]', 118, 100, 'hour'),
+(20, '15 drinks', '[\"97857aa9-3b75-4048-8df2-169231f442d8.png\", \"0e0818d2-c930-4bbb-8545-438526b2dbca.png\"]', 118, 15, 'unit');
 
 -- --------------------------------------------------------
 
@@ -239,6 +367,45 @@ CREATE TABLE `favorites` (
   `user_id` int(11) NOT NULL,
   `event_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `favorites`
+--
+
+INSERT INTO `favorites` (`id`, `user_id`, `event_id`) VALUES
+(2, 55, 89);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `inquiry`
+--
+
+CREATE TABLE `inquiry` (
+  `id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `full_name` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `guest_count` int(11) NOT NULL,
+  `additional_notes` varchar(1024) DEFAULT NULL,
+  `start_date` date NOT NULL,
+  `end_date` date NOT NULL,
+  `start_time` time NOT NULL,
+  `end_time` time NOT NULL,
+  `all_day` tinyint(1) DEFAULT NULL,
+  `event_type` varchar(255) DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `cancelled` tinyint(1) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `inquiry`
+--
+
+INSERT INTO `inquiry` (`id`, `event_id`, `user_id`, `full_name`, `email`, `guest_count`, `additional_notes`, `start_date`, `end_date`, `start_time`, `end_time`, `all_day`, `event_type`, `created_at`, `cancelled`) VALUES
+(2, 70, 55, 'Rafay and Rafay', 'johndoe@example.com', 5, 'Special requests for the event.', '2024-01-12', '2024-01-12', '12:00:00', '13:20:23', 0, 'Bussiness Meeting', '2024-01-11 13:13:14', 0),
+(3, 70, 55, 'Rafay and Rafay', 'asbfjkdnf@gmail.com', 5, 'Special requests for the event.', '2024-01-12', '2024-01-12', '12:00:00', '13:20:23', 0, 'Bussiness Meeting', '2024-01-11 13:13:32', 0);
 
 -- --------------------------------------------------------
 
@@ -349,6 +516,31 @@ INSERT INTO `review` (`id`, `booking_id`, `event_id`, `user_id`, `cleanliness_ra
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `transaction`
+--
+
+CREATE TABLE `transaction` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `user_type` varchar(10) NOT NULL,
+  `transaction_time` datetime NOT NULL,
+  `transaction_amount` float NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `transaction`
+--
+
+INSERT INTO `transaction` (`id`, `user_id`, `user_type`, `transaction_time`, `transaction_amount`) VALUES
+(1, 54, 'vendor', '2024-01-19 15:02:51', 20),
+(2, 54, 'vendor', '2024-01-19 15:05:51', 20),
+(3, 54, 'vendor', '2024-01-19 15:06:52', 20),
+(4, 54, 'vendor', '2024-01-19 15:08:19', 31),
+(5, 54, 'vendor', '2024-01-19 15:08:19', 4954);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `user`
 --
 
@@ -404,8 +596,8 @@ INSERT INTO `user` (`id`, `email`, `password_hash`, `access_token`, `role`, `pro
 (51, 'just1.03@gmail.com', '$2b$12$nqXV2GHiaT9DodRwnNoEwe16cAPGh0K5/hy4CMSzPUrOM8f2M9jIG', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwMzIzOTU5MCwianRpIjoiZDliZDI2OGYtMTM3Zi00ZDAzLTk5MzgtMDM0YWExNTY5ZTY5IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6Imp1c3QxLjAzQGdtYWlsLmNvbSIsIm5iZiI6MTcwMzIzOTU5MCwiZXhwIjoxNzAzMjQwNDkwfQ.6YEevXnKorm1QmOC2FOnWMrFx1D3DTcAICFzAlhT7Rw', 'user', 'ab7ebf3d-c31f-4e69-aff2-f126a22a8578.png', NULL),
 (52, 'abdulrafayatiq@gmail.com.com', '$2b$12$6tmvlYLzyYiZtllws6mCwOHOK/gS3p1xkzyNWA1ZHDHKMJrwtUXBK', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwMTk0ODc1MywianRpIjoiZDY1ZjQxY2UtMzgyZS00NDZjLWJmZDYtYTE0OTk0ZWMxZDhiIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFiZHVscmFmYXlhdGlxQGdtYWlsLmNvbS5jb20iLCJuYmYiOjE3MDE5NDg3NTMsImV4cCI6MTcwMTk0OTY1M30.JZUjefQ0wz_uGzbZMISF8DV6a6huWpCi8UHZ0kXi6hQ', 'vendor', 'ab7ebf3d-c31f-4e69-aff2-f126a22a8578.png', 14),
 (53, 'justvendor.03@gmail.com', '$2b$12$45f9pZi8ic2dUAErRFN5CuLXd1AEuUkPhgr8f3K6zn6VUZ9aJqhaO', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwMjQ2NzQ1NCwianRpIjoiZTJlNTQ5NTEtODZjZS00MDIxLThkYTAtZjJhNmQ2YjJhOTYzIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6Imp1c3R2ZW5kb3IuMDNAZ21haWwuY29tIiwibmJmIjoxNzAyNDY3NDU0LCJleHAiOjE3MDI0NjgzNTR9.TNPyjVZ_GxTbK54DZA-Iv3omMS_wJGEikFWAvrZouR4', 'vendor', NULL, 15),
-(54, 'abdulrafayatiq123.03@gmail.com', '$2b$12$h4.UeYCQDAPnOPIzHP0UN.qtKUjLu8qYA7L74D/0/.k7gX4B5eY0m', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwNDk2ODUyOSwianRpIjoiZDJjYzQwMjQtYjYzNi00ODdkLWI0NjUtNjYxMDMwYzA1NTllIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFiZHVscmFmYXlhdGlxMTIzLjAzQGdtYWlsLmNvbSIsIm5iZiI6MTcwNDk2ODUyOSwiZXhwIjoxNzA0OTY5NDI5fQ.2bxHLgjk496W1dkCJH1BGkqjmV7aQAEf3Y0xvwKR484', 'vendor', NULL, 16),
-(55, 'abdulrafayatiq123456.03@gmail.com', '$2b$12$09vHC2/suja0qn8kbJ.hmeNJLz9MCkiqOyCwlIn79XnxE7FSMVDAy', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwNDk2Nzg4OSwianRpIjoiYTU4ZGM5ZmUtN2Y0MC00NmJlLWI4ODQtMmRkYTVjZDBmNjcxIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFiZHVscmFmYXlhdGlxMTIzNDU2LjAzQGdtYWlsLmNvbSIsIm5iZiI6MTcwNDk2Nzg4OSwiZXhwIjoxNzA0OTY4Nzg5fQ.gG32YHwvDyumOXXDUeSsa5EghWcySNTKvXPHsEV7I-I', 'user', NULL, NULL);
+(54, 'abdulrafayatiq123.03@gmail.com', '$2b$12$h4.UeYCQDAPnOPIzHP0UN.qtKUjLu8qYA7L74D/0/.k7gX4B5eY0m', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwNTkyMzQ3MCwianRpIjoiN2RjZmIzNzktOGIwMi00ZWRmLTk0ZGQtNTI1NTY1MjgyMDEwIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFiZHVscmFmYXlhdGlxMTIzLjAzQGdtYWlsLmNvbSIsIm5iZiI6MTcwNTkyMzQ3MCwiZXhwIjoxNzA1OTI0MzcwfQ.UXnic9J_fN__JoFWIblxutUdOmmwe7mRjdp00dxccUc', 'vendor', NULL, 16),
+(55, 'abdulrafayatiq123456.03@gmail.com', '$2b$12$09vHC2/suja0qn8kbJ.hmeNJLz9MCkiqOyCwlIn79XnxE7FSMVDAy', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwNTkyNzgxMSwianRpIjoiMjQ1NmRlNmMtMGE1Zi00ZWY0LTllN2UtZGExMmM5N2U0NmEyIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFiZHVscmFmYXlhdGlxMTIzNDU2LjAzQGdtYWlsLmNvbSIsIm5iZiI6MTcwNTkyNzgxMSwiZXhwIjoxNzA1OTI4NzExfQ.4Kh89CEZuBfQChTSrdiHrIQtjaHig9YfMSsTJnPa30Q', 'user', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -418,24 +610,25 @@ CREATE TABLE `vendor` (
   `full_name` varchar(255) NOT NULL,
   `phone_number` varchar(255) NOT NULL,
   `location` varchar(255) NOT NULL,
-  `biography` varchar(1024) NOT NULL
+  `biography` varchar(1024) NOT NULL,
+  `wallet` float DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `vendor`
 --
 
-INSERT INTO `vendor` (`id`, `full_name`, `phone_number`, `location`, `biography`) VALUES
-(6, 'Abdul Rafay Atiq', '090078601', 'Karachi', 'Luxury Wedding Celebration Venue'),
-(7, 'Just Itsmerafay', '123-456-7890', 'Karachi', 'I am a talented vendor.'),
-(8, 'Just Itsmerafay', '123-456-7890', 'Karachi', 'I am a talented vendor.'),
-(9, 'djkgnsdkglsd Doe', '123-456-7890', 'Karachi', 'A short biography about the vendor'),
-(10, 'Abdul Rafay Atiq 123', '090078601', 'Karachi', 'Luxury Wedding Celebration Venue 1'),
-(11, 'NO testing', '0823572347059237', 'Karachi', 'Testing Biography 12312312312'),
-(13, 'Rafay The Vendor', '0900833922', 'Karachi', 'Testing Biography'),
-(14, 'Bob The Builder', '', '', ''),
-(15, 'Just Vendor', '1234567890', 'Karachi', 'Just a simple vendor.'),
-(16, 'New doe', '1234567890', 'Karachi', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vitae ante sed urna euismod ultricies.');
+INSERT INTO `vendor` (`id`, `full_name`, `phone_number`, `location`, `biography`, `wallet`) VALUES
+(6, 'Abdul Rafay Atiq', '090078601', 'Karachi', 'Luxury Wedding Celebration Venue', 0),
+(7, 'Just Itsmerafay', '123-456-7890', 'Karachi', 'I am a talented vendor.', 0),
+(8, 'Just Itsmerafay', '123-456-7890', 'Karachi', 'I am a talented vendor.', 0),
+(9, 'djkgnsdkglsd Doe', '123-456-7890', 'Karachi', 'A short biography about the vendor', 0),
+(10, 'Abdul Rafay Atiq 123', '090078601', 'Karachi', 'Luxury Wedding Celebration Venue 1', 0),
+(11, 'NO testing', '0823572347059237', 'Karachi', 'Testing Biography 12312312312', 0),
+(13, 'Rafay The Vendor', '0900833922', 'Karachi', 'Testing Biography', 0),
+(14, 'Bob The Builder', '090078601', 'Karachi', 'Luxury Wedding Celebration Venue 123124nfsd', 0),
+(15, 'Just Vendor', '1234567890', 'Karachi', 'Just a simple vendor.', 0),
+(16, 'New doe', '1234567890', 'Karachi', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vitae ante sed urna euismod ultricies.', 38550);
 
 --
 -- Indexes for dumped tables
@@ -453,7 +646,8 @@ ALTER TABLE `alembic_version`
 ALTER TABLE `booking`
   ADD PRIMARY KEY (`id`),
   ADD KEY `event_id` (`event_id`),
-  ADD KEY `user_id` (`user_id`);
+  ADD KEY `user_id` (`user_id`),
+  ADD KEY `extra_facility_id` (`extra_facility_id`);
 
 --
 -- Indexes for table `event`
@@ -470,9 +664,24 @@ ALTER TABLE `eventtiming`
   ADD KEY `event_id` (`event_id`);
 
 --
+-- Indexes for table `extra_facility`
+--
+ALTER TABLE `extra_facility`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `event_id` (`event_id`);
+
+--
 -- Indexes for table `favorites`
 --
 ALTER TABLE `favorites`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `event_id` (`event_id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `inquiry`
+--
+ALTER TABLE `inquiry`
   ADD PRIMARY KEY (`id`),
   ADD KEY `event_id` (`event_id`),
   ADD KEY `user_id` (`user_id`);
@@ -502,6 +711,12 @@ ALTER TABLE `review`
   ADD KEY `user_id` (`user_id`);
 
 --
+-- Indexes for table `transaction`
+--
+ALTER TABLE `transaction`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `user`
 --
 ALTER TABLE `user`
@@ -524,25 +739,37 @@ ALTER TABLE `vendor`
 -- AUTO_INCREMENT for table `booking`
 --
 ALTER TABLE `booking`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=98;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=168;
 
 --
 -- AUTO_INCREMENT for table `event`
 --
 ALTER TABLE `event`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=71;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=119;
 
 --
 -- AUTO_INCREMENT for table `eventtiming`
 --
 ALTER TABLE `eventtiming`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=139;
+
+--
+-- AUTO_INCREMENT for table `extra_facility`
+--
+ALTER TABLE `extra_facility`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `favorites`
 --
 ALTER TABLE `favorites`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `inquiry`
+--
+ALTER TABLE `inquiry`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `password_reset_token`
@@ -561,6 +788,12 @@ ALTER TABLE `preferences`
 --
 ALTER TABLE `review`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
+
+--
+-- AUTO_INCREMENT for table `transaction`
+--
+ALTER TABLE `transaction`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `user`
@@ -583,7 +816,8 @@ ALTER TABLE `vendor`
 --
 ALTER TABLE `booking`
   ADD CONSTRAINT `booking_ibfk_1` FOREIGN KEY (`event_id`) REFERENCES `event` (`id`),
-  ADD CONSTRAINT `booking_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`);
+  ADD CONSTRAINT `booking_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`),
+  ADD CONSTRAINT `booking_ibfk_3` FOREIGN KEY (`extra_facility_id`) REFERENCES `extra_facility` (`id`);
 
 --
 -- Constraints for table `event`
@@ -598,11 +832,24 @@ ALTER TABLE `eventtiming`
   ADD CONSTRAINT `eventtiming_ibfk_1` FOREIGN KEY (`event_id`) REFERENCES `event` (`id`);
 
 --
+-- Constraints for table `extra_facility`
+--
+ALTER TABLE `extra_facility`
+  ADD CONSTRAINT `extra_facility_ibfk_1` FOREIGN KEY (`event_id`) REFERENCES `event` (`id`);
+
+--
 -- Constraints for table `favorites`
 --
 ALTER TABLE `favorites`
   ADD CONSTRAINT `favorites_ibfk_1` FOREIGN KEY (`event_id`) REFERENCES `event` (`id`),
   ADD CONSTRAINT `favorites_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`);
+
+--
+-- Constraints for table `inquiry`
+--
+ALTER TABLE `inquiry`
+  ADD CONSTRAINT `inquiry_ibfk_1` FOREIGN KEY (`event_id`) REFERENCES `event` (`id`),
+  ADD CONSTRAINT `inquiry_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`);
 
 --
 -- Constraints for table `password_reset_token`

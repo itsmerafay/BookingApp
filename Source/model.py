@@ -61,24 +61,38 @@ class User(db.Model):
         return bcrypt.check_password_hash(self.password_hash, password)
 
 
+# class ExtraFacility(db.Model):
+#     __tablename__ = 'extra_facility'  # Specify the table name
+
+#     id = db.Column(db.Integer, primary_key=True)
+#     name = db.Column(db.String(1024), nullable=True)
+#     image = db.Column(db.JSON, nullable=True)
+#     hourly_rate = db.Column(db.Float, nullable=True, server_default='0')
+#     complete_event_rate = db.Column(db.Float, nullable=True, server_default='0')
+    
+#     allow_extra_fac_complete_event = db.Column(db.Boolean, server_default='0')
+#     allow_extra_fac_per_hour = db.Column(db.Boolean, server_default='0')
+#     unit_price_enable = db.Column(db.Boolean, server_default = '0')
+#     timings_enable = db.Column(db.Boolean, server_default = '0')
+#     unit_price_amount = db.Column(db.Float, nullable = True, server_default = '0')
+
+#     event_id = db.Column(db.Integer, db.ForeignKey("event.id"), nullable=False)
+#     event = db.relationship("Event", back_populates="extra_facilities")
+    
+
 class ExtraFacility(db.Model):
-    __tablename__ = 'extra_facility'  # Specify the table name
+    __tablename__ = 'extra_facility'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(1024), nullable=True)
     image = db.Column(db.JSON, nullable=True)
-    hourly_rate = db.Column(db.Float, nullable=True, server_default='0')
-    complete_event_rate = db.Column(db.Float, nullable=True, server_default='0')
-    
-    allow_extra_fac_complete_event = db.Column(db.Boolean, server_default='0')
-    allow_extra_fac_per_hour = db.Column(db.Boolean, server_default='0')
-    unit_price_enable = db.Column(db.Boolean, server_default = '0')
-    timings_enable = db.Column(db.Boolean, server_default = '0')
-    unit_price_amount = db.Column(db.Float, nullable = True, server_default = '0')
+    rate = db.Column(db.Float, nullable=True, server_default='0')
+    unit = db.Column(db.String(255), nullable=True)
 
     event_id = db.Column(db.Integer, db.ForeignKey("event.id"), nullable=False)
     event = db.relationship("Event", back_populates="extra_facilities")
-    
+
+
 
 class Vendor(db.Model):
     id = db.Column(db.Integer, primary_key=True)    
@@ -152,13 +166,9 @@ class Event(db.Model):
         event_dict["extra_facilities"] = [{
             "name":facility.name,
             "image":facility.image,
-            "hourly_rate":facility.hourly_rate,
-            "complete_event_rate":facility.complete_event_rate,
-            "allow_extra_fac_complete_event":facility.allow_extra_fac_complete_event,
-            "allow_extra_fac_per_hour":facility.allow_extra_fac_per_hour,
-            "unit_price_enable":facility.unit_price_enable,
-            "timings_enable":facility.timings_enable,
-            "unit_price_amount":facility.unit_price_amount,
+            "rate":facility.rate,
+            "rate":facility.rate,
+            "unit":facility.unit
             
         } for facility in self.extra_facilities]
 
@@ -226,21 +236,21 @@ class Booking(db.Model):
 
 
     def calculate_total_cost(self):
-        start_datetime = datetime.combine(self.start_date, self.start_time)
-        end_datetime = datetime.combine(self.end_date, self.end_time)
-        duration = end_datetime - start_datetime
-        duration_hours = duration.total_seconds() / 3600  # Convert duration to hours
-        # Calculate total cost based on hourly rate
-        total_cost = duration_hours * self.event.rate
+            start_datetime = datetime.combine(self.start_date, self.start_time)
+            end_datetime = datetime.combine(self.end_date, self.end_time)
+            duration = end_datetime - start_datetime
+            duration_hours = duration.total_seconds() / 3600  # Convert duration to hours
+            # Calculate total cost based on hourly rate
+            total_cost = duration_hours * self.event.rate
 
-        if self.extra_facility:
-            if self.all_day:
-                if self.allow_extra_facility_for_complete_event:
-                    total_cost += self.extra_facility.complete_event_rate * duration_hours
-                else:
-                    total_cost += self.extra_facility.hourly_rate * self.extra_facility_hours
+            if self.extra_facility:
+                if self.all_day:
+                    if self.extra_facility.allow_extra_fac_complete_event:
+                        total_cost += self.extra_facility.rate * duration_hours
+                    else:
+                        total_cost += self.extra_facility.rate * self.extra_facility_hours
 
-        return total_cost
+            return total_cost
 
     def calculate_total_price(self):
         total_cost = self.calculate_total_cost()
@@ -341,6 +351,7 @@ class Booking(db.Model):
             del booking_dict["event"]["event_timings"]
 
         return booking_dict
+    
 
 class PasswordResetToken(db.Model):
     id = db.Column(db.Integer, primary_key=True)
