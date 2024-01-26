@@ -1862,6 +1862,201 @@ def custom_event_search():
 #             "message": str(e)
 #         }), 500
 
+# @app.route('/create_booking', methods=["POST"])
+# @jwt_required()
+# def create_booking():
+#     try:
+#         data = request.get_json()
+#         user = get_current_user()
+
+#         if not user:
+#             return jsonify({
+#                 "status": False,
+#                 "message": "User not authenticated !!"
+#             }), 401
+
+#         if user.role != "user":
+#             return jsonify({
+#                 "status": False,
+#                 "message": "Unauthorized access: Only users can create bookings."
+#             })
+
+#         full_name = data.get('full_name')
+#         email = data.get('email')
+#         guest_count = data.get('guest_count')
+#         additional_notes = data.get('additional_notes', '')
+#         start_date = data.get('start_date')
+#         end_date = data.get('end_date')
+#         all_day = data.get('all_day')
+#         event_id = data.get('event_id')
+#         event_type = data.get("event_type")
+#         extra_facility_id = data.get("extra_facility_id")
+#         apply_extra_facility_for_complete_event = data.get("apply_extra_facility_for_complete_event", False)
+#         extra_facilities = data.get("extra_facilities", [])
+
+#         desired_day_of_week = datetime.strptime(start_date, "%Y-%m-%d").strftime("%A")
+#         event_timings = eventtiming.query.filter_by(event_id=event_id, day_of_week=desired_day_of_week).first()
+
+#         if not event_timings:
+#             return jsonify({
+#                 "status": False,
+#                 "message": "Event timings not found. Unable to create booking !!"
+#             }), 400
+
+#         if not all([full_name, email, guest_count, start_date, end_date, event_id, event_type]):
+#             return jsonify({
+#                 "status": False,
+#                 "message": "All necessary fields must be set !!"
+#             })
+
+#         start_time = datetime.strptime(data.get("start_time", str(event_timings.start_time)), "%H:%M:%S").time()
+#         end_time = datetime.strptime(data.get("end_time", str(event_timings.end_time)), "%H:%M:%S").time()
+
+#         if start_time < event_timings.start_time or end_time > event_timings.end_time:
+#             return jsonify({
+#                 "status": False,
+#                 "message": "Booking timings out of range for this day."
+#             }), 400
+
+#         # If it's an all-day event, set start_time and end_time accordingly
+#         if all_day:
+#             start_time = event_timings.start_time
+#             end_time = event_timings.end_time
+#         else:
+#             start_time = data.get('start_time', event_timings.start_time)
+#             end_time = data.get('end_time', event_timings.end_time)
+
+
+#         # Check if the selected extra facility is associated with the correct event
+#         selected_extra_facility = None
+
+#         if extra_facility_id:
+#             selected_extra_facility = ExtraFacility.query.filter_by(id=extra_facility_id, event_id=event_id).first()
+
+#         if not selected_extra_facility:
+#             if data.get("extra_facility_hours") or data.get("apply_extra_facility_for_complete_event"):
+#                 return jsonify({
+#                     "status": False,
+#                     "message": "Selected extra facility is not available for the specified event !!"
+#                 }), 400
+
+#         # Calculate total event hours
+#         event_hours = DateTimeConversions.calculate_event_hours(start_date, end_date, start_time, end_time, all_day)
+
+#         overlapping_booking = Booking.query.filter(
+#             (Booking.event_id == event_id) &
+#             (Booking.start_date <= start_date) &
+#             (Booking.end_date >= end_date) &
+#             (Booking.start_time <= start_time) &
+#             (Booking.end_time == end_time)
+#         ).first()
+
+#         if overlapping_booking:
+#             return jsonify({
+#                 "status": False,
+#                 "message": "Event is already booked !!"
+#             })
+
+    
+
+#         unit_price_count = data.get("unit_price_count")
+#         extra_facility_hours = data.get("extra_facility_hours")
+
+#         if unit_price_count is not None:
+#             # Check if the extra facility has the unit set to "unit"
+#             if selected_extra_facility and selected_extra_facility.unit == "unit":
+#                 # Use count directly
+#                 extra_facility_cost = unit_price_count * selected_extra_facility.rate
+#             else:
+#                 return jsonify({
+#                     "status": False,
+#                     "message": "Invalid input. This extra facility is not based on units."
+#                 }), 400
+
+#         elif extra_facility_hours is not None:
+#             # Check if the extra facility has the unit set to "hour"
+#             if selected_extra_facility and selected_extra_facility.unit == "hour":
+#                 # Use hours directly
+#                 extra_facility_cost = extra_facility_hours * selected_extra_facility.rate
+#             else:
+#                 return jsonify({
+#                     "status": False,
+#                     "message": "Invalid input. This extra facility is not based on hours."
+#                 }), 400
+        
+
+#         elif apply_extra_facility_for_complete_event:
+#             extra_facility_cost = selected_extra_facility.rate * event_hours
+
+#         else:
+#             return jsonify({
+#                 "status": False,
+#                 "message": "Invalid input. Please provide either unit_price_count or extra_facility_hours."
+#             }), 400
+
+#         event = Event.query.filter_by(id=event_id).first()
+#         subtotal = event_hours * event.rate
+#         subtotal += extra_facility_cost
+
+#         # Calculate tax (15% of the subtotal, not including extra_facility_cost)
+#         tax_percentage = 0.15
+#         tax_amount = subtotal * tax_percentage
+
+#         # Calculate the final total price
+#         total_price = subtotal + tax_amount
+
+#         # Create and save the booking
+#         if event and event_timings.available:
+#             booking = Booking(
+#                 user_id=user.id,
+#                 full_name=full_name,
+#                 email=email,
+#                 guest_count=guest_count,
+#                 additional_notes=additional_notes,
+#                 start_date=start_date,
+#                 end_date=end_date,
+#                 start_time=start_time,
+#                 end_time=end_time,
+#                 all_day=all_day,
+#                 event_id=event_id,
+#                 event_type=event_type,
+#                 extra_facility_id=extra_facility_id
+#             )
+#             db.session.add(booking)
+#             db.session.commit()
+
+#             vendor = Vendor.query.filter_by(id=event.vendor_id).first()
+#             if vendor:
+#                 vendor.wallet += subtotal
+#             db.session.commit()
+
+#             return jsonify({
+#                 "status": True,
+#                 "Summary": {
+#                     "event_hours": f"{event_hours} Hours", 
+#                     "guest_count": f"{guest_count}",
+#                     "event_rate": f"{event.rate}$",
+#                     "subtotal": f"{subtotal}$",
+#                     "extra_facility_cost": f"{extra_facility_cost}",
+#                     "tax": f"{tax_amount}$ (15%)",
+#                     "total_price": f"{total_price} $"
+#                 }
+#             }), 200
+
+#         else:
+#             return jsonify({
+#                 "status": False,
+#                 "message": f"{event.location_name} is not operating today !!"
+#             }), 400
+
+#     except Exception as e:
+#         return jsonify({
+#             "status": False,
+#             "message": str(e)
+#         }), 500
+
+
+
 @app.route('/create_booking', methods=["POST"])
 @jwt_required()
 def create_booking():
@@ -1890,8 +2085,8 @@ def create_booking():
         all_day = data.get('all_day')
         event_id = data.get('event_id')
         event_type = data.get("event_type")
-        extra_facility_id = data.get("extra_facility_id")
         apply_extra_facility_for_complete_event = data.get("apply_extra_facility_for_complete_event", False)
+        extra_facilities = data.get("extra_facilities", [])
 
         desired_day_of_week = datetime.strptime(start_date, "%Y-%m-%d").strftime("%A")
         event_timings = eventtiming.query.filter_by(event_id=event_id, day_of_week=desired_day_of_week).first()
@@ -1926,21 +2121,41 @@ def create_booking():
             end_time = data.get('end_time', event_timings.end_time)
 
 
-        apply_extra_facility_for_complete_event = data.get("apply_extra_facility_for_complete_event", False)
-
-
         # Check if the selected extra facility is associated with the correct event
+        # selected_extra_facility = None
+
+        # if extra_facility_id:
+        #     selected_extra_facility = ExtraFacility.query.filter_by(id=extra_facility_id, event_id=event_id).first()
+
+        # if selected_extra_facility is not None:
+        #     if data.get("extra_facility_hours") or data.get("apply_extra_facility_for_complete_event"):
+        #         return jsonify({
+        #             "status": False,
+        #             "message": "Selected extra facility is not available for the specified event !!"
+        #         }), 400
+
+
         selected_extra_facility = None
 
-        if extra_facility_id:
-            selected_extra_facility = ExtraFacility.query.filter_by(id=extra_facility_id, event_id=event_id).first()
+        extra_facility_id = None
+        for facility in extra_facilities:
+            facility_id = facility.get("extra_facility_id")
+            if facility_id:
+                extra_facility_id = facility_id
+                break
 
-        if not selected_extra_facility:
-            if data.get("extra_facility_hours") or data.get("apply_extra_facility_for_complete_event"):
-                return jsonify({
-                    "status": False,
-                    "message": "Selected extra facility is not available for the specified event !!"
-                }), 400
+
+        if extra_facility_id:
+
+            print(f"Trying to find ExtraFacility with ID {extra_facility_id} for Event ID {event_id}")
+            selected_extra_facility = ExtraFacility.query.filter_by(id=extra_facility_id, event_id=event_id).first()
+            print("Selected ExtraFacility:", selected_extra_facility)
+
+        if selected_extra_facility is None:
+            return jsonify({
+                "status": False,
+                "message": "Selected extra facility is not available for the specified event !!"
+            }), 400
 
         # Calculate total event hours
         event_hours = DateTimeConversions.calculate_event_hours(start_date, end_date, start_time, end_time, all_day)
@@ -1959,40 +2174,97 @@ def create_booking():
                 "message": "Event is already booked !!"
             })
 
-        unit_price_count = data.get("unit_price_count")
-        extra_facility_hours = data.get("extra_facility_hours")
+    
 
-        if unit_price_count is not None:
-            # Check if the extra facility has the unit set to "unit"
-            if selected_extra_facility and selected_extra_facility.unit == "unit":
-                # Use count directly
-                extra_facility_cost = unit_price_count * selected_extra_facility.rate
-            else:
-                return jsonify({
-                    "status": False,
-                    "message": "Invalid input. This extra facility is not based on units."
-                }), 400
+        # unit_price_count = None
+        # extra_facility_hours = None 
 
-        elif extra_facility_hours is not None:
-            # Check if the extra facility has the unit set to "hour"
-            if selected_extra_facility and selected_extra_facility.unit == "hour":
-                # Use hours directly
-                extra_facility_cost = extra_facility_hours * selected_extra_facility.rate
-            else:
-                return jsonify({
-                    "status": False,
-                    "message": "Invalid input. This extra facility is not based on hours."
-                }), 400
+        # for facility in extra_facilities:
+        #     facility_id = facility.get("extra_facility_id")
+        #     if facility_id and facility_id == selected_extra_facility.id:
+        #         unit_price_count = facility.get("unit_price_count")
+        #         extra_facility_hours = facility.get("extra_facility_hours")
+        #         break
+
+
+        # if unit_price_count is not None:
+        #     # Check if the extra facility has the unit set to "unit"
+        #     if selected_extra_facility and selected_extra_facility.unit == "unit":
+        #         # Use count directly
+        #         extra_facility_cost = unit_price_count * selected_extra_facility.rate
+        #     else:
+        #         return jsonify({
+        #             "status": False,
+        #             "message": "Invalid input. This extra facility is not based on units."
+        #         }), 400
+
+        # elif extra_facility_hours is not None:
+        #     # Check if the extra facility has the unit set to "hour"
+        #     if selected_extra_facility and selected_extra_facility.unit == "hour":
+        #         # Use hours directly
+        #         extra_facility_cost = extra_facility_hours * selected_extra_facility.rate
+        #     else:
+        #         return jsonify({
+        #             "status": False,
+        #             "message": "Invalid input. This extra facility is not based on hours."
+        #         }), 400
         
 
-        elif apply_extra_facility_for_complete_event:
-            extra_facility_cost = selected_extra_facility.rate * event_hours
+        # elif apply_extra_facility_for_complete_event:
+        #     extra_facility_cost = selected_extra_facility.rate * event_hours
 
-        else:
-            return jsonify({
-                "status": False,
-                "message": "Invalid input. Please provide either unit_price_count or extra_facility_hours."
-            }), 400
+        # else:
+        #     return jsonify({
+        #         "status": False,
+        #         "message": "Invalid input. Please provide either unit_price_count or extra_facility_hours."
+        #     }), 400
+
+
+
+        extra_facility_cost = 0
+
+        for facility in extra_facilities:
+            facility_id = facility.get("extra_facility_id")
+            if facility_id :
+                selected_extra_facility = ExtraFacility.query.filter_by(id=facility_id, event_id=event_id).first()
+
+                if selected_extra_facility is not None :
+                    unit_price_count = facility.get("unit_price_count")
+                    extra_facility_hours = facility.get("extra_facility_hours")
+                    apply_extra_facility_for_complete_event = facility.get("apply_extra_facility_for_complete_event")
+                    
+                    if unit_price_count is not None:
+                        if selected_extra_facility.unit == "unit":
+                            extra_facility_cost += unit_price_count * selected_extra_facility.rate
+                        else:
+                            return jsonify({
+                                "status": False,
+                                "message": "Invalid input. This extra facility is not based on units."
+                            }), 400
+
+                    elif extra_facility_hours is not None:
+                        if selected_extra_facility.unit == "hour":
+                            extra_facility_cost += extra_facility_hours * selected_extra_facility.rate
+                        else:
+                            return jsonify({
+                                "status": False,
+                                "message": "Invalid input. This extra facility is not based on hours."
+                            }), 400
+
+                    elif apply_extra_facility_for_complete_event:
+                        extra_facility_cost += selected_extra_facility.rate * event_hours
+                else:
+                    return jsonify({
+                    "status": False,
+                    "message": "Invalid input. Please provide either unit_price_count, extra_facility_hours, or apply_extra_facility_for_complete_event."
+                }), 400
+
+            
+            else:
+                return jsonify({
+                    "status":False,
+                    "message":"Specified facility for your seleceted event is not available "
+                }), 404
 
         event = Event.query.filter_by(id=event_id).first()
         subtotal = event_hours * event.rate
@@ -2033,7 +2305,7 @@ def create_booking():
             return jsonify({
                 "status": True,
                 "Summary": {
-                    "event_hours": f"{event_hours} Hours",
+                    "event_hours": f"{event_hours} Hours", 
                     "guest_count": f"{guest_count}",
                     "event_rate": f"{event.rate}$",
                     "subtotal": f"{subtotal}$",
@@ -2054,6 +2326,13 @@ def create_booking():
             "status": False,
             "message": str(e)
         }), 500
+
+
+
+
+
+
+
 
 
 

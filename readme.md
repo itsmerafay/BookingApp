@@ -1,3 +1,9 @@
+1/22/2024 7:36
+
+Update create_booking api for booking multiple extra facilities with respect to hours or units for an event
+
+
+
 1/22/2024 6:03
 
 updated model.py
