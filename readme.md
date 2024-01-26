@@ -1,7 +1,7 @@
-1/22/2024 7:36
+1/22/2024 7:49
 
 Update create_booking api for booking multiple extra facilities with respect to hours or units for an event
-
+With updated json-content for create_booking
 
 
 1/22/2024 6:03
