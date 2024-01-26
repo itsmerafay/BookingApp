@@ -757,22 +757,16 @@ def get_event(event_id):
                 }
 
                 event_details['vendor_details'] = vendor_details
-                        
-            user_bookings = Booking.query.filter_by(user = user, event = event).all()
-            extra_facility_list = []
-            for bookings in user_bookings:
-                if bookings.extra_facility:
-                    extra_fac_details = {
-                        "name":bookings.extra_facility.name,
-                        "image":bookings.extra_facility.image,
-                        "rate":bookings.extra_facility.rate,
-                        "unit":bookings.extra_facility.unit
-                    }
-                    extra_facility_list.append(extra_fac_details)
-            print(extra_facility_list)
-            
-            event_details['extra_facility_list'] = extra_facility_list
+                print(event_details)
                     
+            extra_facility_list = [{
+                "name":extra_fac.name,
+                "image":extra_fac.image,
+                "rate":extra_fac.rate,
+                "unit":extra_fac.unit,
+            } for extra_fac in event.extra_facilities] # extra facility as bidirectional relationship is defined in the model class for Event
+
+            event_details['extra_facility_list'] = extra_facility_list
 
 
             return jsonify({"status":True,"Event Details":event_details})
