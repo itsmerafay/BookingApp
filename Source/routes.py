@@ -760,6 +760,7 @@ def get_event(event_id):
                 print(event_details)
                     
             extra_facility_list = [{
+                "id":extra_fac.id,
                 "name":extra_fac.name,
                 "image":extra_fac.image,
                 "rate":extra_fac.rate,
