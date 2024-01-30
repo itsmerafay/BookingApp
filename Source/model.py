@@ -213,7 +213,7 @@ class Booking(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    extra_facility_id = db.Column(db.Integer, db.ForeignKey("extra_facility.id"))
+    # extra_facility_id = db.Column(db.Integer, db.ForeignKey("extra_facility.id"))
     full_name = db.Column(db.String(255), nullable = False)
     email = db.Column(db.String(255), nullable = False)
     guest_count = db.Column(db.Integer, nullable = False)
@@ -232,7 +232,7 @@ class Booking(db.Model):
     # backref used is bcz of bi-directional relationship 
     event = db.relationship("Event", backref="bookings")
     user = db.relationship("User", backref="bookings")
-    extra_facility = db.relationship("ExtraFacility", backref="bookings")
+    extra_facilities = db.relationship("BookingExtraFacility", backref="bookings", lazy="joined")
 
 
     def calculate_total_cost(self):
@@ -267,13 +267,18 @@ class Booking(db.Model):
         booking_dict = {}
         for c in self.__table__.columns:
             value = getattr(self, c.name)
-            # Check if value is an instance of date or time
             if isinstance(value, (date, time)):
                 # Convert date/time to string
                 booking_dict[c.name] = value.isoformat()
             else:
                 booking_dict[c.name] = value
+
+        # Include extra_facilities if present
+        if self.extra_facilities:
+            booking_dict["extra_facilities_user_booked"] = [facility.as_dict() for facility in self.extra_facilities]
+
         return booking_dict
+
     
     def as_dict(self):
         event_dict = {}
@@ -311,7 +316,6 @@ class Booking(db.Model):
 
             return booking_dict
 
-
     def calculate_total_price(self):
         # Calculate the duration in hours
         start_datetime = datetime.combine(self.start_date, self.start_time)
@@ -323,7 +327,7 @@ class Booking(db.Model):
         hourly_rate = self.event.rate
         total_price = duration_hours * hourly_rate
         return total_price
-    
+   
     def get_booking_with_event_details(self, include_event_timings=False):
         booking_dict = {c.name: getattr(self, c.name) for c in self.__table__.columns}
         for c in self.__table__.columns:
@@ -332,6 +336,10 @@ class Booking(db.Model):
                 booking_dict[c.name] = value.isoformat()
             else:
                 booking_dict[c.name] = value
+
+        # Include extra_facilities if present
+        if self.extra_facilities:
+            booking_dict["extra_facilities_user_booked"] = [facility.as_dict() for facility in self.extra_facilities]
 
         # Include event details
         if self.event:
@@ -344,14 +352,29 @@ class Booking(db.Model):
         booking_dict['total_paid_price'] = self.calculate_total_price()
 
         # Remove event_timings if not required
-        # if not include_event_timings and 'event' in booking_dict and 'event_timings' in booking_dict['event']:
-        #     del booking_dict['event']['event_timings']
-
         if not include_event_timings and "event" in booking_dict and "event_timings" in booking_dict["event"]:
             del booking_dict["event"]["event_timings"]
 
         return booking_dict
-    
+
+class BookingExtraFacility(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    booking_id = db.Column(db.ForeignKey("booking.id"), nullable = False)
+    extra_facility_id = db.Column(db.ForeignKey("extra_facility.id"), nullable = False)
+    unit = db.Column(db.String(10), nullable = False)
+    quantity = db.Column(db.Float, nullable = False)
+
+
+    def as_dict(self):
+        facility_dict = {}
+        for c in self.__table__.columns:
+            value = getattr(self, c.name)
+            if isinstance(value, (date, time)):
+                facility_dict[c.name] = value.isoformat()
+            else:
+                facility_dict[c.name] = value
+        return facility_dict
+
 
 class PasswordResetToken(db.Model):
     id = db.Column(db.Integer, primary_key=True)
