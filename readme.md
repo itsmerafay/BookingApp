@@ -1,6 +1,6 @@
 2/1/2024 4:59
 
-removed unccessary and extra lines of code making it little optimized
+removed unccessary and extra lines of code making it little optimized (model.py)
 
 
 2/1/2024 4:51
