@@ -91,6 +91,12 @@ class ExtraFacility(db.Model):
 
     event_id = db.Column(db.Integer, db.ForeignKey("event.id"), nullable=False)
     event = db.relationship("Event", back_populates="extra_facilities")
+    
+    def as_dict(self):
+        facility_dict = {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        # Include the image field in the dictionary
+        facility_dict["image"] = self.image
+        return facility_dict
 
 
 
@@ -364,15 +370,14 @@ class BookingExtraFacility(db.Model):
     unit = db.Column(db.String(10), nullable = False)
     quantity = db.Column(db.Float, nullable = False)
 
+    extra_facility = db.relationship("ExtraFacility", lazy="joined")
 
     def as_dict(self):
-        facility_dict = {}
-        for c in self.__table__.columns:
-            value = getattr(self, c.name)
-            if isinstance(value, (date, time)):
-                facility_dict[c.name] = value.isoformat()
-            else:
-                facility_dict[c.name] = value
+        facility_dict = {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        # Include the image field from the ExtraFacility model
+        if self.extra_facility:
+            facility_dict["image"] = self.extra_facility.image
+            facility_dict["rate"] = self.extra_facility.rate
         return facility_dict
 
 
