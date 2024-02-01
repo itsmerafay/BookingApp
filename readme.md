@@ -1,3 +1,8 @@
+2/1/2024 4:59
+
+removed unccessary and extra lines of code making it little optimized
+
+
 2/1/2024 4:51
 
 updated response for getting image and rate in extra facilities user booked 

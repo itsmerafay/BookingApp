@@ -94,8 +94,6 @@ class ExtraFacility(db.Model):
     
     def as_dict(self):
         facility_dict = {c.name: getattr(self, c.name) for c in self.__table__.columns}
-        # Include the image field in the dictionary
-        facility_dict["image"] = self.image
         return facility_dict
 
 
@@ -287,24 +285,17 @@ class Booking(db.Model):
 
     
     def as_dict(self):
-        event_dict = {}
-        for c in self.__table__.columns:
-            value = getattr(self, c.name)
-            if isinstance(value, (date, time)):
-                event_dict[c.name] = value.isoformat()
-            else:
-                event_dict[c.name] = value
+        event_dict = {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        # for c in self.__table__.columns:
+        #     value = getattr(self, c.name)
+        #     if isinstance(value, (date, time)):
+        #         event_dict[c.name] = value.isoformat()
+        #     else:
+        #         event_dict[c.name] = value
         return event_dict
 
     def booking_today(self):
-            booking_dict = {}
-            for c in self.__table__.columns:
-                value = getattr(self, c.name)
-                if isinstance(value, (date, time)):
-                    # Convert date/time to string
-                    booking_dict[c.name] = value.isoformat()
-                else:
-                    booking_dict[c.name] = value
+            booking_dict = {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
             # Include event details
             if self.event:
@@ -333,7 +324,7 @@ class Booking(db.Model):
         hourly_rate = self.event.rate
         total_price = duration_hours * hourly_rate
         return total_price
-   
+
     def get_booking_with_event_details(self, include_event_timings=False):
         booking_dict = {c.name: getattr(self, c.name) for c in self.__table__.columns}
         for c in self.__table__.columns:
@@ -376,6 +367,7 @@ class BookingExtraFacility(db.Model):
         facility_dict = {c.name: getattr(self, c.name) for c in self.__table__.columns}
         # Include the image field from the ExtraFacility model
         if self.extra_facility:
+            facility_dict["image"] = self.extra_facility.image
             facility_dict["image"] = self.extra_facility.image
             facility_dict["rate"] = self.extra_facility.rate
         return facility_dict
@@ -421,12 +413,6 @@ class eventtiming(db.Model):
     available = db.Column(db.Boolean, nullable = True, default = False)
 
     event = db.relationship('Event', back_populates='event_timing')
-
-# @event.listens_for(eventtiming, "before_insert")  
-# def validate_timings(mapper, connection, target):
-#     if target.start_time >= target.end_time:
-#         raise IntegrityError("End time should be after start time.")
-
 
 
 class Inquiry(db.Model):
