@@ -560,47 +560,59 @@ def update_event(event_id):
         }), 500
 
 
-@app.route("/update_event_extra_facility/<int:event_id>/<int:facility_id>", methods = ["PUT"])
+
+@app.route("/update_event_extra_facility/<int:event_id>", methods=["PUT"])
 @jwt_required()
-def update_event_extra_facility(event_id, facility_id):
+def update_event_extra_facility(event_id):
     try:
         data = request.get_json()
         user = get_current_user()
 
         if not user:
             return jsonify({
-                "status":False,
-                "message":"User Not Found !!"
+                "status": False,
+                "message": "User Not Found !!"
             }), 401
 
         if user.role != "vendor":
             return jsonify({
-                "status":False,
-                "message":"User Authentication Error !!!"
+                "status": False,
+                "message": "User Authentication Error !!!"
             })
 
         # Ensuring that user is associated with a vendor profile
         if not user.vendor:
             return jsonify({
-                "status":False,
-                "message":"User is not associated with a vendor profile make sure to complete the vendor profile first !!! "
+                "status": False,
+                "message": "User is not associated with a vendor profile make sure to complete the vendor profile first !!! "
             })
-                
-        event = Event.query.filter_by(id = event_id, vendor = user.vendor).first()        
-        extrafacility = ExtraFacility.query.filter_by(id = facility_id, event = event).first()
 
+        event = Event.query.filter_by(id=event_id, vendor=user.vendor).first()
 
-        extrafacility.name = data.get("name",extrafacility.name)
-        extrafacility.image = data.get("image", extrafacility.image)
+        if not event:
+            return jsonify({
+                "status": False,
+                "message": "Event not found or unauthorized user"
+            }), 404
 
-        extrafacility.rate = data.get("rate",extrafacility.rate)
-        extrafacility.unit = data.get("unit",extrafacility.unit)
+        facilities_data = data.get("facilities_data", [])
 
-        image = extrafacility.image
+        for facility_data in facilities_data:
+            facility_id = facility_data.get("facility_id")
+            facility = ExtraFacility.query.filter_by(id=facility_id, event=event).first()
 
-        if image:
-            extra_facility_image_filenames = save_multiple_images_from_base64(image)
-            extrafacility.image = extra_facility_image_filenames
+            if facility:
+                facility.name = facility_data.get("facility_name", facility.name)
+                facility.unit = facility_data.get("facility_unit", facility.unit)
+                facility.rate = facility_data.get("facility_rate", facility.rate)
+                images = facility_data.get("images", [])
+
+                # Save each image
+                saved_images = []
+                for image_data in images:
+                    saved_images.append(save_image_from_base64(image_data))
+
+                facility.images = saved_images
 
         db.session.commit()
 
@@ -611,10 +623,9 @@ def update_event_extra_facility(event_id, facility_id):
 
     except Exception as e:
         return jsonify({
-            "status":False,
+            "status": False,
             "message": str(e)
         }), 500
-
 
 
 

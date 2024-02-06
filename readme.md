@@ -1,3 +1,7 @@
+2/6/2024 2:40
+update_event_extra_facility_updated
+
+
 2/1/2024 4:59
 
 removed unccessary and extra lines of code making it little optimized (model.py)
