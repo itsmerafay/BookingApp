@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 06, 2024 at 11:17 AM
+-- Generation Time: Feb 07, 2024 at 10:08 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -379,12 +379,19 @@ INSERT INTO `extra_facility` (`id`, `name`, `image`, `event_id`, `rate`, `unit`)
 (6, 'water bottle', '[\"a5d272fc-2c4f-408e-b5b9-6c574c2ac615.png\", \"e32c8129-de25-4234-a69a-3a42d35f0bc6.png\"]', 88, 200, 'unit'),
 (17, 'art galleries', '[\"61404a80-035d-4873-897d-b1fb1814229b.png\", \"956a2671-cfb9-420c-adcf-d99cceaf0b01.png\"]', 109, 50, 'hour'),
 (18, 'museums', '[\"94da3696-c2b9-42ed-b012-2258117a041b.png\", \"5d255696-ee8a-4397-a8e9-0bcec1870ec1.png\"]', 109, 80, 'hour'),
-(19, 'Updated name for extra facility 1', '[\"7fd89e82-14d3-444c-9459-0b5867a28895.png\", \"fc3533e2-7faf-4b5d-89a2-0157c9f6abc4.png\"]', 118, 20, 'hour'),
-(20, 'Updated name for extra facility 2', '[\"97857aa9-3b75-4048-8df2-169231f442d8.png\", \"0e0818d2-c930-4bbb-8545-438526b2dbca.png\"]', 118, 20, 'hour'),
+(19, 'extra 112', '[\"f499ade3-2452-4949-95a4-7e0d5fe5f2f6.png\", \"69ece214-0651-4895-aad0-9b42d884f5ab.png\"]', 118, 100, 'hour'),
+(20, 'extra asdas1', '[\"f183afd4-0582-4775-8c7e-bec88c41a508.png\", \"31f855f6-7259-4c81-a2e5-f4829e826100.png\"]', 118, 20, 'hour'),
 (21, 'Extra Facility 1', '[\"8e172ca6-9957-49e7-a783-915bf9b5dab4.png\", \"f56a2020-b598-4d0c-a15f-7a10cb9ce995.png\"]', 119, 20, 'hour'),
 (22, 'Extra Facility 2', '[\"fc4c5779-c2e0-4412-bcfb-4bf6d15436b8.png\", \"4da4b467-8696-4204-a40b-5101d9a0deda.png\"]', 119, 15, 'unit'),
 (23, 'Extra Facility 1', '[\"f8e2d6c9-d3c7-4dbe-b829-daad5cc7b8aa.png\", \"ad9d3d21-b89f-4032-8439-0242acba4bae.png\"]', 120, 2000000, 'unit'),
-(24, 'Extra Facility 2', '[\"c9546fce-fc05-4efb-824c-4a30244d4080.png\", \"2badb4ce-9b57-4303-b7ea-587c21f8acf3.png\"]', 120, 2000000, 'unit');
+(24, 'Extra Facility 2', '[\"c9546fce-fc05-4efb-824c-4a30244d4080.png\", \"2badb4ce-9b57-4303-b7ea-587c21f8acf3.png\"]', 120, 2000000, 'unit'),
+(25, 'extra 3', '[\"bc7ef704-0246-48cf-b6fa-e52be5fa53cf.png\", \"6cbc9060-8dec-4323-96d6-4567ff7eca26.png\"]', 118, 20, 'hour'),
+(26, 'extra asdas1', '[\"b8bba6a2-48a5-4d33-8767-9b93d0f91883.png\", \"e8a7281b-c0a7-4625-bc8c-10d3d7416e03.png\"]', 118, 20, 'hour'),
+(27, 'extra 3', '[\"cc4c5603-d297-4568-831a-0e6a5f7175e8.png\", \"9fb0d10c-06f5-4009-aa12-7aee87fae3e4.png\"]', 118, 20, 'hour'),
+(28, 'extra 3', '[\"72796baa-ed9c-4543-bbb7-340bc786624b.png\", \"b48f6e8d-5ff0-43da-8661-acb448c4a68b.png\"]', 118, 20, 'hour'),
+(29, 'extra 3', '[\"7aa57144-2b40-4293-9cea-5acedbccb010.png\", \"663a91dc-7e6b-4277-a8c9-2f52f6e2f882.png\"]', 118, 20, 'hour'),
+(30, 'extra 3', '[\"4d2335b6-f59f-485a-a0dd-8018cc0a0dea.png\", \"19d86b5d-38aa-420d-8797-16837219d34e.png\"]', 118, 20, 'hour'),
+(31, 'extra 3', '[\"d9c3526d-69e2-4c88-a6ce-bddaa12c7a7a.png\", \"0ad8f161-ab64-4d06-bd0e-300b25f3e1e9.png\"]', 118, 20, 'hour');
 
 -- --------------------------------------------------------
 
@@ -626,7 +633,7 @@ INSERT INTO `user` (`id`, `email`, `password_hash`, `access_token`, `role`, `pro
 (51, 'just1.03@gmail.com', '$2b$12$nqXV2GHiaT9DodRwnNoEwe16cAPGh0K5/hy4CMSzPUrOM8f2M9jIG', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwMzIzOTU5MCwianRpIjoiZDliZDI2OGYtMTM3Zi00ZDAzLTk5MzgtMDM0YWExNTY5ZTY5IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6Imp1c3QxLjAzQGdtYWlsLmNvbSIsIm5iZiI6MTcwMzIzOTU5MCwiZXhwIjoxNzAzMjQwNDkwfQ.6YEevXnKorm1QmOC2FOnWMrFx1D3DTcAICFzAlhT7Rw', 'user', 'ab7ebf3d-c31f-4e69-aff2-f126a22a8578.png', NULL),
 (52, 'abdulrafayatiq@gmail.com.com', '$2b$12$6tmvlYLzyYiZtllws6mCwOHOK/gS3p1xkzyNWA1ZHDHKMJrwtUXBK', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwMTk0ODc1MywianRpIjoiZDY1ZjQxY2UtMzgyZS00NDZjLWJmZDYtYTE0OTk0ZWMxZDhiIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFiZHVscmFmYXlhdGlxQGdtYWlsLmNvbS5jb20iLCJuYmYiOjE3MDE5NDg3NTMsImV4cCI6MTcwMTk0OTY1M30.JZUjefQ0wz_uGzbZMISF8DV6a6huWpCi8UHZ0kXi6hQ', 'vendor', 'ab7ebf3d-c31f-4e69-aff2-f126a22a8578.png', 14),
 (53, 'justvendor.03@gmail.com', '$2b$12$45f9pZi8ic2dUAErRFN5CuLXd1AEuUkPhgr8f3K6zn6VUZ9aJqhaO', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwMjQ2NzQ1NCwianRpIjoiZTJlNTQ5NTEtODZjZS00MDIxLThkYTAtZjJhNmQ2YjJhOTYzIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6Imp1c3R2ZW5kb3IuMDNAZ21haWwuY29tIiwibmJmIjoxNzAyNDY3NDU0LCJleHAiOjE3MDI0NjgzNTR9.TNPyjVZ_GxTbK54DZA-Iv3omMS_wJGEikFWAvrZouR4', 'vendor', NULL, 15),
-(54, 'abdulrafayatiq123.03@gmail.com', '$2b$12$h4.UeYCQDAPnOPIzHP0UN.qtKUjLu8qYA7L74D/0/.k7gX4B5eY0m', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwNzIxNDM5NCwianRpIjoiZjFmNmU4YWQtNjIzMC00MDZiLWI5NDYtMGZlZDk3MDc1MTk0IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFiZHVscmFmYXlhdGlxMTIzLjAzQGdtYWlsLmNvbSIsIm5iZiI6MTcwNzIxNDM5NCwiZXhwIjoxNzA3MjE1Mjk0fQ.pCq1cf7zyzjGrxF4rpURsdbfgjnnrBped4ppVh9XciE', 'vendor', NULL, 16),
+(54, 'abdulrafayatiq123.03@gmail.com', '$2b$12$h4.UeYCQDAPnOPIzHP0UN.qtKUjLu8qYA7L74D/0/.k7gX4B5eY0m', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwNzI5NjMzNywianRpIjoiMjIyMmMyY2QtMmU2Zi00NzE4LTliMWYtYzk0NWZhYmY0NzU4IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFiZHVscmFmYXlhdGlxMTIzLjAzQGdtYWlsLmNvbSIsIm5iZiI6MTcwNzI5NjMzNywiZXhwIjoxNzA3Mjk3MjM3fQ.4G2Lnu0AqSVCM76wDXjJbQ6lD4qXiuH-4fgrZEarupY', 'vendor', NULL, 16),
 (55, 'abdulrafayatiq123456.03@gmail.com', '$2b$12$09vHC2/suja0qn8kbJ.hmeNJLz9MCkiqOyCwlIn79XnxE7FSMVDAy', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwNzIxMTMzNywianRpIjoiZTBkZDU5ZDYtOTljNC00ZTgyLTlkM2YtNzg2ZmNmZDk1NDRhIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFiZHVscmFmYXlhdGlxMTIzNDU2LjAzQGdtYWlsLmNvbSIsIm5iZiI6MTcwNzIxMTMzNywiZXhwIjoxNzA3MjEyMjM3fQ.W8c-Fi0ry3vXdIX5fmA54SbyAghMIGYMxwFZ3bXZ5W0', 'user', NULL, NULL);
 
 -- --------------------------------------------------------
@@ -800,7 +807,7 @@ ALTER TABLE `eventtiming`
 -- AUTO_INCREMENT for table `extra_facility`
 --
 ALTER TABLE `extra_facility`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT for table `favorites`
