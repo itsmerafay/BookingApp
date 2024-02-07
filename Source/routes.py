@@ -559,6 +559,102 @@ def getmyevents():
 #             "message": str(e)
 #         }), 500
 
+# this one
+
+# @app.route("/update_event_extra_facility/<int:event_id>", methods=["PUT"])
+# @jwt_required()
+# def update_event_extra_facility(event_id):
+#     try:
+#         data = request.get_json()
+#         user = get_current_user()
+
+#         if not user:
+#             return jsonify({
+#                 "status": False,
+#                 "message": "User Not Found !!"
+#             }), 401
+
+#         if user.role != "vendor":
+#             return jsonify({
+#                 "status": False,
+#                 "message": "User Authentication Error !!!"
+#             })
+
+#         # Ensuring that user is associated with a vendor profile
+#         if not user.vendor:
+#             return jsonify({
+#                 "status": False,
+#                 "message": "User is not associated with a vendor profile make sure to complete the vendor profile first !!! "
+#             })
+
+#         event = Event.query.filter_by(id=event_id, vendor=user.vendor).first()
+
+#         if not event:
+#             return jsonify({
+#                 "status": False,
+#                 "message": "Event not found or unauthorized user"
+#             }), 404
+
+#         facilities_data = data.get("facilities_data", [])
+
+#         for facility_data in facilities_data:
+#             facility_id = facility_data.get("facility_id")
+#             facility_name = facility_data.get("facility_name")
+#             facility_unit = facility_data.get("facility_unit")
+#             facility_rate = facility_data.get("facility_rate")
+#             images = facility_data.get("images", [])
+
+#             if facility_id is not None:
+#                 facility = ExtraFacility.query.filter_by(id=facility_id, event_id = event_id).first()
+
+#                 if facility:
+#                     facility.name = facility_name or facility.name
+#                     facility.unit = facility_unit or facility.unit
+#                     facility.rate = facility_rate or facility.rate
+#                     facility.name = facility_name or facility.name
+
+#                     if images:
+#                         images_filenames = save_multiple_images_from_base64(images)
+#                         facility.image = images_filenames
+
+#                     else:
+#                         return jsonify({
+#                             "status": False,
+#                             "message": f"Facility with ID {facility_id} not found for event {event_id}"
+#                         }), 404
+
+#             else:
+#                 new_facility = ExtraFacility(
+#                         name=facility_name,
+#                         unit=facility_unit,
+#                         rate=facility_rate,
+#                         event_id=event_id
+#                     )
+                    
+#                 if images:
+#                         images_filenames = save_multiple_images_from_base64(images)
+#                         new_facility.image = images_filenames
+
+#                 db.session.add(new_facility)
+#                     # print(new_facil)
+
+
+#             db.session.commit()
+
+#         return jsonify({
+#             "status": True,
+#             "message": "Updated successfully !!"
+#         })
+
+        
+
+#     except Exception as e:
+#         return jsonify({
+#             "status": False,
+#             "message": str(e)
+#         }), 500
+
+
 
 @app.route("/update_event_extra_facility/<int:event_id>", methods=["PUT"])
 @jwt_required()
@@ -595,7 +691,6 @@ def update_event_extra_facility(event_id):
             }), 404
 
         facilities_data = data.get("facilities_data", [])
-
         for facility_data in facilities_data:
             facility_id = facility_data.get("facility_id")
             facility_name = facility_data.get("facility_name")
@@ -604,52 +699,61 @@ def update_event_extra_facility(event_id):
             images = facility_data.get("images", [])
 
             if facility_id is not None:
-                facility = ExtraFacility.query.filter_by(id=facility_id, event_id = event_id).first()
+                facility = ExtraFacility.query.filter_by(id=facility_id, event_id=event_id).first()
 
                 if facility:
                     facility.name = facility_name or facility.name
                     facility.unit = facility_unit or facility.unit
                     facility.rate = facility_rate or facility.rate
-                    facility.name = facility_name or facility.name
 
-                    if images:
+                    # Check if any of the images are in UUID format
+                    uuid_format = all(image.endswith('.png') and '-' in image for image in images)
+
+                    if not uuid_format:
+                        # Save base64 images
                         images_filenames = save_multiple_images_from_base64(images)
                         facility.image = images_filenames
-
-                    else:
-                        return jsonify({
-                            "status": False,
-                            "message": f"Facility with ID {facility_id} not found for event {event_id}"
-                        }), 404
+                else:
+                    return jsonify({
+                        "status": False,
+                        "message": f"Facility with ID {facility_id} not found for event {event_id}"
+                    }), 404
 
             else:
                 new_facility = ExtraFacility(
-                        name=facility_name,
-                        unit=facility_unit,
-                        rate=facility_rate,
-                        event_id=event_id
-                    )
-                    
-                if images:
-                        images_filenames = save_multiple_images_from_base64(images)
-                        new_facility.image = images_filenames
+                    name=facility_name,
+                    unit=facility_unit,
+                    rate=facility_rate,
+                    event_id=event_id
+                )
+
+                # Check if any of the images are in UUID format
+                uuid_format = all(image.endswith('.png') and '-' in image for image in images)
+
+                if not uuid_format:
+                    # Save base64 images
+                    images_filenames = save_multiple_images_from_base64(images)
+                    new_facility.image = images_filenames
 
                 db.session.add(new_facility)
-                    # print(new_facil)
 
-
-            db.session.commit()
+        db.session.commit()
 
         return jsonify({
             "status": True,
             "message": "Updated successfully !!"
         })
 
+        
+
     except Exception as e:
         return jsonify({
             "status": False,
             "message": str(e)
         }), 500
+
+
+
 
 
 ###############################     Delete Event     ######################################
