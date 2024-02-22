@@ -3,7 +3,7 @@ from sqlalchemy import func, or_
 from utils import Validations
 from app import app, db, mail
 from sqlalchemy.orm import joinedload
-from utils import Validations, Ratings, DateTimeConversions, Notificationpush, BookingAvailability, Filterations
+from utils import Validations, Ratings, DateTimeConversions, Notificationpush, BookingAvailability, Filterations, Password
 from flask import request, jsonify, url_for, current_app, send_file, send_from_directory
 from datetime import datetime, timedelta
 from model import User, PasswordResetToken, Vendor, Event, Booking , Review, eventtiming, Inquiry, ExtraFacility,Favorites, Transaction, Notification, BookingExtraFacility
@@ -16,10 +16,16 @@ from flask_jwt_extended import  create_access_token, jwt_required, get_jwt_ident
 from model import bcrypt   
 from werkzeug.utils import secure_filename
 import os
+from google.oauth2 import id_token
+import google.auth.transport.requests as req
 from geopy.distance import geodesic
 import sys
 import string
+from firebase_admin import auth
+import stripe 
 sys.dont_write_bytecode = True
+
+stripe.api_key = app.config["STRIPE_SECRET_KEY"]
 
 
 ######################### Security ############################
@@ -95,7 +101,68 @@ def security():
 
 
 
+###############################     Google Auth     ######################################
 
+@app.route('/google_login', methods=['POST'])
+def google_login():
+    try:
+        data = request.get_json()
+        token = data.get("token")
+        client_id = data.get("client_id")
+        idinfo = id_token.verify_oauth2_token(token, req.Request(), client_id)
+
+        print(idinfo['email'])  # email
+        print(idinfo['picture'])  # profile image
+
+        email = idinfo.get("email")
+        profile_image = idinfo.get("picture")
+
+        access_token = create_access_token(identity=email)
+
+        role = data.get("role")
+
+        user = User.query.filter_by(email=email).first()
+        if user:
+            user.access_token = access_token
+            user.google_token = token
+            db.session.commit()  # Committing here after updating access_token
+            
+            return jsonify({
+                "status": True,
+                "message": "Successfully logged in using google",
+                "role": user.role,
+                "id": user.id,
+                "profile_image": profile_image,
+                "access_token": access_token
+            })
+
+        password = Password.generate_random_password()
+        password_hash = bcrypt.generate_password_hash(password).decode("utf-8")
+
+        # Create the User instance and pass the password hash
+        user = User(email=email, password_hash=password_hash, role=role, otp=None, access_token=access_token)
+
+        # Set the profile_image attribute
+        user.profile_image = profile_image
+
+        # Add the user to the database
+        db.session.add(user)
+        db.session.commit()
+
+        return jsonify({
+            "status": True,
+            "message": "Successfully logged in using google",
+            "role": user.role,
+            "id": user.id,
+            "profile_image": profile_image,
+            "access_token": access_token
+        }), 200
+
+    except Exception as e:
+        return jsonify({
+            "status": False,
+            "error": str(e)
+        }), 500
 
 
 
@@ -404,12 +471,16 @@ def update_event_hours():
             "message": str(e)
         }), 500
 
+
+
+
 @app.route('/signup', methods=['POST'])  # Updated route
 def signup():
     try:
         data = request.get_json()
         email = data.get('email')
-        password = data.get('password')
+        password = data.get("password")
+        password_hash = bcrypt.generate_password_hash(password).decode("utf-8")
         role = data.get('role')  # Get the user's role from the request
 
         # Validate email and password using your Validations class
@@ -430,11 +501,13 @@ def signup():
 
         if role not in ['user', 'vendor']:
             return jsonify({"message": "Invalid Role","status":False}), 400
-        gen_otp = ''.join(random.choices(string.digits, k=4))
-        user = User(email=email, password=password, role=role, otp=gen_otp)  # Pass the role during user creation
-        msg = Message('Email verification', sender='noreply@gmail.com', recipients=[email])
-        msg.body = f"This is your OTP for email verification {gen_otp}"
-        mail.send(msg)
+        # gen_otp = ''.join(random.choices(string.digits, k=4))
+        # user = User(email=email, password=password, role=role, otp=gen_otp)  # Pass the role during user creation
+        # msg = Message('Email verification', sender='noreply@gmail.com', recipients=[email])
+        # msg.body = f"This is your OTP for email verification {gen_otp}"
+        # mail.send(msg)
+        user = User(email=email, password_hash=password_hash, role=role, otp=None, access_token=None)  # Pass the role during user creation
+
         if role == "vendor":
                 vendor = user.vendor
                 # If vendor profile doesn't exist then create a new one
@@ -450,6 +523,7 @@ def signup():
                     #db.session.commit()
         db.session.add(user)
         db.session.commit()
+        
         return jsonify({"status":True, "message": "Registered Successfully !!"})
     except Exception as e:
         print(e)
@@ -517,7 +591,7 @@ def signin():
         "role":user.role,
         "id":user.id,
         "profile_image":user.profile_image
-    })
+    }), 200
 
 
 
@@ -3516,6 +3590,117 @@ def create_booking():
 
 
 
+######################### STRIPE PAYMENT INTENT #########################
+
+
+
+# @app.route("/create_payment_intent", methods = ["POST"])
+# @jwt_required()
+# def create_payment_intent():
+#     try:
+#         data = request.get_json()
+#         user = get_current_user()
+#         print(user)
+#         amount = data.get("amount")  # amount in cent (amount should be multiplied with 100-- for 10.99 it should be 10.99 * 100)
+#         currency = data.get("currency", "usd") ## default currency is set for usd
+#         user_type = user.get("role")
+#         user_id = user.get("id")
+
+#         intent = stripe.PaymentIntent.create(
+#             amount=amount * 100,
+#             currency=currency,
+#             payment_method_types=["card"],
+#         )
+
+#         transaction_amount = amount 
+#         transaction_time = datetime.utcnow()
+#         transaction_type = data.get("transaction_type")
+#         trans_id = intent.id
+
+#         transaction = Transaction(
+#             user_id=user_id,
+#             user_type=user_type,
+#             transaction_amount=transaction_amount,
+#             trans_id=trans_id,
+#             transaction_time=transaction_time,
+#             transaction_type=transaction_type
+#         )
+
+#         db.session.add(transaction)
+#         db.session.commit()
+
+
+
+#         print(intent.cleint_secret)
+#         print(intent.id)
+
+#         return jsonify({
+#             "status": True,
+#             "client_secret": intent.client_secret,
+#             "transaction_id": transaction.id  
+#         }), 200
+
+#     except Exception as e:
+#         return jsonify({
+#             "status":False,
+#             "error":str(e)
+#         })
+
+
+@app.route("/create_payment_intent", methods=["POST"])
+@jwt_required()
+def create_payment_intent():
+    try:
+        data = request.get_json()
+        user = get_current_user()  # Assuming get_current_user() returns the current user object
+        print(user)
+        amount = data.get("amount")  # amount in cent (amount should be multiplied with 100-- for 10.99 it should be 10.99 * 100)
+        currency = data.get("currency", "usd")  # default currency is set for usd
+        user_type = user.role  # Accessing role attribute directly
+        user_id = user.id  # Accessing id attribute directly
+
+        intent = stripe.PaymentIntent.create(
+            amount=amount * 100,
+            currency=currency,
+            payment_method_types=["card"],
+        )
+
+        transaction_amount = amount 
+        transaction_time = datetime.utcnow()
+        transaction_type = data.get("transaction_type")
+        trans_id = intent.id
+
+        transaction = Transaction(
+            user_id=user_id,
+            user_type=user_type,
+            transaction_amount=transaction_amount,
+            trans_id=trans_id,
+            transaction_time=transaction_time,
+            transaction_type=transaction_type
+        )
+
+        db.session.add(transaction)
+        db.session.commit()
+
+        print(intent.client_secret)
+        print(intent.id)
+
+        return jsonify({
+            "status": True,
+            "client_secret": intent.client_secret,
+            "transaction_id": transaction.id  
+        }), 200
+
+    except Exception as e:
+        return jsonify({
+            "status": False,
+            "error": str(e)
+        })
+
+
+
+
+##########################################################################
 
 def calculate_event_hours(start_date, end_date, start_time, end_time, all_day):
     # If it's an all-day event, set start_time and end_time accordingly

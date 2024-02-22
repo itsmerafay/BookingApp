@@ -28,6 +28,8 @@ app.config['MAIL_USERNAME'] = 'abdulrafayatiq.03@gmail.com'
 app.config['MAIL_PASSWORD'] = 'todp ilxm pjdf wdwa'
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
+app.config['STRIPE_PUBLIC_KEY'] = 'pk_test_51OL25jCvNBqAG6fPGBNbOuZDVlm74liMRkTByZ4YxYJvkggMRW5wFLIooDyMSxlGgPpGlGUDECYZ3hKkFuEiByu000aZhNzZ2C'
+app.config['STRIPE_SECRET_KEY'] = 'sk_test_51OL25jCvNBqAG6fPkHTZzZnl8vHk0kjfcM4t0Lt7MGQNVkPIfy8TMtNrB1mKfWCLbOAQ1gW9EeYpIPsShWm6wwk900FngUWdTx'
 app.config["EVENT_ICON_FOLDER"] = "static/event_icons"
 
 

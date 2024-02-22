@@ -319,10 +319,23 @@ from datetime import datetime, timedelta
 import firebase_admin
 import requests
 from firebase_admin import credentials, messaging
+import string, secrets
 import sys
 sys.dont_write_bytecode = True
+
+
 cred = credentials.Certificate(r"serviceAccountKey.json")
 firebase_admin.initialize_app(cred)
+
+
+class Password:
+    def generate_random_password(length=30):
+        alphabets = string.ascii_letters + string.digits
+        print(alphabets)
+        password = ''.join(secrets.choice(alphabets) for i in range(length))
+        return password
+
+
 
 class Notificationpush():
     @staticmethod
@@ -350,6 +363,8 @@ class Notificationpush():
         except Exception as e:
             print("Error in handling the error ", e)
             return False
+        
+
     @staticmethod
     def send_notification(data):
         device_token = data.get("device_token")

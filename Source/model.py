@@ -13,11 +13,12 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(255), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
-    access_token = db.Column(db.String(255), unique=True, nullable=True)
+    access_token = db.Column(db.String(1024), unique=True, nullable=True)
     role = db.Column(db.String(50), nullable=False)
     profile_image = db.Column(db.String(255))
     vendor_id = db.Column(db.Integer, db.ForeignKey('vendor.id'), unique=True, nullable=True)
     vendor = db.relationship('Vendor', back_populates='user')
+    google_token = db.Column(db.String(255), unique=True, nullable=True)
     verified = db.Column(db.Boolean, nullable=False, default=False)
     otp = db.Column(db.String(10), nullable=True)
     device_token = db.Column(db.Text, nullable=True)
@@ -26,15 +27,24 @@ class User(db.Model):
     favorites = db.relationship("Favorites", backref="user")  # Relationship to the 'Favorites' model
 
 
-    def __init__(self, email, password, role, otp):
+    # def __init__(self, email,password ,role, otp):
+    #     self.email = email
+    #     self.password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
+    #     self.access_token = None
+    #     self.role = role
+    #     self.otp = otp
+
+    def __init__(self, email, password_hash, role, access_token, otp): # for the time being otp removed 
         self.email = email
-        self.password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
+        self.password_hash = password_hash
         self.access_token = None
+        self.access_token = access_token
         self.role = role
         self.otp = otp
 
+
     def as_dict(self):
-       return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
     def as_vendor(self):
         user_dict = {c.name: getattr(self, c.name) for c in self.__table__.columns}
@@ -421,8 +431,13 @@ class Transaction(db.Model):
     user_type = db.Column(db.String(10), nullable = False)
     transaction_time = db.Column(db.DateTime, default = datetime.utcnow(), nullable = False)
     transaction_amount = db.Column(db.Float , nullable = False)
+    trans_id = db.Column(db.String(255), nullable=False)
+    transaction_type = db.Column(db.String(10), nullable=False)
 
-    def __init__(self, user_id , user_type , transaction_amount):
+    def __init__(self, user_id, user_type, transaction_amount, trans_id, transaction_time, transaction_type):
         self.user_id = user_id
         self.user_type = user_type
         self.transaction_amount = transaction_amount
+        self.trans_id = trans_id  # Correcting the attribute name
+        self.transaction_time = transaction_time
+        self.transaction_type = transaction_type

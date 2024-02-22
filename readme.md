@@ -1,3 +1,6 @@
+2/22/2024 7:34
+google login and stripe work is done
+
 2/7/2024 2:03
 Updates done on the new code
 
