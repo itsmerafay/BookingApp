@@ -118,11 +118,9 @@ def google_login():
         profile_image = idinfo.get("picture")
 
         access_token = create_access_token(identity=email)
-
-        role = data.get("role")
-
+        
         user = User.query.filter_by(email=email).first()
-        if user:
+        if user and user.role:
             user.access_token = access_token
             user.google_token = token
             db.session.commit()  # Committing here after updating access_token
@@ -135,6 +133,8 @@ def google_login():
                 "profile_image": profile_image,
                 "access_token": access_token
             })
+        
+        role = data.get("role")
 
         password = Password.generate_random_password()
         password_hash = bcrypt.generate_password_hash(password).decode("utf-8")
