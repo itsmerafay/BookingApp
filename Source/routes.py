@@ -22,10 +22,12 @@ from geopy.distance import geodesic
 import sys
 import string
 from firebase_admin import auth
+from dotenv import load_dotenv
 import stripe 
 sys.dont_write_bytecode = True
 
 stripe.api_key = app.config["STRIPE_SECRET_KEY"]
+load_dotenv()
 
 
 ######################### Security ############################
@@ -99,8 +101,6 @@ def security():
     }), 200
 
 
-
-
 ###############################     Google Auth     ######################################
 
 @app.route('/google_login', methods=['POST'])
@@ -108,46 +108,52 @@ def google_login():
     try:
         data = request.get_json()
         token = data.get("token")
-        client_id = data.get("client_id")
+        client_id = os.environ.get("client_id")
         idinfo = id_token.verify_oauth2_token(token, req.Request(), client_id)
 
         print(idinfo['email'])  # email
         print(idinfo['picture'])  # profile image
+        print(idinfo)
 
         email = idinfo.get("email")
         profile_image = idinfo.get("picture")
 
+        if not email:
+            return jsonify({
+                "status":False,
+                "message":"Invalid Email provided"  
+            }), 400
+
         access_token = create_access_token(identity=email)
         
         user = User.query.filter_by(email=email).first()
-        if user and user.role:
+        if user :
+            if profile_image:
+                user.profile_image = profile_image
+            if not user.role:
+                return jsonify({
+                    "status":False,
+                    "message":"User Registration incomplete due to role !"
+                }), 400
+            
             user.access_token = access_token
             user.google_token = token
             db.session.commit()  # Committing here after updating access_token
-            
-            return jsonify({
-                "status": True,
-                "message": "Successfully logged in using google",
-                "role": user.role,
-                "id": user.id,
-                "profile_image": profile_image,
-                "access_token": access_token
-            })
         
-        role = data.get("role")
+        else:
+            role = data.get("role")
+            password = Password.generate_random_password()
+            password_hash = bcrypt.generate_password_hash(password).decode("utf-8")
 
-        password = Password.generate_random_password()
-        password_hash = bcrypt.generate_password_hash(password).decode("utf-8")
+            user = User(email=email, password_hash=password_hash, role=role, access_token=access_token)
+            user.google_token = token
 
-        # Create the User instance and pass the password hash
-        user = User(email=email, password_hash=password_hash, role=role, otp=None, access_token=access_token)
+            if profile_image:
+                user.profile_image = profile_image
 
-        # Set the profile_image attribute
-        user.profile_image = profile_image
-
-        # Add the user to the database
-        db.session.add(user)
-        db.session.commit()
+            # Add the user to the database
+            db.session.add(user)
+            db.session.commit()
 
         return jsonify({
             "status": True,
@@ -157,12 +163,84 @@ def google_login():
             "profile_image": profile_image,
             "access_token": access_token
         }), 200
+    
+    except ValueError:
+        return jsonify({
+            "status":False,
+            "message":"Invalid token or client id"
+        }), 400
 
     except Exception as e:
         return jsonify({
             "status": False,
             "error": str(e)
         }), 500
+
+
+
+
+
+# @app.route('/google_login', methods=['POST'])
+# def google_login():
+#     try:
+#         data = request.get_json()
+#         token = data.get("token")
+#         client_id = data.get("client_id")
+#         idinfo = id_token.verify_oauth2_token(token, req.Request(), client_id)
+
+#         print(idinfo['email'])  # email
+#         print(idinfo['picture'])  # profile image
+
+#         email = idinfo.get("email")
+#         print(email)
+#         profile_image = idinfo.get("picture")
+
+#         access_token = create_access_token(identity=email)
+
+#         role = data.get("role")
+
+#         user = User.query.filter_by(email=email).first()
+#         if user:
+#             user.access_token = access_token
+#             user.google_token = token
+#             db.session.commit()  # Committing here after updating access_token
+            
+#             return jsonify({
+#                 "status": True,
+#                 "message": "Successfully logged in using google",
+#                 "role": user.role,
+#                 "id": user.id,
+#                 "profile_image": profile_image,
+#                 "access_token": access_token
+#             })
+
+#         password = Password.generate_random_password()
+#         password_hash = bcrypt.generate_password_hash(password).decode("utf-8")
+
+#         # Create the User instance and pass the password hash
+#         user = User(email=email, password_hash=password_hash, role=role, otp=None, access_token=access_token)
+
+#         # Set the profile_image attribute
+#         user.profile_image = profile_image
+
+#         # Add the user to the database
+#         db.session.add(user)
+#         db.session.commit()
+
+#         return jsonify({
+#             "status": True,
+#             "message": "Successfully logged in using google",
+#             "role": user.role,
+#             "id": user.id,
+#             "profile_image": profile_image,
+#             "access_token": access_token
+#         }), 200
+
+#     except Exception as e:
+#         return jsonify({
+#             "status": False,
+#             "error": str(e)
+#         }), 500
 
 
 
@@ -3127,7 +3205,7 @@ def create_booking_validate():
         }), 500
 
 
-
+# testing now
 # @app.route('/create_booking', methods=["POST"])
 # @jwt_required()
 # def create_booking():
@@ -3367,6 +3445,229 @@ def create_booking_validate():
 
 
 
+# @app.route('/create_booking', methods=["POST"])
+# @jwt_required()
+# def create_booking():
+#     try:
+#         data = request.get_json()
+#         user = get_current_user()
+
+#         if not user:
+#             return jsonify({
+#                 "status": False,
+#                 "message": "User not authenticated !!"
+#             }), 401
+
+#         if user.role != "user":
+#             return jsonify({
+#                 "status": False,
+#                 "message": "Unauthorized access: Only users can create bookings."
+#             })
+
+#         full_name = data.get('full_name')
+#         email = data.get('email')
+#         guest_count = data.get('guest_count')
+#         additional_notes = data.get('additional_notes', '')
+#         start_date = data.get('start_date')
+#         end_date = data.get('end_date')
+#         all_day = data.get('all_day')
+#         event_id = data.get('event_id')
+#         event_type = data.get("event_type")
+#         apply_extra_facility_for_complete_event = data.get("apply_extra_facility_for_complete_event", False)
+#         extra_facilities = data.get("extra_facilities", [])
+
+#         desired_day_of_week = datetime.strptime(start_date, "%Y-%m-%d").strftime("%A")
+#         event_timings = eventtiming.query.filter_by(event_id=event_id, day_of_week=desired_day_of_week).first()
+
+#         if not event_timings:
+#             return jsonify({
+#                 "status": False,
+#                 "message": "Event timings not found. Unable to create booking !!"
+#             }), 400
+
+#         if not all([full_name, email, guest_count, start_date, end_date, event_id, event_type]):
+#             return jsonify({
+#                 "status": False,
+#                 "message": "All necessary fields must be set !!"
+#             })
+
+#         event = Event.query.filter_by(id=event_id).first()
+#         if event.guest_capacity is not None and guest_count > event.guest_capacity:
+#             return jsonify({
+#                 "status": False,
+#                 "message": f"Guest count exceeds the maximum capacity ({event.guest_capacity}) for this event."
+#             }), 400
+        
+
+#         start_time = datetime.strptime(data.get("start_time", str(event_timings.start_time)), "%H:%M:%S").time()
+#         end_time = datetime.strptime(data.get("end_time", str(event_timings.end_time)), "%H:%M:%S").time()
+
+#         if start_time < event_timings.start_time or end_time > event_timings.end_time:
+#             return jsonify({
+#                 "status": False,
+#                 "message": "Booking timings out of range for this day."
+#             }), 400
+
+#         # If it's an all-day event, set start_time and end_time accordingly
+#         if all_day:
+#             start_time = event_timings.start_time
+#             end_time = event_timings.end_time
+#         else:
+#             start_time = data.get('start_time', event_timings.start_time)
+#             end_time = data.get('end_time', event_timings.end_time)
+
+#         selected_extra_facility = None
+#         facility_id = None
+#         unit_price_count = None
+#         extra_facility_hours = None
+#         apply_extra_facility_for_complete_event = None
+
+#         event_hours = DateTimeConversions.calculate_event_hours(start_date, end_date, start_time, end_time, all_day)
+
+#         overlapping_booking = Booking.query.filter(
+#             (Booking.event_id == event_id) &
+#             (Booking.start_date <= start_date) &
+#             (Booking.end_date >= end_date) &
+#             (Booking.start_time <= start_time) &
+#             (Booking.end_time == end_time)
+#         ).first()
+
+#         if overlapping_booking:
+#             return jsonify({
+#                 "status": False,
+#                 "message": "Event is already booked !!"
+#             })
+
+#         extra_facility_cost = 0
+
+#         for facility in extra_facilities:
+#             facility_id = facility.get("extra_facility_id")
+
+#             if facility_id:
+#                 selected_extra_facility = ExtraFacility.query.filter_by(id=facility_id, event_id=event_id).first()
+
+#                 if selected_extra_facility:
+#                     unit_price_count = facility.get("unit_price_count")
+#                     extra_facility_hours = facility.get("extra_facility_hours")
+#                     apply_extra_facility_for_complete_event = facility.get("apply_extra_facility_for_complete_event")
+
+#                     if unit_price_count is not None:
+#                         if selected_extra_facility.unit == "unit":
+#                             extra_facility_cost += unit_price_count * selected_extra_facility.rate
+
+#                     elif extra_facility_hours is not None:
+#                         if selected_extra_facility.unit == "hour":
+#                             extra_facility_cost += extra_facility_hours * selected_extra_facility.rate
+
+#                     elif apply_extra_facility_for_complete_event:
+#                         extra_facility_cost += selected_extra_facility.rate * event_hours
+
+#                 else:
+#                     return jsonify({
+#                         "status": False,
+#                         "message": "Invalid input. Selected extra facility is not available for the specified event."
+#                     }), 400
+
+#         event = Event.query.filter_by(id=event_id).first()
+
+#         if not event:
+#             return jsonify({
+#                 "status": False,
+#                 "message": "Event not found."
+#             }), 404
+
+#         extra_facilities_event = event.extra_facilities
+#         subtotal = event_hours * event.rate
+#         subtotal += extra_facility_cost
+
+#         tax_percentage = 0.15
+#         tax_amount = subtotal * tax_percentage
+
+#         total_price = subtotal + tax_amount
+
+#         if event and event_timings.available:
+#             booking = Booking(
+#                 user_id=user.id,
+#                 full_name=full_name,
+#                 email=email,
+#                 guest_count=guest_count,
+#                 additional_notes=additional_notes,
+#                 start_date=start_date,
+#                 end_date=end_date,
+#                 start_time=start_time,
+#                 end_time=end_time,
+#                 all_day=all_day,
+#                 event_id=event_id,
+#                 event_type=event_type
+#             )
+
+#             db.session.add(booking)
+#             db.session.flush()
+
+#             for facility in extra_facilities:
+#                 facility_id = facility.get("extra_facility_id")
+#                 unit_price_count = facility.get("unit_price_count")
+#                 extra_facility_hours = facility.get("extra_facility_hours")
+#                 apply_extra_facility_for_complete_event = facility.get("apply_extra_facility_for_complete_event")
+
+#                 if facility_id:
+#                     selected_extra_facility = ExtraFacility.query.filter_by(id=facility_id, event_id=event_id).first()
+
+#                     if selected_extra_facility:
+#                         if unit_price_count is not None:
+#                             unit = "unit"
+#                             quantity = unit_price_count
+#                         elif apply_extra_facility_for_complete_event or extra_facility_hours is not None:
+#                             unit = "hour"
+#                             quantity = extra_facility_hours
+#                         else:
+#                             return jsonify({
+#                                 "status": False,
+#                                 "message": "Unit is not specified !!"
+#                             }), 404
+
+#                         booking_extra_facility = BookingExtraFacility(
+#                             booking_id=booking.id,
+#                             unit=unit,
+#                             extra_facility_id=facility_id,
+#                             quantity=quantity
+#                         )
+#                         db.session.add(booking_extra_facility)
+
+#             vendor = Vendor.query.filter_by(id=event.vendor_id).first()
+
+#             if vendor:
+#                 vendor.wallet += subtotal
+#                 db.session.commit()
+
+#             return jsonify({
+#                 "status": True,
+#                 "Summary": {
+#                     "event_hours": f"{event_hours} Hours",
+#                     "guest_count": f"{guest_count}",
+#                     "event_rate": f"{event.rate}$",
+#                     "subtotal": f"{subtotal}$",
+#                     "extra_facility_cost": f"{extra_facility_cost}",
+#                     "tax": f"{tax_amount}$ (15%)",
+#                     "total_price": f"{total_price} $"
+#                 }
+#             }), 200
+
+#         else:
+#             return jsonify({
+#                 "status": False,
+#                 "message": f"{event.location_name} is not operating today !!"
+#             }), 400
+
+#     except Exception as e:
+#         return jsonify({
+#             "status": False,
+#             "message": str(e)
+#         }), 500
+
+
+from datetime import datetime, time
+
 @app.route('/create_booking', methods=["POST"])
 @jwt_required()
 def create_booking():
@@ -3384,7 +3685,7 @@ def create_booking():
             return jsonify({
                 "status": False,
                 "message": "Unauthorized access: Only users can create bookings."
-            })
+            }), 403
 
         full_name = data.get('full_name')
         email = data.get('email')
@@ -3411,7 +3712,7 @@ def create_booking():
             return jsonify({
                 "status": False,
                 "message": "All necessary fields must be set !!"
-            })
+            }), 400
 
         event = Event.query.filter_by(id=event_id).first()
         if event.guest_capacity is not None and guest_count > event.guest_capacity:
@@ -3420,9 +3721,14 @@ def create_booking():
                 "message": f"Guest count exceeds the maximum capacity ({event.guest_capacity}) for this event."
             }), 400
         
-
         start_time = datetime.strptime(data.get("start_time", str(event_timings.start_time)), "%H:%M:%S").time()
         end_time = datetime.strptime(data.get("end_time", str(event_timings.end_time)), "%H:%M:%S").time()
+
+        if start_time >= end_time:
+            return jsonify({
+                "status": False,
+                "message": "Invalid booking timings. End time must be after start time."
+            }), 400
 
         if start_time < event_timings.start_time or end_time > event_timings.end_time:
             return jsonify({
@@ -3435,16 +3741,11 @@ def create_booking():
             start_time = event_timings.start_time
             end_time = event_timings.end_time
         else:
-            start_time = data.get('start_time', event_timings.start_time)
-            end_time = data.get('end_time', event_timings.end_time)
+            start_time = start_time
+            end_time = end_time
 
-        selected_extra_facility = None
-        facility_id = None
-        unit_price_count = None
-        extra_facility_hours = None
-        apply_extra_facility_for_complete_event = None
-
-        event_hours = DateTimeConversions.calculate_event_hours(start_date, end_date, start_time, end_time, all_day)
+        # Calculate booking duration in hours
+        booking_duration_hours = (datetime.combine(datetime.min, end_time) - datetime.combine(datetime.min, start_time)).seconds / 3600
 
         overlapping_booking = Booking.query.filter(
             (Booking.event_id == event_id) &
@@ -3482,7 +3783,7 @@ def create_booking():
                             extra_facility_cost += extra_facility_hours * selected_extra_facility.rate
 
                     elif apply_extra_facility_for_complete_event:
-                        extra_facility_cost += selected_extra_facility.rate * event_hours
+                        extra_facility_cost += selected_extra_facility.rate * booking_duration_hours
 
                 else:
                     return jsonify({
@@ -3490,16 +3791,8 @@ def create_booking():
                         "message": "Invalid input. Selected extra facility is not available for the specified event."
                     }), 400
 
-        event = Event.query.filter_by(id=event_id).first()
-
-        if not event:
-            return jsonify({
-                "status": False,
-                "message": "Event not found."
-            }), 404
-
         extra_facilities_event = event.extra_facilities
-        subtotal = event_hours * event.rate
+        subtotal = booking_duration_hours * event.rate
         subtotal += extra_facility_cost
 
         tax_percentage = 0.15
@@ -3565,7 +3858,7 @@ def create_booking():
             return jsonify({
                 "status": True,
                 "Summary": {
-                    "event_hours": f"{event_hours} Hours",
+                    "event_hours": f"{booking_duration_hours} Hours",
                     "guest_count": f"{guest_count}",
                     "event_rate": f"{event.rate}$",
                     "subtotal": f"{subtotal}$",
@@ -3586,8 +3879,6 @@ def create_booking():
             "status": False,
             "message": str(e)
         }), 500
-
-
 
 
 ######################### STRIPE PAYMENT INTENT #########################

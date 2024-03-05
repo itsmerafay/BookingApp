@@ -15,7 +15,7 @@ class User(db.Model):
     password_hash = db.Column(db.String(255), nullable=False)
     access_token = db.Column(db.String(1024), unique=True, nullable=True)
     role = db.Column(db.String(50), nullable=False)
-    profile_image = db.Column(db.String(255))
+    profile_image = db.Column(db.String(255), nullable=True)
     vendor_id = db.Column(db.Integer, db.ForeignKey('vendor.id'), unique=True, nullable=True)
     vendor = db.relationship('Vendor', back_populates='user')
     google_token = db.Column(db.String(255), unique=True, nullable=True)
@@ -34,13 +34,13 @@ class User(db.Model):
     #     self.role = role
     #     self.otp = otp
 
-    def __init__(self, email, password_hash, role, access_token, otp): # for the time being otp removed 
+    def __init__(self, email, password_hash, role, access_token): # for the time being otp removed 
         self.email = email
         self.password_hash = password_hash
         self.access_token = None
         self.access_token = access_token
         self.role = role
-        self.otp = otp
+        # self.otp = otp
 
 
     def as_dict(self):
