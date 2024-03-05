@@ -103,12 +103,14 @@ def security():
 
 ###############################     Google Auth     ######################################
 
+from google.auth.exceptions import InvalidValue
+
 @app.route('/google_login', methods=['POST'])
 def google_login():
     try:
         data = request.get_json()
         token = data.get("token")
-        client_id = os.environ.get("client_id")
+        client_id = os.environ.get("GOOGLE_CLIENT_ID")  # Correct environment variable name
         idinfo = id_token.verify_oauth2_token(token, req.Request(), client_id)
 
         print(idinfo['email'])  # email
@@ -120,26 +122,26 @@ def google_login():
 
         if not email:
             return jsonify({
-                "status":False,
-                "message":"Invalid Email provided"  
-            }), 400
+                    "status":False,
+                    "message":"Invalid Email provided"  
+                }), 400
 
         access_token = create_access_token(identity=email)
-        
+            
         user = User.query.filter_by(email=email).first()
         if user :
             if profile_image:
                 user.profile_image = profile_image
             if not user.role:
                 return jsonify({
-                    "status":False,
-                    "message":"User Registration incomplete due to role !"
-                }), 400
-            
+                        "status":False,
+                        "message":"User Registration incomplete due to role !"
+                    }), 400
+                
             user.access_token = access_token
             user.google_token = token
             db.session.commit()  # Committing here after updating access_token
-        
+            
         else:
             role = data.get("role")
             password = Password.generate_random_password()
@@ -151,31 +153,101 @@ def google_login():
             if profile_image:
                 user.profile_image = profile_image
 
-            # Add the user to the database
+                # Add the user to the database
             db.session.add(user)
             db.session.commit()
 
         return jsonify({
-            "status": True,
-            "message": "Successfully logged in using google",
-            "role": user.role,
-            "id": user.id,
-            "profile_image": profile_image,
-            "access_token": access_token
-        }), 200
-    
-    except ValueError:
+                "status": True,
+                "message": "Successfully logged in using google",
+                "role": user.role,
+                "id": user.id,
+                "profile_image": profile_image,
+                "access_token": access_token
+            }), 200
+
+    except InvalidValue as e:
+        print(idinfo["client_id"])
         return jsonify({
-            "status":False,
-            "message":"Invalid token or client id"
+            "status": False,
+            "message": "Invalid token or client ID",
+            "error": str(e)
         }), 400
 
     except Exception as e:
         return jsonify({
             "status": False,
-            "error": str(e)
+            "message": str(e)
         }), 500
 
+
+
+
+
+
+
+
+
+# @app.route('/google_login', methods=['POST'])
+# def google_login():
+#     data = request.get_json()
+#     token = data.get("token")
+#     client_id = os.environ.get("client_id")
+#     idinfo = id_token.verify_oauth2_token(token, req.Request(), client_id)
+
+#     print(idinfo['email'])  # email
+#     print(idinfo['picture'])  # profile image
+#     print(idinfo)
+
+#     email = idinfo.get("email")
+#     profile_image = idinfo.get("picture")
+
+#     if not email:
+#         return jsonify({
+#                 "status":False,
+#                 "message":"Invalid Email provided"  
+#             }), 400
+
+#     access_token = create_access_token(identity=email)
+        
+#     user = User.query.filter_by(email=email).first()
+#     if user :
+#         if profile_image:
+#             user.profile_image = profile_image
+#         if not user.role:
+#             return jsonify({
+#                     "status":False,
+#                     "message":"User Registration incomplete due to role !"
+#                 }), 400
+            
+#         user.access_token = access_token
+#         user.google_token = token
+#         db.session.commit()  # Committing here after updating access_token
+        
+#     else:
+#         role = data.get("role")
+#         password = Password.generate_random_password()
+#         password_hash = bcrypt.generate_password_hash(password).decode("utf-8")
+
+#         user = User(email=email, password_hash=password_hash, role=role, access_token=access_token)
+#         user.google_token = token
+
+#         if profile_image:
+#             user.profile_image = profile_image
+
+#             # Add the user to the database
+#         db.session.add(user)
+#         db.session.commit()
+
+#     return jsonify({
+#             "status": True,
+#             "message": "Successfully logged in using google",
+#             "role": user.role,
+#             "id": user.id,
+#             "profile_image": profile_image,
+#             "access_token": access_token
+#         }), 200
+    
 
 
 
