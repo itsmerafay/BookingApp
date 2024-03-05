@@ -18,7 +18,7 @@ class User(db.Model):
     profile_image = db.Column(db.String(255), nullable=True)
     vendor_id = db.Column(db.Integer, db.ForeignKey('vendor.id'), unique=True, nullable=True)
     vendor = db.relationship('Vendor', back_populates='user')
-    google_token = db.Column(db.String(255), unique=True, nullable=True)
+    google_token = db.Column(db.String(255),nullable=True)
     verified = db.Column(db.Boolean, nullable=False, default=False)
     otp = db.Column(db.String(10), nullable=True)
     device_token = db.Column(db.Text, nullable=True)
