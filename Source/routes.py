@@ -167,7 +167,7 @@ def google_login():
             }), 200
 
     except InvalidValue as e:
-        print(idinfo["client_id"])
+        # print(idinfo["client_id"])
         return jsonify({
             "status": False,
             "message": "Invalid token or client ID",
