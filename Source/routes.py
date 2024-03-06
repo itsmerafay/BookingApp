@@ -23,6 +23,7 @@ import sys
 import string
 from firebase_admin import auth
 from dotenv import load_dotenv
+from google.auth.exceptions import InvalidValue
 import stripe 
 sys.dont_write_bytecode = True
 
@@ -103,8 +104,7 @@ def security():
 
 ###############################     Google Auth     ######################################
 
-from google.auth.exceptions import InvalidValue
-
+# working
 @app.route('/google_login', methods=['POST'])
 def google_login():
     try:
@@ -116,6 +116,8 @@ def google_login():
         print(idinfo['email'])  # email
         print(idinfo['picture'])  # profile image
         print(idinfo)
+
+        idinfo.pop('exp', None)
 
         email = idinfo.get("email")
         profile_image = idinfo.get("picture")
@@ -179,10 +181,6 @@ def google_login():
             "status": False,
             "message": str(e)
         }), 500
-
-
-
-
 
 
 
@@ -2133,6 +2131,181 @@ def refresh_token():
 #         }), 500
 
 
+# # working
+# @app.route("/home_events", methods=["POST"])
+# @jwt_required()
+# def home_events():
+#     try:
+#         data = request.get_json()
+#         user = get_current_user()
+
+#         if not user:
+#             return jsonify({
+#                 "status": False,
+#                 "message": "User not authenticated !!"
+#             }), 401
+
+#         requested_availability = data.get("is_available")
+#         user_location = (data.get("latitude"), data.get("longitude"))  # Retrieve user's location from request data
+#         max_distance = 300000
+
+#         events = []
+#         event_types = Event.query.with_entities(Event.event_type).distinct().all()
+
+#         for event_type in event_types:
+#             events.extend(
+#                 Event.query.join(Event.vendor)
+#                     .join(Vendor.user)
+#                     .order_by(func.random())
+#                     .limit(15)
+#                     .all()
+#             )
+
+#         serialized_events = []
+#         for event in events:
+#             current_date_time = datetime.now()
+
+#             if requested_availability:
+#                 is_event_available = any(
+#                     BookingAvailability.check_availability(booking, current_date_time)
+#                     for booking in event.bookings
+#                     if not booking.all_day and not booking.cancelled
+#                     or (booking.start_date <= current_date_time.date() <= booking.end_date)
+#                 )
+
+#                 if not is_event_available:
+#                     continue
+
+#             if any(booking.all_day for booking in event.bookings):
+#                 continue
+
+#             total_bookings = sum(1 for booking in event.bookings)
+
+#             serialized_event = {
+#                 "event_id": event.id,
+#                 "vendor_id": event.vendor_id,
+#                 "event_type": event.event_type,
+#                 "event_rate": event.rate,
+#                 "event_address": event.address,
+#                 "event_latitude": event.latitude,
+#                 "event_longitude": event.longitude,
+#                 "event_ratings": Ratings.get_average_rating(event.id),
+#                 "total_bookings": total_bookings,
+#                 "location_name": event.location_name,  # assuming you have a location_name attribute
+#                 "fixed_price": event.fixed_price,  # assuming you have a fixed_price attribute
+#                 "thumbnail": event.thumbnail,  # assuming you have a thumbnail attribute
+#                 "vendor_details": {
+#                     "vendor_id": event.vendor.id,
+#                     "vendor_profile_image": event.vendor.user[0].profile_image,
+#                 }
+#             }
+#             serialized_events.append(serialized_event)
+
+#         prefered_filter = data.get("prefered_filter")
+#         if prefered_filter:
+#             serialized_events = Filterations.apply_filters(serialized_events, prefered_filter, user_location, max_distance)
+
+#         return jsonify({
+#             "status": True,
+#             "Events": serialized_events,
+#             "Total_Events": len(serialized_events)
+#         }), 200
+
+#     except Exception as e:
+#         return jsonify({
+#             "status": False,
+#             "message": str(e)
+#         }), 500
+
+
+
+# @app.route("/home_events", methods=["POST"])
+# @jwt_required()
+# def home_events():
+#     try:
+#         data = request.get_json()
+#         user = get_current_user()
+
+#         if not user:
+#             return jsonify({
+#                 "status": False,
+#                 "message": "User not authenticated !!"
+#             }), 401
+
+#         requested_availability = data.get("is_available")
+#         user_location = (data.get("latitude"), data.get("longitude"))  # Retrieve user's location from request data
+#         max_distance = 300000
+
+#         events = Event.query.join(Event.vendor).join(Vendor.user).order_by(func.random()).limit(15).all()
+
+#         serialized_events = []
+#         for event in events:
+#             current_date_time = datetime.now()
+
+#             if requested_availability:
+#                 is_event_available = any(
+#                     BookingAvailability.check_availability(booking, current_date_time)
+#                     for booking in event.bookings
+#                     if not booking.all_day and not booking.cancelled
+#                     or (booking.start_date <= current_date_time.date() <= booking.end_date)
+#                 )
+
+#                 if not is_event_available:
+#                     continue
+
+#             if any(booking.all_day for booking in event.bookings):
+#                 continue
+
+#             total_bookings = sum(1 for booking in event.bookings)
+
+#             serialized_event = {
+#                 "event_id": event.id,
+#                 "vendor_id": event.vendor_id,
+#                 "event_type": event.event_type,
+#                 "event_rate": event.rate,
+#                 "event_address": event.address,
+#                 "event_latitude": event.latitude,
+#                 "event_longitude": event.longitude,
+#                 "event_ratings": Ratings.get_average_rating(event.id),
+#                 "total_bookings": total_bookings,
+#                 "location_name": event.location_name,  # assuming you have a location_name attribute
+#                 "fixed_price": event.fixed_price,  # assuming you have a fixed_price attribute
+#                 "thumbnail": event.thumbnail,  # assuming you have a thumbnail attribute
+#                 "vendor_details": {
+#                     "vendor_id": event.vendor.id,
+#                     "vendor_profile_image": event.vendor.user[0].profile_image,
+#                 }
+#             }
+#             serialized_events.append(serialized_event)
+        
+
+#         prefered_filter = data.get("prefered_filter")
+#         if prefered_filter:
+#             serialized_events = Filterations.apply_filters(serialized_events, prefered_filter, user_location, max_distance)
+
+#         unique_events = []
+#         seen_event_ids = set()
+#         for event in serialized_events:
+#             event_id = event["event_id"]
+#             if event_id not in seen_event_ids:
+#                 unique_events.append(event)
+#                 seen_event_ids.add(event_id)
+
+#         # Remove duplicate events if any
+#         serialized_events = [dict(t) for t in {tuple(d.items()) for d in serialized_events}]
+
+#         return jsonify({
+#             "status": True,
+#             "Events": unique_events,
+#             "Total_Events": len(unique_events)
+#         }), 200
+
+#     except Exception as e:
+#         return jsonify({
+#             "status": False,
+#             "message": str(e)
+#         }), 500
+
 
 @app.route("/home_events", methods=["POST"])
 @jwt_required()
@@ -2151,17 +2324,7 @@ def home_events():
         user_location = (data.get("latitude"), data.get("longitude"))  # Retrieve user's location from request data
         max_distance = 300000
 
-        events = []
-        event_types = Event.query.with_entities(Event.event_type).distinct().all()
-
-        for event_type in event_types:
-            events.extend(
-                Event.query.join(Event.vendor)
-                    .join(Vendor.user)
-                    .order_by(func.random())
-                    .limit(15)
-                    .all()
-            )
+        events = Event.query.join(Event.vendor).join(Vendor.user).order_by(func.random()).limit(15).all()
 
         serialized_events = []
         for event in events:
@@ -2206,11 +2369,19 @@ def home_events():
         prefered_filter = data.get("prefered_filter")
         if prefered_filter:
             serialized_events = Filterations.apply_filters(serialized_events, prefered_filter, user_location, max_distance)
+        
+        unique_events = []
+        already_had_event = set()
+        for event in serialized_events:
+            event_id = event["event_id"]
+            if event_id not in already_had_event:
+                unique_events.append(events)
+                already_had_event.append(event_id)
 
         return jsonify({
             "status": True,
-            "Events": serialized_events,
-            "Total_Events": len(serialized_events)
+            "Events": unique_events,
+            "Total_Events": len(unique_events)
         }), 200
 
     except Exception as e:
@@ -2218,7 +2389,6 @@ def home_events():
             "status": False,
             "message": str(e)
         }), 500
-
 
 
 ###############################     Search Events API        ######################################
@@ -2358,7 +2528,7 @@ def search_event():
             "vendor_details": vendor_details
         }
         event_list.append(event_info)
-
+        
     return jsonify({
         "status": True,
         "Total_Events": total_events_found,
