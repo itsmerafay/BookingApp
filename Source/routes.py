@@ -115,12 +115,6 @@ def google_login():
 
         print(idinfo['email'])  # email
         print(idinfo['picture'])  # profile image
-        print("Before",idinfo["exp"])
-
-        idinfo.pop('exp', None)
-
-        # print("After",idinfo["exp"])
-
 
         email = idinfo.get("email")
         profile_image = idinfo.get("picture")
@@ -131,7 +125,7 @@ def google_login():
                     "message":"Invalid Email provided"  
                 }), 400
 
-        access_token = create_access_token(identity=email)
+        access_token = create_access_token(identity=email, expires_delta=False) 
             
         user = User.query.filter_by(email=email).first()
         if user :
