@@ -2371,12 +2371,12 @@ def home_events():
             serialized_events = Filterations.apply_filters(serialized_events, prefered_filter, user_location, max_distance)
         
         unique_events = []
-        already_had_event = set()
+        already_had_event_ids = set()
         for event in serialized_events:
             event_id = event["event_id"]
-            if event_id not in already_had_event:
-                unique_events.append(events)
-                already_had_event.append(event_id)
+            if event_id not in already_had_event_ids:
+                unique_events.append(event)
+                already_had_event_ids.add(event_id)
 
         return jsonify({
             "status": True,
@@ -2528,7 +2528,7 @@ def search_event():
             "vendor_details": vendor_details
         }
         event_list.append(event_info)
-        
+
     return jsonify({
         "status": True,
         "Total_Events": total_events_found,
