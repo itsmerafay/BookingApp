@@ -115,9 +115,12 @@ def google_login():
 
         print(idinfo['email'])  # email
         print(idinfo['picture'])  # profile image
-        print(idinfo)
+        print("Before",idinfo["exp"])
 
         idinfo.pop('exp', None)
+
+        # print("After",idinfo["exp"])
+
 
         email = idinfo.get("email")
         profile_image = idinfo.get("picture")
