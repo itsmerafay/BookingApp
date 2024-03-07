@@ -1441,8 +1441,12 @@ def all_reviews():
             return jsonify({"message": "Invalid user role."}), 400
 
         if not reviews:
-            return jsonify({"message": "Reviews Not Found !!"}), 400
-
+            return jsonify({
+                "rated_reviews": [],
+                "total_rated_reviews": 0,
+                "status":True
+            }), 200
+        
         review_data = []
 
         for review, event, vendor in reviews:
