@@ -334,9 +334,6 @@ class Password:
         print(alphabets)
         password = ''.join(secrets.choice(alphabets) for i in range(length))
         return password
-
-
-
 class Notificationpush():
     @staticmethod
     def send_push_notification(device_token, title, body, dataObject=None):

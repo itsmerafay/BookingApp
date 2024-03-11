@@ -181,8 +181,6 @@ def google_login():
 
 
 
-
-
 # @app.route('/google_login', methods=['POST'])
 # def google_login():
 #     data = request.get_json()
@@ -2545,39 +2543,6 @@ def search_event():
 
 
 
-@app.route("/add_to_favorites", methods = ["POST"])
-@jwt_required()
-def add_to_favorites():
-    data = request.get_json()
-    user = get_current_user()
-
-    if not user:
-        return jsonify({ "status":False,"message": "User not found"}), 401
-
-
-    if user.role != "user":
-        return jsonify({
-                "status": False,
-                "message": "Unauthorized access: Only users can create bookings."
-            })
-    
-    event_id = data.get("event_id")
-    # user = User.query.filter_by(id = user.id).first_or_404()
-    event = Event.query.get_or_404(event_id)
-    
-    favorite = Favorites(user_id = user.id, event_id = event.id)
-    db.session.add(favorite)
-    db.session.commit()
-
-    return jsonify({
-        "status":True,
-        "message":"Successfully Added the event to favorites !!"
-    }), 200
-
-
-    
-
-
 
 
 
@@ -4457,7 +4422,6 @@ def update_profile_image():
     except Exception as e:
         return jsonify({"status":False,"message": str(e)}), 500
 
-
 @app.route("/read_all_notification",methods=["GET"])
 @jwt_required()
 def read_all_noti():
@@ -4541,6 +4505,37 @@ def contact_us():
 
 
 
+@app.route("/add_to_favorites", methods = ["POST"])
+@jwt_required()
+def add_to_favorites():
+    data = request.get_json()
+    user = get_current_user()
+
+    if not user:
+        return jsonify({ "status":False,"message": "User not found"}), 401
+
+
+    if user.role != "user":
+        return jsonify({
+                "status": False,
+                "message": "Unauthorized access: Only users can create bookings."
+            })
+    
+    event_id = data.get("event_id")
+    # user = User.query.filter_by(id = user.id).first_or_404()
+    event = Event.query.get_or_404(event_id)
+    
+    favorite = Favorites(user_id = user.id, event_id = event.id)
+    db.session.add(favorite)
+    db.session.commit()
+
+    return jsonify({
+        "status":True,
+        "message":"Successfully Added the event to favorites !!"
+    }), 200
+
+
+
 @app.route("/get_my_favorite_event", methods = ["POST"])
 @jwt_required()
 def get_my_favorite_event():
@@ -4614,7 +4609,6 @@ def update_my_favorite_event():
 
 
 
-
 @app.route("/delete_my_favorite_event", methods = ["DELETE"])
 @jwt_required()
 def delete_my_favorite_event():
@@ -4630,9 +4624,10 @@ def delete_my_favorite_event():
                 "message": "Unauthorized access: Only users can delete the favorite event."
             })
     
-    favorite_id = data.get("favorite_id")
+    # favorite_id = data.get("favorite_id")
+    event_id = data.get("event_id")
 
-    favorites = Favorites.query.filter_by(id = favorite_id ,user_id = user.id).first()
+    favorites = Favorites.query.filter_by(event_id=event_id ,user_id = user.id).first()
 
     if favorites:
         db.session.delete(favorites)
@@ -4640,7 +4635,7 @@ def delete_my_favorite_event():
 
         return jsonify({
             "status":True,
-            "message":"Successfully updated the favorite event !"
+            "message":"Successfully deleted the favorite event !"
         }), 200
     
     else:
