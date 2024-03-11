@@ -1,3 +1,7 @@
+3/11/2024 4:19
+1 - add_to_favorite_event -- fix bug again
+2 - favorite is added in response for search_event and custom_event_search
+
 3/5/2024 4:39
 google login updated (issue is client id)
 

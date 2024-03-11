@@ -2463,6 +2463,7 @@ def bookings_today():
 @app.route("/search_event", methods=["POST"])
 @jwt_required()
 def search_event():
+    user = get_current_user()
     page_number = request.args.get('page', default=1, type=int)
     data = request.get_json()
     event_type = data.get("event_type")
@@ -2482,6 +2483,7 @@ def search_event():
         events_query = events_query.filter(or_(Event.location_name.ilike(f"%{location_name}%")))
 
     all_events = events_query.all()
+
 
     user_location = (latitude, longitude)
     results_within_range = []
@@ -2503,16 +2505,23 @@ def search_event():
     end_index = min(offset + events_per_page, len(sorted_within_range))
 
     paginated_results = sorted_within_range[offset:end_index]
+
+    fav_event_ids = [favorite.event_id for favorite in Favorites.query.filter_by(user_id=user.id).all()]
+
+
     event_list = []
 
     for result in paginated_results:
         event = result[0]
         within_radius = result[1]
 
+        is_favorite = event.id in fav_event_ids
+
         vendor_details = {
             "vendor_profile_image": event.vendor.user[0].profile_image,
             "vendor_id": event.vendor.id
         }
+
 
         event_info = {
             "id": event.id,
@@ -2524,7 +2533,8 @@ def search_event():
             "distance_km": geodesic((event.latitude, event.longitude), user_location).kilometers,
             "address": event.vendor.location,
             "location_name": event.location_name,
-            "vendor_details": vendor_details
+            "vendor_details": vendor_details,
+            "favorite":is_favorite
         }
         event_list.append(event_info)
 
@@ -2651,9 +2661,108 @@ def search_evettttt():
 
 ################### Custom Event Search ###########################
 
+# @app.route("/custom_event_search", methods=["POST"])
+# @jwt_required()
+# def custom_event_search():
+#     user =  get_current_user()
+#     data = request.get_json()
+#     event_type = data.get("event_type")
+#     location_name = data.get("location_name")
+#     min_price = data.get("min_price")
+#     max_price = data.get("max_price")
+#     start_date = data.get("start_date")
+#     end_date = data.get("end_date")
+#     start_time = data.get("start_time")
+#     end_time = data.get("end_time")
+#     all_day = data.get("all_day")
+#     latitude = data.get("event_latitude")
+#     longitude = data.get("event_longitude")
+#     ratings = data.get("ratings")
+#     query = db.session.query(Event)
+
+#     if event_type:
+#         query = query.filter(func.lower(Event.event_type) == event_type.lower())
+
+#     if location_name:
+#         query = query.filter(or_(Event.location_name.ilike(f"%{location_name}%")))
+
+#     if min_price is not None and max_price is not None:
+#         query = query.filter(Event.rate.between(min_price, max_price))
+
+#     elif min_price is not None or max_price is not None:
+#         if min_price is not None:
+#             query = query.filter(Event.rate >= min_price)
+#         elif max_price is not None:
+#             query = query.filter(Event.rate <= max_price)
+
+#     if not all_day and start_date and end_date and start_time and end_time:
+#         subquery = db.session.query(Booking.event_id).filter(
+#             (Booking.start_date <= end_date) &
+#             (Booking.end_date >= start_date) &
+#             (Booking.start_time <= end_time) &
+#             (Booking.end_time >= start_time)
+#         ).distinct()
+
+#         query = query.filter(~Event.id.in_(subquery))
+
+#     results = query.all()
+#     user_location = (latitude, longitude)
+#     results_with_distance = []
+
+
+#     for event in results:
+#         if event.latitude is not None and event.longitude is not None:
+#             event_location = (event.latitude, event.longitude)
+#             distance = geodesic(event_location, user_location).kilometers <= 5
+#             results_with_distance.append((event, distance))
+#             fav_event_ids = [favorite.event_id for favorite in Favorites.query.filter_by(user_id=user.id).all()]
+#             is_favorite = event.id in fav_event_ids
+
+
+#     sorted_results = sorted(results_with_distance, key=lambda x: Ratings.get_average_rating(x[0].id), reverse=True)
+
+#     serialized_results = []
+
+#     for event_tuple in sorted_results:
+#         event = event_tuple[0]
+#         vendor_details = []
+
+#         if event.latitude is not None and event.longitude is not None:
+#             event_location = (event.latitude, event.longitude)
+#             distance = geodesic(event_location, user_location).kilometers <= 4
+
+#             if distance:
+#                 vendor_profile_image = event.vendor.user[0].profile_image  # Assuming only one user for the vendor
+
+#                 serialized_event = {
+#                     "id": event.id,
+#                     "thumbnail": event.thumbnail,
+#                     "event_type": event.event_type,
+#                     "rate": event.rate,
+#                     "event_rating": Ratings.get_average_rating(event.id),
+#                     "fixed_price": event.fixed_price,
+#                     "distance_km": geodesic(event_location, user_location).kilometers,
+#                     "address": event.vendor.location,  # Modify as per the actual address field in your model
+#                     "location": event.location_name,  # Modify as per the actual field name
+#                     "favorite":is_favorite,
+#                     "vendor_details": {
+#                         "vendor_profile_image": vendor_profile_image,
+#                         "vendor_id": event.vendor.id
+#                     }
+#                 }
+#                 serialized_results.append(serialized_event)
+
+#     return jsonify({
+#         "status": True,
+#         "Search Result Found": f"{len(serialized_results)} vendors found for {location_name} with {ratings} star rating",
+#         "Search results": serialized_results
+#     })
+
+# new 
 @app.route("/custom_event_search", methods=["POST"])
 @jwt_required()
 def custom_event_search():
+    user = get_current_user()
     data = request.get_json()
     event_type = data.get("event_type")
     location_name = data.get("location_name")
@@ -2677,7 +2786,6 @@ def custom_event_search():
 
     if min_price is not None and max_price is not None:
         query = query.filter(Event.rate.between(min_price, max_price))
-
     elif min_price is not None or max_price is not None:
         if min_price is not None:
             query = query.filter(Event.rate >= min_price)
@@ -2689,35 +2797,24 @@ def custom_event_search():
             (Booking.start_date <= end_date) &
             (Booking.end_date >= start_date) &
             (Booking.start_time <= end_time) &
-            (Booking.end_time >= start_time)
+            (Booking.end_time >= end_time)
         ).distinct()
-
         query = query.filter(~Event.id.in_(subquery))
 
     results = query.all()
     user_location = (latitude, longitude)
-    results_with_distance = []
+    serialized_results = []
 
     for event in results:
         if event.latitude is not None and event.longitude is not None:
             event_location = (event.latitude, event.longitude)
-            distance = geodesic(event_location, user_location).kilometers <= 5
-            results_with_distance.append((event, distance))
-
-    sorted_results = sorted(results_with_distance, key=lambda x: Ratings.get_average_rating(x[0].id), reverse=True)
-
-    serialized_results = []
-
-    for event_tuple in sorted_results:
-        event = event_tuple[0]
-        vendor_details = []
-
-        if event.latitude is not None and event.longitude is not None:
-            event_location = (event.latitude, event.longitude)
-            distance = geodesic(event_location, user_location).kilometers <= 4
-
-            if distance:
+            distance = geodesic(event_location, user_location).kilometers
+            if distance <= 5:
                 vendor_profile_image = event.vendor.user[0].profile_image  # Assuming only one user for the vendor
+
+                fav_event_ids = [favorite.event_id for favorite in Favorites.query.filter_by(user_id=user.id).all()]
+
+                is_favorite = event.id in fav_event_ids
 
                 serialized_event = {
                     "id": event.id,
@@ -2726,9 +2823,10 @@ def custom_event_search():
                     "rate": event.rate,
                     "event_rating": Ratings.get_average_rating(event.id),
                     "fixed_price": event.fixed_price,
-                    "distance_km": geodesic(event_location, user_location).kilometers,
+                    "distance_km": distance,
                     "address": event.vendor.location,  # Modify as per the actual address field in your model
                     "location": event.location_name,  # Modify as per the actual field name
+                    "favorite": is_favorite,
                     "vendor_details": {
                         "vendor_profile_image": vendor_profile_image,
                         "vendor_id": event.vendor.id
@@ -2736,10 +2834,12 @@ def custom_event_search():
                 }
                 serialized_results.append(serialized_event)
 
+    sorted_results = sorted(serialized_results, key=lambda x: x["event_rating"], reverse=True)
+
     return jsonify({
         "status": True,
-        "Search Result Found": f"{len(serialized_results)} vendors found for {location_name} with {ratings} star rating",
-        "Search results": serialized_results
+        "Search Result Found": f"{len(sorted_results)} vendors found for {location_name} with {ratings} star rating",
+        "Search results": sorted_results
     })
 
 
@@ -4522,9 +4622,16 @@ def add_to_favorites():
             })
     
     event_id = data.get("event_id")
+    favorites = Favorites.query.filter_by(user_id=user.id , event_id=event_id).first()
+    if favorites:
+        return jsonify({
+            "status":False,
+            "message":"Event is already in the favorite list"
+        }), 403
+    
     # user = User.query.filter_by(id = user.id).first_or_404()
     event = Event.query.get_or_404(event_id)
-    
+
     favorite = Favorites(user_id = user.id, event_id = event.id)
     db.session.add(favorite)
     db.session.commit()
