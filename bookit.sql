@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 04, 2024 at 12:00 PM
+-- Generation Time: Mar 11, 2024 at 12:21 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -36,7 +36,7 @@ CREATE TABLE `alembic_version` (
 --
 
 INSERT INTO `alembic_version` (`version_num`) VALUES
-('adecf4bc11b4');
+('81226e916f7d');
 
 -- --------------------------------------------------------
 
@@ -134,7 +134,8 @@ INSERT INTO `booking` (`id`, `event_id`, `user_id`, `full_name`, `email`, `guest
 (156, 109, 55, 'Alice Smith', 'alicesmith@example.com', 8, 'Special requests for the event.', '2024-01-19', '2024-01-19', '20:00:00', '22:00:00', 0, '2024-01-18 15:06:28', 'Business Meeting', 0, NULL),
 (189, 118, 55, 'Jane Smith', 'jane.smith@example.com', 10, 'Nothing', '2024-02-06', '2024-02-06', '15:00:00', '17:00:00', 0, '2024-01-30 14:44:56', 'Wedding', 0, NULL),
 (212, 123, 55, 'Jane Smith', 'jane.smith@example.com', 52, 'Nothing', '2024-02-07', '2024-02-07', '15:00:00', '17:00:00', 0, '2024-02-20 12:09:12', 'Wedding', 0, NULL),
-(213, 123, 62, 'Jane Smith', 'jane.smith@example.com', 50, '', '2034-02-27', '2034-02-27', '10:00:00', '11:00:00', 0, '2024-02-22 11:04:35', 'Wedding', 0, NULL);
+(220, 123, 55, 'Jane Smith', 'jane.smith@example.com', 50, '', '2034-02-27', '2034-02-27', '10:00:00', '13:00:00', 0, '2024-03-05 10:02:18', 'Wedding', 0, NULL),
+(221, 124, 55, 'Jane Smith', 'jane.smith@example.com', 50, '', '2034-02-27', '2034-02-27', '10:00:00', '11:00:00', 0, '2024-03-05 10:02:36', 'Wedding', 0, NULL);
 
 -- --------------------------------------------------------
 
@@ -251,7 +252,7 @@ INSERT INTO `event` (`id`, `thumbnail`, `other_images`, `video_showcase`, `addre
 (92, 'f009db8d-f83c-4286-b08f-4502eac0280b.png', '[\"978a0c24-847e-4fdd-bd84-0c73bfef74ae.png\", \"fdd78bfa-84d0-46de-825b-3aa18c9299e2.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"0074fc93-e4e2-4fd3-b3a9-c171307444e2.png\", \"00ec510c-b897-45a5-be38-15f9bbdcf4db.png\"]', 'Event description', 'Anything', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
 (93, '250c8f17-ff39-493e-b5ca-b3faec1bc89a.png', '[\"c143feae-d952-4ad1-85f5-13c727f4c478.png\", \"dbc836ba-cefe-4a26-88a1-b409a3c0febd.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"3a8e6be1-4f6b-4a39-80c7-d8afeceb67c4.png\", \"b6205e84-a619-42a8-8a8b-bd0b32adb30f.png\"]', 'Event description', 'Anything', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
 (94, 'c3c56b61-cb28-43a4-923c-4c32f27e2df1.png', '[\"3f0e3afb-d2ab-4113-8914-9ecef2efe23e.png\", \"a97f287a-fa49-4af9-9186-3176e2f81f9d.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"2c1a1044-7f21-410d-8f36-0c987165e445.png\", \"4bd6d042-b37e-42d6-81cd-cb36f8f00460.png\"]', 'Event description', 'Anything', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
-(95, 'dcfdb331-e3be-4b1f-9cd1-d33c6a6aace1.png', '[\"a33ade92-e523-4274-8f88-0a344aa73a2f.png\", \"3b140c89-db64-4a7b-8751-4316f2dbcee9.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"04aacce9-54f7-430e-9d64-2c28654e43b7.png\", \"838b31af-ee6f-4fd4-ade3-50adc1a37f37.png\"]', 'Event description', 'Anything', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
+(95, 'dcfdb331-e3be-4b1f-9cd1-d33c6a6aace1.png', '[\"a33ade92-e523-4274-8f88-0a344aa73a2f.png\", \"3b140c89-db64-4a7b-8751-4316f2dbcee9.png\"]', 'youtube.com', 'Gulshan block 7', 200, 1, 'Event details 123123', '[\"04aacce9-54f7-430e-9d64-2c28654e43b7.png\", \"838b31af-ee6f-4fd4-ade3-50adc1a37f37.png\"]', 'Event description', 'Anything', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
 (96, 'c4434531-e1d3-4b01-ae40-ac734405eaba.png', '[\"5bab3e4b-d8f1-4232-aa1a-75fe3fe2d6ea.png\", \"81bbf65f-c8ee-4794-b85b-fadba3a3bca8.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"1ab0fe80-472f-485e-bf38-456949d06093.png\", \"0b46a00a-df65-4dad-a52c-c65f54ab9016.png\"]', 'Event description', 'Anything', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
 (97, 'f1db03a2-dc6e-4352-8bf5-77da96b4bdf5.png', '[\"268c3a37-108b-4f5c-ad95-f0ed0e686311.png\", \"7b3277aa-c556-4439-aa23-5a652cec9c32.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"fe0eec55-b899-4272-b441-8d57e618e002.png\", \"6c8893d5-c0dc-4e75-89db-bd1fb1173976.png\"]', 'Event description', 'Anything', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
 (98, '7846ea78-8c13-43fd-9673-aa4ebc7a2a16.png', '[\"fbc7112b-cffe-4ce6-af82-e26cb1d1509c.png\", \"d02a28ae-4ac7-4071-96c3-f09624cef4b8.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"a2285dec-9d85-4ba6-aa13-e2fa87a59401.png\", \"e8255571-c2c8-43ad-99ad-30b02922ce48.png\"]', 'Event description', 'Anything', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
@@ -450,6 +451,15 @@ CREATE TABLE `favorites` (
   `user_id` int(11) NOT NULL,
   `event_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `favorites`
+--
+
+INSERT INTO `favorites` (`id`, `user_id`, `event_id`) VALUES
+(10, 55, 15),
+(11, 55, 8),
+(12, 55, 2);
 
 -- --------------------------------------------------------
 
@@ -679,12 +689,12 @@ INSERT INTO `user` (`id`, `email`, `password_hash`, `access_token`, `role`, `pro
 (52, 'abdulrafayatiq@gmail.com.com', '$2b$12$6tmvlYLzyYiZtllws6mCwOHOK/gS3p1xkzyNWA1ZHDHKMJrwtUXBK', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwMTk0ODc1MywianRpIjoiZDY1ZjQxY2UtMzgyZS00NDZjLWJmZDYtYTE0OTk0ZWMxZDhiIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFiZHVscmFmYXlhdGlxQGdtYWlsLmNvbS5jb20iLCJuYmYiOjE3MDE5NDg3NTMsImV4cCI6MTcwMTk0OTY1M3', 'vendor', 'ab7ebf3d-c31f-4e69-aff2-f126a22a8578.png', 14, 0, NULL, NULL, NULL),
 (53, 'justvendor.03@gmail.com', '$2b$12$45f9pZi8ic2dUAErRFN5CuLXd1AEuUkPhgr8f3K6zn6VUZ9aJqhaO', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwMjQ2NzQ1NCwianRpIjoiZTJlNTQ5NTEtODZjZS00MDIxLThkYTAtZjJhNmQ2YjJhOTYzIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6Imp1c3R2ZW5kb3IuMDNAZ21haWwuY29tIiwibmJmIjoxNzAyNDY3NDU0LCJleHAiOjE3MDI0NjgzNTR9.TNPyj', 'vendor', NULL, 15, 0, NULL, NULL, NULL),
 (54, 'abdulrafayatiq123.03@gmail.com', '$2b$12$U4aqywc9wSvbZkoqa/7dc.te5z.YXu00HLeSP4.OnYQ2n38Ls5dRG', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwODU5NzAxOSwianRpIjoiNjJlMTcwYjItZTdmMC00MjMwLTlmZTItZWU5YjkxMDQ5Yjg3IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFiZHVscmFmYXlhdGlxMTIzLjAzQGdtYWlsLmNvbSIsIm5iZiI6MTcwODU5NzAxOSwiZXhwIjoxNzA4NTk3OT', 'vendor', NULL, 16, 0, NULL, NULL, NULL),
-(55, 'abdulrafayatiq123456.03@gmail.com', '$2b$12$09vHC2/suja0qn8kbJ.hmeNJLz9MCkiqOyCwlIn79XnxE7FSMVDAy', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwODYxMjEzMiwianRpIjoiODU1ODg0ZGYtZDUxNy00MjExLWI0ZGMtZjMzNjE1YjU1NDUxIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFiZHVscmFmYXlhdGlxMTIzNDU2LjAzQGdtYWlsLmNvbSIsIm5iZiI6MTcwODYxMjEzMiwiZXhwIjoxNzA4NjEzMDMyfQ.CgCPiTpSMWtgugtvpgt36tt6vuiFis75rgQUyPzJuXk', 'user', NULL, NULL, 0, NULL, NULL, NULL),
+(55, 'abdulrafayatiq123456.03@gmail.com', '$2b$12$09vHC2/suja0qn8kbJ.hmeNJLz9MCkiqOyCwlIn79XnxE7FSMVDAy', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcxMDE1NTM4NCwianRpIjoiN2RiODU0ZjItMjQ4MC00NjkyLWFiNjktMDY5NmJmMzQ4ZjU1IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFiZHVscmFmYXlhdGlxMTIzNDU2LjAzQGdtYWlsLmNvbSIsIm5iZiI6MTcxMDE1NTM4NCwiZXhwIjoxNzEwMTU2Mjg0fQ.3iEmV__qVuacrUFtnvc0FurrWl-fkYj_d5tfRsibx80', 'user', NULL, NULL, 0, NULL, NULL, NULL),
 (56, 'abdulrafayatiq10.03@gmail.com', '$2b$12$pAcd4u8i/MDQPF.9PE2XBOUV7q1ol8opER87g5UZ45L2gHFUIv8dK', NULL, 'vendor', NULL, 20, 0, '9102', NULL, NULL),
 (57, 'samscoutt.03@gmail.com', '$2b$12$6Rll0VLJ1nFnHzkOZ4P2a..lw9Y9v3QVhKb9gvNKlIzapiVLU.ntS', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwODA4Nzk5OSwianRpIjoiNzkwZjM2YzAtM2MzYi00Y2JhLTkzY2UtZmEzZWNkMDMzNmU1IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6InNhbXNjb3V0dC4wM0BnbWFpbC5jb20iLCJuYmYiOjE3MDgwODc5OTksImV4cCI6MTcwODA4ODg5OX0.UHUlj5', 'vendor', NULL, 21, 0, '3019', NULL, NULL),
 (59, 'abdulrafayatiq123alfnsk.03@gmail.com', '$2b$12$5IfaRl.R4/FsvFGrylyqr.nP1MaqvABV0jjRnhqnSay7vOVPVtN36', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwODYwODk2NywianRpIjoiNjkyMmYyN2QtN2MyMC00MzA5LWIwMTctNDk3OTAyNTZmMDk4IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFiZHVscmFmYXlhdGlxMTIzYWxmbnNrLjAzQGdtYWlsLmNvbSIsIm5iZiI6MTcwODYwODk2NywiZXhwIjoxNzA4NjA5ODY3fQ.OW1lshbYmyMdaaue_48rnozhYWVZBzEKfufwEaoUeGo', 'vendor', NULL, 22, 0, NULL, NULL, NULL),
-(61, 'asklfnasklmdas.03@gmail.com', '$2b$12$bxBSIQ9ZlhNtMW.gZkh4i.3nGzaWI2Uyyosv1NupAMzL30g2M0K7e', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwODU5ODk1NSwianRpIjoiOGZmOGNlM2MtYzYxZi00NjQ0LWIwYzctYTJhNjViNDk3NTdhIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFza2xmbmFza2xtZGFzLjAzQGdtYWlsLmNvbSIsIm5iZiI6MTcwODU5ODk1NSwiZXhwIjoxNzA4NTk5ODU1fQ', 'vendor', NULL, 23, 0, NULL, NULL, NULL),
-(62, 'hr1938082@gmail.com', '$2b$12$xnPb7A.6h1g8rdmqqB6B.eIloEG3ku0WkU/nuBumHDr2qP8REQWOu', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwODYwMjI1MSwianRpIjoiMDMzMzNhMDYtOTI5Yy00NmViLTkzYzgtYmM2N2NjMDdmNjJjIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImhyMTkzODA4MkBnbWFpbC5jb20iLCJuYmYiOjE3MDg2MDIyNTEsImV4cCI6MTcwODYwMzE1MX0.lSYSHHTpTEevDcO1UtXQpfNwjlya4tbL3temaT1HquI', 'user', 'https://lh3.googleusercontent.com/a/ACg8ocJIPkSrNudbeCyVd-8cvOsCgneKr1RRU08qXBaeUO-foEg=s96-c', NULL, 0, NULL, NULL, 'eyJhbGciOiJSUzI1NiIsImtpZCI6IjU1YzE4OGE4MzU0NmZjMTg4ZTUxNTc2YmE3MjgzNmUwNjAwZThiNzMiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJhenAiOiI0OTY2NjA1MjA1NjUtZTVkdnAwM2p2ZWJxdTE4NjZyMWEzZDYyMXN0YmwzdW8uYXBwcy5nb29nbGV1c2VyY29udGVudC5j');
+(61, 'asklfnasklmdas.03@gmail.com', '$2b$12$bxBSIQ9ZlhNtMW.gZkh4i.3nGzaWI2Uyyosv1NupAMzL30g2M0K7e', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwOTYzMjcwNiwianRpIjoiYzU2MDgyOWEtMjA1Zi00MDUyLTliNGUtN2M3MTQ3MGJjNmZmIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFza2xmbmFza2xtZGFzLjAzQGdtYWlsLmNvbSIsIm5iZiI6MTcwOTYzMjcwNiwiZXhwIjoxNzA5NjMzNjA2fQ.Pfimkvdj8Tui5n_aHIZSubrZu_8KcARQBEYHakWG-ww', 'vendor', NULL, 23, 0, NULL, NULL, NULL),
+(71, 'mylaptophp10se@gmail.com', '$2b$12$QgQAvgSidblUNrNcuVWq1utFxD5jOQ7DzVV72wXJtiMQ8jH7RaguC', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwOTcyOTY0NSwianRpIjoiOThmZmNiYjEtODJkMS00ZDU3LTk3YWItZWVjNDI1MTUyNzRiIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6Im15bGFwdG9waHAxMHNlQGdtYWlsLmNvbSIsIm5iZiI6MTcwOTcyOTY0NX0.Y2c0Fjhu7yQVB2n3U-dve-mTsYaAjz0xWQuzw_qlf2c', 'user', 'https://lh3.googleusercontent.com/a/ACg8ocLx6lBx_M-0QqlRN06o1BlQFYAIQFPmby0v9aSqVrnO=s96-c', NULL, 0, NULL, NULL, 'eyJhbGciOiJSUzI1NiIsImtpZCI6IjZmOTc3N2E2ODU5MDc3OThlZjc5NDA2MmMwMGI2NWQ2NmMyNDBiMWIiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJhenAiOiIzNjIzNDczODM3NTUtNGw2dHVyc2dlZ3BxbjF0NHE5MG9sdWxucGxjdTR1dG4uYXBwcy5nb29nbGV1c2VyY29udGVudC5j');
 
 -- --------------------------------------------------------
 
@@ -715,7 +725,7 @@ INSERT INTO `vendor` (`id`, `full_name`, `phone_number`, `location`, `biography`
 (13, 'Rafay The Vendor', '0900833922', 'Karachi', 'Testing Biography', 0),
 (14, 'Bob The Builder', '090078601', 'Karachi', 'Luxury Wedding Celebration Venue 123124nfsd', 0),
 (15, 'Just Vendor', '1234567890', 'Karachi', 'Just a simple vendor.', 0),
-(16, 'John Doe', '1234567890', 'Some Location', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.', 44898),
+(16, 'John Doe', '1234567890', 'Some Location', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.', 47498),
 (20, '', '', '', '', 0),
 (21, '', '', '', '', 0),
 (22, '', '', '', '', 0),
@@ -821,8 +831,7 @@ ALTER TABLE `user`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `email` (`email`),
   ADD UNIQUE KEY `access_token` (`access_token`) USING HASH,
-  ADD UNIQUE KEY `vendor_id` (`vendor_id`),
-  ADD UNIQUE KEY `google_token` (`google_token`);
+  ADD UNIQUE KEY `vendor_id` (`vendor_id`);
 
 --
 -- Indexes for table `vendor`
@@ -838,7 +847,7 @@ ALTER TABLE `vendor`
 -- AUTO_INCREMENT for table `booking`
 --
 ALTER TABLE `booking`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=214;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=222;
 
 --
 -- AUTO_INCREMENT for table `booking_extra_facility`
@@ -868,7 +877,7 @@ ALTER TABLE `extra_facility`
 -- AUTO_INCREMENT for table `favorites`
 --
 ALTER TABLE `favorites`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `inquiry`
@@ -904,7 +913,7 @@ ALTER TABLE `transaction`
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=72;
 
 --
 -- AUTO_INCREMENT for table `vendor`
