@@ -31,6 +31,38 @@ stripe.api_key = app.config["STRIPE_SECRET_KEY"]
 load_dotenv()
 
 
+######################### Category ##############################
+
+
+@app.route("/category", methods=["GET"])
+def category():
+    try:
+        event_types_count = db.session.query(Event.event_type, func.count(Event.id)).group_by(Event.event_type).all()
+
+        if not event_types_count:
+            return jsonify({
+                "status":False,
+                "message": "Events not found"
+            }), 404
+    
+        event_types_data = {}
+        for event_type, count in event_types_count:
+            event_types_data[event_type] = count
+
+        return jsonify({
+            "status":False,
+            "message": event_types_data
+        })
+
+    except Exception as e:
+        return jsonify({
+            "status":False,
+            "message": str(e)
+        })
+
+
+
+
 ######################### Security ############################
 
 
@@ -1931,6 +1963,8 @@ def get_event(event_id):
     event = Event.query.get(event_id) 
     
     if event:
+        fav_event_ids = [favorite.event_id for favorite in Favorites.query.filter_by(user_id=user.id).all()]
+        is_favorite = event.id in fav_event_ids
         event_details = {
             "id": event.id,
             "thumbnail": event.thumbnail,
@@ -1949,9 +1983,10 @@ def get_event(event_id):
             "custom event name":event.custom_event_name,
             "longitude":event.longitude,
             "latitude":event.latitude,
-            "guest_capacity":event.guest_capacity
+            "guest_capacity":event.guest_capacity,
+            "favorite":is_favorite
         }
-         # Fetch vendor details
+        # Fetch vendor details
         event_timings = event.event_timing
         print(event_timings)
         if event_timings:
@@ -1993,6 +2028,11 @@ def get_event(event_id):
             "status":False,
             "message":"Event not Found !!"
         })
+
+
+
+
+
 
 # decoding image
 
@@ -2358,12 +2398,17 @@ def home_events():
                 "location_name": event.location_name,  # assuming you have a location_name attribute
                 "fixed_price": event.fixed_price,  # assuming you have a fixed_price attribute
                 "thumbnail": event.thumbnail,  # assuming you have a thumbnail attribute
+                # "favorite":is_favorite,
                 "vendor_details": {
                     "vendor_id": event.vendor.id,
                     "vendor_profile_image": event.vendor.user[0].profile_image,
                 }
             }
             serialized_events.append(serialized_event)
+
+            fav_event_ids = [favorite.event_id for favorite in Favorites.query.filter_by(user_id=user.id).all()]
+            is_favorite = event.id in fav_event_ids
+            serialized_event["favorite"] = is_favorite
 
         prefered_filter = data.get("prefered_filter")
         if prefered_filter:
