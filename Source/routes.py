@@ -34,31 +34,57 @@ load_dotenv()
 ######################### Category ##############################
 
 
-@app.route("/category", methods=["GET"])
+@app.route("/category", methods = ["GET"])
 def category():
     try:
         event_types_count = db.session.query(Event.event_type, func.count(Event.id)).group_by(Event.event_type).all()
-
         if not event_types_count:
             return jsonify({
                 "status":False,
-                "message": "Events not found"
+                "message":"Not found"
             }), 404
-    
-        event_types_data = {}
-        for event_type, count in event_types_count:
-            event_types_data[event_type] = count
+        
+        event_icon_path = os.path.join(app.static_folder, "event_icons")
+        event_icon_file = os.listdir(event_icon_path)
 
+        event_types_data = []
+
+        for event_type , count in event_types_count:
+            image_url = None
+            for filename in event_icon_file:
+                if event_type.lower() in filename.lower():
+                    image_url = url_for("static", filename=f"event_icons/{filename}")
+                    break
+
+            event_type_data = {
+                "name":event_type,
+                "image_url":image_url,
+                "total_count": count
+            }
+            event_types_data.append(event_type_data)
         return jsonify({
-            "status":False,
-            "message": event_types_data
-        })
+            "status":True,
+            "event_categories":event_types_data
+        }), 200
 
     except Exception as e:
         return jsonify({
             "status":False,
-            "message": str(e)
-        })
+            "message":str(e)
+        }), 500
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
