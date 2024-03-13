@@ -505,6 +505,7 @@ class Filterations:
         ]), reverse = True)
         print(len(events_data))
         return filtered_events
+
     @staticmethod
     def apply_filters(events_data, prefered_filter, user_location, max_distance=None):
         if prefered_filter.lower() == "my_location":
