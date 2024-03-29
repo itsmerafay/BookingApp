@@ -441,3 +441,14 @@ class Transaction(db.Model):
         self.trans_id = trans_id  # Correcting the attribute name
         self.transaction_time = transaction_time
         self.transaction_type = transaction_type
+
+
+class Preferences(db.Model):
+    id = db.Column(db.Integer , primary_key = True)
+    user_id = db.Column(db.Integer , db.ForeignKey("user.id"), nullable = False)
+    event_preference = db.Column(db.JSON , nullable = True)
+    vendor_preference = db.Column(db.JSON, nullable = True)
+    guest_count = db.Column(db.Integer ,nullable = True)
+
+    user = db.relationship("User", backref = "preferences")
+

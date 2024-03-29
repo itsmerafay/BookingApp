@@ -6,7 +6,7 @@ from sqlalchemy.orm import joinedload
 from utils import Validations, Ratings, DateTimeConversions, Notificationpush, BookingAvailability, Filterations, Password
 from flask import request, jsonify, url_for, current_app, send_file, send_from_directory
 from datetime import datetime, timedelta
-from model import User, PasswordResetToken, Vendor, Event, Booking , Review, eventtiming, Inquiry, ExtraFacility,Favorites, Transaction, Notification, BookingExtraFacility
+from model import User, PasswordResetToken, Vendor, Event, Booking , Review, eventtiming, Inquiry, ExtraFacility,Favorites, Transaction, Notification, BookingExtraFacility, Preferences         
 import secrets
 from sqlalchemy.exc import IntegrityError
 import uuid
@@ -31,7 +31,59 @@ stripe.api_key = app.config["STRIPE_SECRET_KEY"]
 load_dotenv()
 
 
-######################### Category ##############################
+######################### Set User Preferences ############################
+
+
+@app.route("/set_user_preferences", methods = ["POST","PUT"])
+@jwt_required()
+def set_user_preference():
+    try:
+        data = request.get_json()
+        user = get_current_user()
+
+        if not user:
+            return jsonify({
+                "status":False,
+                "message":"User not authenticated !!"
+            }), 401
+
+        if user.role != "user":
+            return jsonify({
+                "status":False,
+                "message":"Unauthorized access: Only users can set preferences"
+            })
+        
+        user_preference = Preferences.query.filter_by(user_id = user.id).first()
+
+        event_preference = data.get("event_preferences")
+        vendor_preference = data.get("vendor_preferences")
+        guest_count =  data.get("guest_count")
+
+        if not user_preference:
+            user_preference = Preferences(user_id=user.id , event_preference=event_preference, vendor_preference=vendor_preference, guest_count=guest_count)
+            db.session.add(user_preference)
+        else:
+            user_preference.event_preference = event_preference
+            user_preference.vendor_preference = vendor_preference
+            user_preference.guest_count = guest_count
+            
+        db.session.commit()
+
+        return jsonify({
+            "status":True,
+            "message":"User preference set successfully !!"
+        })
+
+    except Exception as e:
+        return jsonify({
+            "status": False,
+            "message": str(e)
+        }), 500
+
+
+
+
+######################### Category ############################# 
 
 
 @app.route("/category", methods = ["GET"])

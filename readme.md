@@ -1,3 +1,6 @@
+3/29/2024 10:30
+~ set user preference -- model + api 
+
 3/11/2024 6:46
 ~ All changes done
 
