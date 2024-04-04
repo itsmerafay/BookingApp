@@ -3029,8 +3029,8 @@ def custom_event_search():
                         "event_rating": Ratings.get_average_rating(event.id),
                         "fixed_price": event.fixed_price,
                         "distance_km": distance,
-                        "address": event.vendor.location,  # Modify as per the actual address field in your model
-                        "location": event.location_name,  # Modify as per the actual field name
+                        "address": event.vendor.location,  
+                        "location": event.location_name,  
                         "favorite": is_favorite,
                         "vendor_details": {
                             "vendor_profile_image": vendor_profile_image,
@@ -3047,13 +3047,10 @@ def custom_event_search():
             "Search results": sorted_results
         })
     else:
-        # If latitude and longitude are not provided, fallback to other search criteria
         results = query.all()
-        # Implement your fallback logic here, e.g., filtering by other criteria
-        # For now, returning all results without filtering
         serialized_results = []
         for event in results:
-            vendor_profile_image = event.vendor.user[0].profile_image  # Assuming only one user for the vendor
+            vendor_profile_image = event.vendor.user[0].profile_image  
 
             serialized_event = {
                 "id": event.id,
@@ -3062,8 +3059,8 @@ def custom_event_search():
                 "rate": event.rate,
                 "event_rating": Ratings.get_average_rating(event.id),
                 "fixed_price": event.fixed_price,
-                "address": event.vendor.location,  # Modify as per the actual address field in your model
-                "location": event.location_name,  # Modify as per the actual field name
+                "address": event.vendor.location,  
+                "location": event.location_name,  
                 "vendor_details": {
                     "vendor_profile_image":vendor_profile_image,
                     "vendor_id": event.vendor.id
