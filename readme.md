@@ -1,3 +1,7 @@
+4/4/2024 2:09
+~ updated custom_event_search for lat and long (with and without) 
+
+
 3/29/2024 10:30
 ~ set user preference -- model + api 
 

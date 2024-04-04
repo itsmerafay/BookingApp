@@ -2873,6 +2873,94 @@ def search_evettttt():
 #         "Search results": serialized_results
 #     })
 
+
+
+# # new 
+# @app.route("/custom_event_search", methods=["POST"])
+# @jwt_required()
+# def custom_event_search():
+#     user = get_current_user()
+#     data = request.get_json()
+#     event_type = data.get("event_type")
+#     location_name = data.get("location_name")
+#     min_price = data.get("min_price")
+#     max_price = data.get("max_price")
+#     start_date = data.get("start_date")
+#     end_date = data.get("end_date")
+#     start_time = data.get("start_time")
+#     end_time = data.get("end_time")
+#     all_day = data.get("all_day")
+#     latitude = data.get("event_latitude")
+#     longitude = data.get("event_longitude")
+#     ratings = data.get("ratings")
+#     query = db.session.query(Event)
+
+#     if event_type:
+#         query = query.filter(func.lower(Event.event_type) == event_type.lower())
+
+#     if location_name:
+#         query = query.filter(or_(Event.location_name.ilike(f"%{location_name}%")))
+
+#     if min_price is not None and max_price is not None:
+#         query = query.filter(Event.rate.between(min_price, max_price))
+#     elif min_price is not None or max_price is not None:
+#         if min_price is not None:
+#             query = query.filter(Event.rate >= min_price)
+#         elif max_price is not None:
+#             query = query.filter(Event.rate <= max_price)
+
+#     if not all_day and start_date and end_date and start_time and end_time:
+#         subquery = db.session.query(Booking.event_id).filter(
+#             (Booking.start_date <= end_date) &
+#             (Booking.end_date >= start_date) &
+#             (Booking.start_time <= end_time) &
+#             (Booking.end_time >= end_time)
+#         ).distinct()
+#         query = query.filter(~Event.id.in_(subquery))
+
+#     results = query.all()
+#     user_location = (latitude, longitude)
+#     serialized_results = []
+
+#     for event in results:
+#         if event.latitude is not None and event.longitude is not None:
+#             event_location = (event.latitude, event.longitude)
+#             distance = geodesic(event_location, user_location).kilometers
+#             if distance <= 5:
+#                 vendor_profile_image = event.vendor.user[0].profile_image  # Assuming only one user for the vendor
+
+#                 fav_event_ids = [favorite.event_id for favorite in Favorites.query.filter_by(user_id=user.id).all()]
+
+#                 is_favorite = event.id in fav_event_ids
+
+#                 serialized_event = {
+#                     "id": event.id,
+#                     "thumbnail": event.thumbnail,
+#                     "event_type": event.event_type,
+#                     "rate": event.rate,
+#                     "event_rating": Ratings.get_average_rating(event.id),
+#                     "fixed_price": event.fixed_price,
+#                     "distance_km": distance,
+#                     "address": event.vendor.location,  # Modify as per the actual address field in your model
+#                     "location": event.location_name,  # Modify as per the actual field name
+#                     "favorite": is_favorite,
+#                     "vendor_details": {
+#                         "vendor_profile_image": vendor_profile_image,
+#                         "vendor_id": event.vendor.id
+#                     }
+#                 }
+#                 serialized_results.append(serialized_event)
+
+#     sorted_results = sorted(serialized_results, key=lambda x: x["event_rating"], reverse=True)
+
+#     return jsonify({
+#         "status": True,
+#         "Search Result Found": f"{len(sorted_results)} vendors found for {location_name} with {ratings} star rating",
+#         "Search results": sorted_results
+#     })
+
+
+
 # new 
 @app.route("/custom_event_search", methods=["POST"])
 @jwt_required()
@@ -2916,46 +3004,82 @@ def custom_event_search():
         ).distinct()
         query = query.filter(~Event.id.in_(subquery))
 
-    results = query.all()
-    user_location = (latitude, longitude)
-    serialized_results = []
+    if latitude is not None and longitude is not None:
+        # If latitude and longitude are provided, prioritize location-based search
+        user_location = (latitude, longitude)
+        results = query.all()
+        serialized_results = []
 
-    for event in results:
-        if event.latitude is not None and event.longitude is not None:
-            event_location = (event.latitude, event.longitude)
-            distance = geodesic(event_location, user_location).kilometers
-            if distance <= 5:
-                vendor_profile_image = event.vendor.user[0].profile_image  # Assuming only one user for the vendor
+        for event in results:
+            if event.latitude is not None and event.longitude is not None:
+                event_location = (event.latitude, event.longitude)
+                distance = geodesic(event_location, user_location).kilometers
+                if distance <= 5:
+                    vendor_profile_image = event.vendor.user[0].profile_image  # Assuming only one user for the vendor
 
-                fav_event_ids = [favorite.event_id for favorite in Favorites.query.filter_by(user_id=user.id).all()]
+                    fav_event_ids = [favorite.event_id for favorite in Favorites.query.filter_by(user_id=user.id).all()]
 
-                is_favorite = event.id in fav_event_ids
+                    is_favorite = event.id in fav_event_ids
 
-                serialized_event = {
-                    "id": event.id,
-                    "thumbnail": event.thumbnail,
-                    "event_type": event.event_type,
-                    "rate": event.rate,
-                    "event_rating": Ratings.get_average_rating(event.id),
-                    "fixed_price": event.fixed_price,
-                    "distance_km": distance,
-                    "address": event.vendor.location,  # Modify as per the actual address field in your model
-                    "location": event.location_name,  # Modify as per the actual field name
-                    "favorite": is_favorite,
-                    "vendor_details": {
-                        "vendor_profile_image": vendor_profile_image,
-                        "vendor_id": event.vendor.id
+                    serialized_event = {
+                        "id": event.id,
+                        "thumbnail": event.thumbnail,
+                        "event_type": event.event_type,
+                        "rate": event.rate,
+                        "event_rating": Ratings.get_average_rating(event.id),
+                        "fixed_price": event.fixed_price,
+                        "distance_km": distance,
+                        "address": event.vendor.location,  # Modify as per the actual address field in your model
+                        "location": event.location_name,  # Modify as per the actual field name
+                        "favorite": is_favorite,
+                        "vendor_details": {
+                            "vendor_profile_image": vendor_profile_image,
+                            "vendor_id": event.vendor.id
+                        }
                     }
+                    serialized_results.append(serialized_event)
+
+        sorted_results = sorted(serialized_results, key=lambda x: x["event_rating"], reverse=True)
+
+        return jsonify({
+            "status": True,
+            "Search Result Found": f"{len(sorted_results)} vendors found for {location_name} with {ratings} star rating",
+            "Search results": sorted_results
+        })
+    else:
+        # If latitude and longitude are not provided, fallback to other search criteria
+        results = query.all()
+        # Implement your fallback logic here, e.g., filtering by other criteria
+        # For now, returning all results without filtering
+        serialized_results = []
+        for event in results:
+            vendor_profile_image = event.vendor.user[0].profile_image  # Assuming only one user for the vendor
+
+            serialized_event = {
+                "id": event.id,
+                "thumbnail": event.thumbnail,
+                "event_type": event.event_type,
+                "rate": event.rate,
+                "event_rating": Ratings.get_average_rating(event.id),
+                "fixed_price": event.fixed_price,
+                "address": event.vendor.location,  # Modify as per the actual address field in your model
+                "location": event.location_name,  # Modify as per the actual field name
+                "vendor_details": {
+                    "vendor_profile_image":vendor_profile_image,
+                    "vendor_id": event.vendor.id
                 }
-                serialized_results.append(serialized_event)
+            }
+            serialized_results.append(serialized_event)
 
-    sorted_results = sorted(serialized_results, key=lambda x: x["event_rating"], reverse=True)
+        sorted_results = sorted(serialized_results, key=lambda x: x["event_rating"], reverse=True)
 
-    return jsonify({
-        "status": True,
-        "Search Result Found": f"{len(sorted_results)} vendors found for {location_name} with {ratings} star rating",
-        "Search results": sorted_results
-    })
+        return jsonify({
+            "status": True,
+            "Search Result Found": f"{len(sorted_results)} vendors found for {location_name} with {ratings} star rating",
+            "Search results": sorted_results
+        })
+
+
 
 
 
