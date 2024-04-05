@@ -1,3 +1,7 @@
+4/5/2024 12:16
+~ Updated features for booking validation
+~ api : create_booking_validate
+
 4/4/2024 2:09
 ~ updated custom_event_search for lat and long (with and without) 
 
