@@ -3710,11 +3710,11 @@ def create_booking_validate():
             "Summary": {
                 "event_hours": "{:.2f} Hours".format(event_hours),
                 "guest_count": str(guest_count),
-                "event_rate": "{}$".format(event.rate),
-                "subtotal": "{}$".format(subtotal),
-                "extra_facility_cost": "{}$".format(extra_facility_cost),
-                "tax": "{}$ (15%)".format(tax_amount),
-                "total_price": "{} $".format(total_price)
+                "event_rate": "{:.2f}$".format(event.rate),
+                "subtotal": "{:.2f}$".format(subtotal),
+                "extra_facility_cost": "{:.2f}$".format(extra_facility_cost),
+                "tax": "{:.2f}$ (15%)".format(tax_amount),
+                "total_price": "{:.2f} $".format(total_price)
             }
         }), 200
 
