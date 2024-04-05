@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 11, 2024 at 12:21 PM
+-- Generation Time: Apr 05, 2024 at 09:19 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -36,7 +36,7 @@ CREATE TABLE `alembic_version` (
 --
 
 INSERT INTO `alembic_version` (`version_num`) VALUES
-('81226e916f7d');
+('c542a3167785');
 
 -- --------------------------------------------------------
 
@@ -135,7 +135,7 @@ INSERT INTO `booking` (`id`, `event_id`, `user_id`, `full_name`, `email`, `guest
 (189, 118, 55, 'Jane Smith', 'jane.smith@example.com', 10, 'Nothing', '2024-02-06', '2024-02-06', '15:00:00', '17:00:00', 0, '2024-01-30 14:44:56', 'Wedding', 0, NULL),
 (212, 123, 55, 'Jane Smith', 'jane.smith@example.com', 52, 'Nothing', '2024-02-07', '2024-02-07', '15:00:00', '17:00:00', 0, '2024-02-20 12:09:12', 'Wedding', 0, NULL),
 (220, 123, 55, 'Jane Smith', 'jane.smith@example.com', 50, '', '2034-02-27', '2034-02-27', '10:00:00', '13:00:00', 0, '2024-03-05 10:02:18', 'Wedding', 0, NULL),
-(221, 124, 55, 'Jane Smith', 'jane.smith@example.com', 50, '', '2034-02-27', '2034-02-27', '10:00:00', '11:00:00', 0, '2024-03-05 10:02:36', 'Wedding', 0, NULL);
+(222, 124, 55, 'Jane Smith', 'jane.smith@example.com', 50, '', '2034-02-27', '2034-02-27', '10:00:00', '11:00:00', 0, '2024-03-13 07:01:56', 'Wedding', 0, NULL);
 
 -- --------------------------------------------------------
 
@@ -193,78 +193,78 @@ CREATE TABLE `event` (
 --
 
 INSERT INTO `event` (`id`, `thumbnail`, `other_images`, `video_showcase`, `address`, `rate`, `fixed_price`, `details`, `facilities`, `description`, `event_type`, `vendor_id`, `services`, `latitude`, `longitude`, `location_name`, `custom_event_name`, `guest_capacity`) VALUES
-(1, '18fabf02-221b-401c-90a6-dc5d012b73ab.png', '[\"9b056398-ec4a-4522-8dce-0b6e4ee650da.png\", \"db1c10fd-e7b9-466a-a5af-0112824c36c6.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 10, 1, 'details', '[\"06ad8829-280d-43b6-9483-1a097ad48e33.png\"]', 'description', 'Birthday', 10, NULL, 24.929, 67.0971, 'Delizia', NULL, NULL),
-(2, 'b0af4b12-aa95-4218-a9a5-13d36579180b.png', '[\"69166b02-97f6-411b-b6f2-bd4e57b520c6.png\", \"cd836160-67b0-4813-beac-b5009264a378.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"4007c72c-be69-4fc9-b41f-6f3882a463f2.png\"]', 'description', 'wedding', 10, NULL, 24.9289, 67.097, 'Pieinthesky', NULL, NULL),
-(3, '629ff76a-073d-45a0-92ff-87610a85cb4e.png', '[\"30efaa63-18fc-4bba-b8a2-41cfe88ccb96.png\", \"53f520a1-e644-42d7-824f-79d1074820df.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 10000, 1, 'details', '[\"3ed2dadc-3829-4f11-86e6-3a41b495e70f.png\"]', 'Birthday', 'Lounge', 10, NULL, 24.9288, 67.0969, 'Kaybees', NULL, NULL),
-(4, '5b49050f-167f-4218-a1f6-6d88580549ec.png', '[\"5214eb22-c75a-42fd-af1a-ed39694fc7b5.png\", \"5b57d947-c14d-486d-8ecd-444715395d3b.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"0b0ae605-cdff-4c74-85de-0635975db9cf.png\"]', 'Its a shop', 'Workshop', 10, NULL, 24.9287, 67.0968, 'Kababjees', NULL, NULL),
-(5, '749e744c-6b1b-4415-9c8c-a0d4a3c8dcd7.png', '[\"009ffe35-818c-4ef3-8c1c-22877797d546.png\", \"1091ac8c-414a-4973-bc50-10357985cc1b.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 1000, 1, 'details', '[\"decf26e4-bfa3-4fc4-8c36-c7de3855677b.png\"]', 'Birthday', 'House', 10, NULL, 24.9286, 67.0967, 'The Bakers', NULL, NULL),
-(6, '45a3259a-6963-488a-9164-23d294c3af28.png', '[\"b05fbba7-d0d7-4a5b-8b9f-e87092493880.png\", \"b8f23972-4a41-45e5-ad0f-927464abd858.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"1b643bb6-3537-4d5c-b220-d1480c1fcca1.png\"]', 'Meeting', 'Bar', 10, NULL, 24.9285, 67.0966, 'Delicacy', NULL, NULL),
-(7, '7a9d4ecf-6861-4ba4-aa04-594c365e9665.png', '[\"4ff2ae06-a1f9-4912-94f8-6ea073961e0f.png\", \"3858aea0-ae4f-48bd-b5d0-a030fa8e5d29.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 1000, 1, 'details', '[\"7cd2599c-0ad7-4bc7-be80-572c602e02a4.png\"]', 'Birthday', 'Restaurant', 10, NULL, 24.9284, 67.0965, 'Delizia', NULL, NULL),
-(8, '7a8ec041-ec14-4885-aee3-7ec282b4f09a.png', '[\"ce7ece10-aa97-418e-b999-0c92ce5f15e0.png\", \"a83681a6-3d58-46a1-8e2e-bd8b11f78b05.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"0b2957d2-fa5d-452e-b022-15b6f216f0b1.png\"]', 'Birthday', 'Wedding', 10, NULL, 24.9283, 67.0964, 'Pieinthesky', NULL, NULL),
-(9, 'ba0f8d0a-bded-429b-8b7b-240bf8bd2c9c.png', '[\"fa3ce8ff-93d6-479c-a8de-64fe2b77928e.png\", \"cb45790d-b17e-40fe-93d9-bfe2daf79759.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"9100c354-957b-43c7-8a16-9fd249b40b69.png\"]', 'Birthday', 'Event Space', 10, NULL, 24.9282, 67.0963, 'The Bakers', NULL, NULL),
-(10, '20b49afa-f623-4a96-af57-587a42ab7aeb.png', '[\"e2eb7bc0-4336-4546-a2b3-644133263bb3.png\", \"4ae0480a-7b73-49cb-836e-d4cc743357ae.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"9197f633-784b-41e3-b75d-51cfea8e2678.png\"]', 'Birthday', 'Wedding', 10, NULL, 24.9281, 67.0962, 'Delicacy', NULL, NULL),
-(11, '1ec67c4f-248c-44e6-9c3c-383e639bbf14.png', '[\"c08d3a06-3be1-4c16-862a-d2025c303098.png\", \"7fa9945c-a061-481b-a648-c6f1d9538223.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100000, 1, 'details', '[\"a6315cab-15a6-4037-865d-48f3bc01ce91.png\"]', 'Birthday', 'Wedding', 10, NULL, 24.928, 67.0961, 'Kababjees', NULL, NULL),
-(12, 'd9613205-0dfc-4b33-afa1-99685d5d632f.png', '[\"d05367b8-0fb1-45af-87f1-84e3f4f55055.png\", \"bf2859fe-d4b3-45b6-b499-cd38f3a2696b.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"85d61838-c292-47e2-9f09-186bbc263a20.png\"]', 'Birthday', 'Studio', 10, NULL, 24.9279, 67.096, 'The sweets', NULL, NULL),
-(13, 'dba59259-f5eb-4ac2-9065-064dfd2b7b00.png', '[\"e04f0374-5263-4e79-be9f-38e66ed6d258.png\", \"b0b83840-172e-4929-a5aa-cae2e82b8e81.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"bfee9161-7a20-4044-910e-78cb002ace5e.png\"]', 'Birthday', 'Wedding1', 6, NULL, 24.9278, 67.0959, 'KFC', NULL, NULL),
-(14, 'cc6245d4-ad5c-4705-bcdd-403e8a5c12e2.png', '[\"d371dc37-3c08-43f3-867b-8af51879ff14.png\", \"d17d4d39-d24c-47ad-b8fb-f339ee9b2277.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"cf0c295a-9444-4f51-a8a4-4087d4f4c9e4.png\"]', 'Testing Birthday', 'Meeting', 11, NULL, 24.9277, 67.0958, 'Mc Donald', NULL, NULL),
-(15, 'a1869d44-adbd-46fa-ba9a-4377a21c8f28.png', '[\"e055ac08-98dc-42bc-af7b-ea06d47cab1f.png\", \"f4e2e5ce-9655-4026-9ba5-9b253c3b13c0.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"2bd0ebe3-9532-4078-a195-9e35b06f47a5.png\"]', 'Testing Birthday', 'Test Wedding', 11, NULL, 24.9276, 67.0957, 'Delizia', NULL, NULL),
-(16, '6416f843-cecf-4928-a582-edd0d89734ba.png', '[\"596984ea-94c5-41ab-bb49-47f65f620e9e.png\", \"9dfd7d0b-0720-47ef-aefc-c7512b4e6294.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"0e4fbc35-34c1-4122-a2f2-2a7f474b288a.png\"]', 'Testing Birthday', 'Test Wedding', 11, 'bn das', 24.9275, 67.0956, 'Kababjees', NULL, NULL),
-(17, '4a91a0bc-8215-4418-a185-0201bcde6f88.png', '[\"e857f928-257a-4919-ace8-a31171a7a35d.png\", \"b468da9b-e5aa-4dd2-ac50-15be0d534083.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"4cde4a15-9d54-447a-880a-c3578f9d478d.png\"]', 'Testing Birthday', 'Test Wedding', 11, 'serepuveicew', 24.9274, 67.0955, 'KFC', NULL, NULL),
-(18, 'a4ee942e-fb7e-4862-a36d-06d550d05ad3.png', '[\"2cd0cc40-c86b-40d7-957a-e9687be0556e.png\", \"bd9c0f25-aa41-4aeb-951c-eac506280ae5.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"957c2666-81ba-4ca8-8954-e2261e1e3dc0.png\"]', 'Testing Birthday', 'Test Wedding', 11, 'servicenas', 24.9273, 67.0955, 'Broadway Pizza', NULL, NULL),
-(19, '92393fa7-5f78-4f00-80c3-5c5b5a6f8f0a.png', '[\"066142a0-27a6-4bd4-a2ab-49c8fe821e29.png\", \"9fae2664-b447-484b-b801-679e57b89654.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"7194f8ba-7ca4-45f5-9c3b-9b7d255556eb.png\"]', 'Testing Birthday', 'Test Wedding', 11, 'n fafhbfkd', 24.9272, 66.954, 'Pizzeria', NULL, NULL),
-(20, '28df872a-7ef8-498a-8d49-a9d9260c7d36.png', '[\"29f33dd7-e16b-4440-986f-6e42c295bf61.png\", \"ba6297f9-de35-493e-858c-30fade31b458.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 10, 1, 'details', '[\"1ae10cb7-e473-4fbb-9e3c-77b54eea7c68.png\"]', 'Testing Birthday', 'Test Wedding', 11, 'nas f sdk', 24.9271, 67.0953, 'Burger o  clock', NULL, NULL),
-(21, 'f1e0a15b-bc89-4258-b36a-f92b5d2c73cf.png', '[\"fa4b5430-af8d-4fc8-b0bc-a2832c3abc49.png\", \"1e52ab04-bdcc-49b4-9b6d-cbaa66345759.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"6b2b535c-1c3c-4630-a039-24e4ce9f9c6a.png\"]', 'Testing Birthday', 'Test Birthday', 11, 'nsjidfb', 24.927, 67.0952, 'Subway', NULL, NULL),
-(22, 'bafa61f0-4dcd-4d73-96dd-19f92e9b13a8.png', '[\"dc8a689e-4cf4-4c08-9a72-c8d1d3bd42db.png\", \"7696a7dc-798d-48c1-aec5-4acffc038cce.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"5c803a90-c387-487b-8d37-f3b81560858d.png\"]', 'Testing Birthday', 'Birthday', 11, 'Wow !!', 24.9268, 67.095, 'Delizia', NULL, NULL),
-(26, 'd7d929e3-48c8-42f6-895c-86f971f9a5e4.png', '[\"92487783-1796-47cd-9a1d-007521fff100.png\", \"1887b593-4d46-4a58-b6f1-454b430c2729.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"30385e1c-c3fb-4b91-8097-1b72f02f0834.png\"]', 'Birthday', 'concert', 6, 'A class service', 24.0123, 67.0123, 'the maze', NULL, NULL),
-(27, '4db7cc10-36e5-4b89-b9e4-d1b19c7b3648.png', '[\"7f4ee5ba-534f-4a8e-815a-55973d41fe79.png\", \"9061c89e-7031-4340-bf22-f66f9f5a57e1.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"2d82d838-acbd-43f0-9874-3a69a209a6ca.png\"]', 'Birthday', 'concert', 6, 'A class service', 24, 67, 'The maze', NULL, NULL),
-(28, '54a2033b-f307-4028-8fa6-a6edea487f73.png', '[\"eafdd5ad-31e6-44d7-9399-92e764e8a403.png\", \"cd731e9c-8ca7-4cb8-b634-f41010666c01.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 10000000, 1, 'details', '[\"4cd0f039-cb39-4042-8b2a-cd722ea54950.png\"]', 'Birthday', 'Birthday', 6, 'A class service', 24.927, 67.0951, 'Delizia', NULL, NULL),
-(31, '57258934-a0f0-4ded-94fe-db0abc7f2639.png', '[\"58697109-9ab4-469e-b687-5d379dadf748.png\", \"0cfe7348-1720-4348-a4e0-65e835a5ea4c.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"4eb19179-aa37-4416-b174-8e3daf6ce66f.png\"]', 'Birthday', 'Testing Birthday', 15, 'A class service', 24.6, 64.2, 'Kababjees Bakers', NULL, NULL),
-(35, 'd9aa7422-40f6-4f09-8da4-f188679e98b9.png', '[\"61f70f88-1019-4f78-9325-8c5d0510944c.png\", \"a66d1336-ed79-46bc-b7d9-7f73d51d7fd9.png\"]', 'base64_encoded_video', 'Sample Address', 1000000, 1, 'Event details...', '[\"4ce57aaf-183c-4e00-993c-bd30f839815d.png\"]', 'Event description...', 'Birthday', 15, 'A class service', 123.456, 78.9, 'Tassaract', NULL, NULL),
-(57, 'b37c97f1-c011-4f4a-84fa-4ad07b329b9c.png', '[\"0fc9501e-bba8-4396-b7f6-9568d80a26fd.png\", \"d3d5a31e-9a4e-41c8-b53c-22f635b96331.png\"]', 'youtube.com', 'Gulshan block 6', 50, 1, 'Event details 123123', '[\"5b2d257a-1702-48c2-95b4-f8d4ea41eaeb.png\", \"dc1ad8e0-fdc0-4a0f-b8c2-6c6582a43d25.png\"]', 'Event description', 'Event Type', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
-(58, '2567eb1b-35e4-4dcd-93ff-6abf00f4fa01.png', '[\"929b5602-7b17-4dcc-aac3-3ded0c70c960.png\", \"51c75bc8-8b3d-470b-9a79-a48034aa5df6.png\"]', 'youtube.com', 'Gulshan block 6', 500, 1, 'Event details 123123', '[\"5616d729-e317-4aa0-968d-3d6692d420fe.png\", \"b260cad2-3726-408c-824e-bb3f0ee60226.png\"]', 'Event description', 'Event Type', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
-(59, '2cf6c14a-f1a5-45f5-9713-14b1c46cc934.png', '[\"adae9f03-dabb-4059-8905-c26561663129.png\", \"c9e1d265-6929-42f8-ba4d-da807957a050.png\"]', 'youtube.com', 'Gulshan block 6', 500, 1, 'Event details 123123', '[\"d188da07-5307-4b48-b208-060f97a00c92.png\", \"32789744-7700-46e0-9372-65e35c847309.png\"]', 'Event description', 'Event Type', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
-(60, 'bc610554-225a-4b03-ae41-4e2aa13192a7.png', '[\"8b0777df-adc7-4b17-a455-93cdf9110fe3.png\", \"130017d8-2492-4779-b3e7-0523397d8fdc.png\"]', 'youtube.com', 'Gulshan block 6', 500, 1, 'Event details 123123', '[\"659ef286-cd03-45bb-91db-38b5ec78a49f.png\", \"0fc1558d-6362-4d59-ac6a-141c526b2742.png\"]', 'Event description', 'Event Type', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
-(61, '5f00fef3-3abf-4a71-9ba7-ff7ef0232ed2.png', '[\"a278eef5-ca3d-4ae5-bdea-0999fc0ffaa3.png\", \"3301ff72-fdba-4394-bcea-1fdf3d2e8be1.png\"]', 'youtube.com', 'Gulshan block 6', 500, 1, 'Event details 123123', '[\"9fa0f89b-3d16-48d3-807c-4c344660f41e.png\", \"686ac33d-914e-46c2-bc82-0eb11834703c.png\"]', 'Event description', 'Event Type', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
-(62, 'ef6be7c1-e869-457b-a56d-be7814144750.png', '[\"304ee178-35c2-489e-bbd7-2967ff138e18.png\", \"a29dd544-1ccb-4ed9-814c-e3b3c3db4fe2.png\"]', 'youtube.com', 'Gulshan block 6', 500, 1, 'Event details 123123', '[\"9b7560d4-c8e8-4c2a-a959-45c6b24d4660.png\", \"e5a35f9e-9539-4f97-8a25-2483d6e0d523.png\"]', 'Event description', 'Event Type', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
-(63, '13a43530-02e6-4a85-9e17-5c7fd5ab9576.png', '[\"a4962fa8-2b5f-4b4d-b070-5078adfe3893.png\", \"f1b94a9b-8927-449a-969a-0592ea62f10f.png\"]', 'youtube.com', 'Gulshan block 6', 500, 1, 'Event details 123123', '[\"35101962-58b1-42a0-8740-be3960e85496.png\", \"bdafa16e-211f-49bf-87ad-fc1628c23549.png\"]', 'Event description', 'Event Type', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
-(64, '16ac297f-b705-48d4-90fe-12f508506e00.png', '[\"772807e1-6d8a-4bde-b14d-7d4c5ed60938.png\", \"33432356-1b1f-49d1-9528-d2851827785b.png\"]', 'youtube.com', 'Gulshan block 6', 500, 1, 'Event details 123123', '[\"903062ae-9c5c-4e54-b520-86fd176a0c3e.png\", \"dc70829b-d986-4e39-a602-55534cb15d68.png\"]', 'Event description', 'Event Type', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
-(65, 'fa91da15-3fdd-4b9f-bf5f-1165a838f1cf.png', '[\"8e3505ba-f33c-438d-8896-2631981802b5.png\", \"b8163bcd-e903-42e2-a115-00e7195c49d8.png\"]', 'youtube.com', 'Gulshan block 6', 500, 1, 'Event details 123123', '[\"f9a47477-9558-44c9-8f10-305f433e593b.png\", \"c9e16b7e-45fd-4c36-9805-29fbffd806fc.png\"]', 'Event description', 'Event Type', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
-(66, 'c5f47585-ca9a-49d5-921b-f8d88a3720f4.png', '[\"eafd8dec-5891-4235-a646-46d5d250bfa4.png\", \"4f1fa2bd-f32d-423a-a64a-1512fdb14521.png\"]', 'youtube.com', 'Gulshan block 6', 500, 1, 'Event details 123123', '[\"76deeb43-0771-47b3-a5bf-cfed6809946f.png\", \"8e8cd11a-35f0-4f4d-a1c4-2a543a77df7e.png\"]', 'Event description', 'Event Type', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
-(67, '5a08084b-66ee-4283-9ed9-e1337b14888b.png', '[\"548287ed-aab1-402c-b329-b6cb6300738e.png\", \"5132b8d0-9c7b-42dc-9ac0-2fd4aa87c8ab.png\"]', 'youtube.com', 'Gulshan block 6', 500, 1, 'Event details 123123', '[\"57f1b4ae-c8bf-4ead-9e08-7bbc59125e2b.png\", \"4b00c6d6-085a-4ada-94eb-d86fb9e42c37.png\"]', 'Event description', 'Event Type', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
-(68, 'ef9e58b9-fee5-473f-a6e8-ff8891a32ff0.png', '[\"ca8e32eb-43de-4a2d-8137-f20f3f823ffd.png\", \"4d4b66fe-b30a-499a-805a-8ca9aa55a6dd.png\"]', 'youtube.com', 'Gulshan block 6', 500, 1, 'Event details 123123', '[\"0dfd141d-1356-4fce-bd55-27514f2193bd.png\", \"46fdb0e0-a9f7-48c9-b95a-2914c72e61f6.png\"]', 'Event description', 'Event Type', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
-(69, '35ff3611-65dd-456a-aca0-ee3912f59e08.png', '[\"81e4010a-97f9-494c-8604-c3f3d8ef3a33.png\", \"35a1ddb4-f12e-43b5-826e-fea1e6a565c4.png\"]', 'youtube.com', 'Gulshan block 6', 500, 1, 'Event details 123123', '[\"b79e486e-8f74-46ee-95c4-4301aa7d31f8.png\", \"68f136ee-8081-4e66-8b12-05aa8bb24df2.png\"]', 'Event description', 'Event Type', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
-(70, '9d017ee3-1abe-4a2b-9d5e-cc67ac7021f2.png', '[\"2067ce7e-8977-42ea-88a8-cb202f720ae1.png\", \"cba83637-4425-4440-9266-4b9b9e3757e7.png\"]', 'youtube.com', 'Gulshan block 6', 500, 1, 'Event details 123123', '[\"f0a6b122-0d44-47b6-9c0a-5e9d8260d2dc.png\", \"124fdbdf-fedd-4822-b6d5-1b8d810ddb64.png\"]', 'Event description', 'Event Type', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
-(71, 'cd9fe236-be55-4171-b0fe-f4b26c8533a8.png', '[\"4f76be94-c983-4732-933a-5eb8a4e4b226.png\", \"16a8a930-6405-423c-8ccc-148981d0afaf.png\"]', 'youtube.com', 'Gulshan block 6', 500, 1, 'Event details 123123', '[\"59c04d5d-e589-408a-a805-74862a1a0ea1.png\", \"284b7bba-aa57-4db9-8ae5-b4088c38d768.png\"]', 'Event description', 'Event Type', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
-(72, 'ff59826c-0ac2-4c0f-97af-88f44317b17d.png', '[\"9741c7e9-4f87-47c3-a555-02cf186ad087.png\", \"8ff955ce-04ff-4fe9-9588-ccb09bddbde8.png\"]', 'youtube.com', 'Gulshan block 6', 500, 1, 'Event details 123123', '[\"c04e601c-68ff-493b-8384-167afb8853c7.png\", \"72bb1dcc-6c34-4d32-adf6-e8e8d7eda953.png\"]', 'Event description', 'Event Type', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
-(73, 'b85515d5-de73-459e-bf4a-a36daf015f14.png', '[\"65a4b7a0-5628-4666-92d7-cef8f038f1bb.png\", \"4c0d3e2f-818f-4bf8-9a27-fcc89557b5a6.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"9d2f159f-227d-4715-950c-b50a0d9bee0b.png\", \"79b93c2d-2c9c-478b-a78a-a5dd9d575430.png\"]', 'Event description', 'Event Type', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
-(74, '281815d8-c9eb-4ca3-bf93-ec1a72a6a62e.png', '[\"2cd9ba04-d0cd-4a53-a186-aa5ffbdd81f1.png\", \"0275eafb-9246-412e-bfec-ad1991adeba0.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"06171d05-d071-4322-ae29-cdfd8efb1478.png\", \"55dd68a4-d318-48a3-82b1-2dd4de83f2c7.png\"]', 'Event description', 'Event Type', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
-(75, '508320a5-5275-4433-a46a-1e10ff9b4c66.png', '[\"11dcf68e-984a-4c02-b9d5-6cde81441b55.png\", \"e415f6fc-3341-46d2-bd65-c02e80d79b7a.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"51f8d573-eba6-4cc1-9419-6c583dc60030.png\", \"761aa657-aa85-4324-b0e7-343881bc7f4f.png\"]', 'Event description', 'Event Type', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
-(76, '19da535f-f3cb-4af2-9eac-3ab2f2e12ce5.png', '[\"17d039ce-7f95-4c79-b1b2-c2d0c5d79270.png\", \"89b2d7ae-3424-417f-ab63-19f03448f6fa.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"0ef1839b-ed06-4dcc-9cae-032e099164f8.png\", \"00ea1ce6-2d3a-44a8-b368-fc9de6b06a5d.png\"]', 'Event description', 'Event Type', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
-(77, 'c4eadc7a-faa7-40bb-8dad-c20624f2b1a3.png', '[\"4e3f623b-1fc8-460c-9640-a0d36ed32e35.png\", \"a8a2941c-8fdb-4ed8-a351-64e9141850a2.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"2885ace8-9201-4722-b63d-1d2514faae62.png\", \"f755d9ee-7951-4a7f-ac46-6e87c43dd8fd.png\"]', 'Event description', 'Event Type', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
-(78, 'f5851b9c-b6ce-47b9-905f-8a25254624ee.png', '[\"559bdc86-4cfc-474b-8711-de3dbcc5bf91.png\", \"2e7baa7e-d100-4d76-8a30-868cc195cf7b.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"e6dd4765-939b-4f45-bf5f-4386383daad4.png\", \"f1c708b9-6f88-4592-9f78-482621d69bc2.png\"]', 'Event description', 'Anything', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
-(79, 'eee89261-0d6a-4972-ab0e-5b9311313fda.png', '[\"e8c9f42a-48fb-42b1-b10d-b16b491bd773.png\", \"67a6dcce-7b87-4b99-868c-157d1d514cef.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"fb344021-d972-45d5-9445-7deb2ab88e4d.png\", \"0e9f5ce9-093f-4d0b-9da7-cc9ce5100c17.png\"]', 'Event description', 'Anything', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
-(80, '2a2277ef-b2fd-4347-a882-d787f5308e38.png', '[\"1bf21bfb-3fbc-49cc-971e-2e84f96b3bb0.png\", \"5743932d-5e09-4fcf-b09a-b00f969467cf.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"0e9f74cc-8bc6-4748-9b77-f7d0890a94be.png\", \"78e4224a-3650-468a-90a8-cb3a8a61df22.png\"]', 'Event description', 'Anything', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
-(81, '67ca1db4-726d-4dd4-8fdb-c1ec44ec1ab0.png', '[\"846223f9-e690-4371-adcf-891a507270f6.png\", \"8813619c-d686-4ead-8b50-b5d07a08a0d1.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"ced6a109-25ed-4e63-9ab5-1926e80bcb0e.png\", \"1a470ce2-fcc5-4d5e-b29c-e8018540cb98.png\"]', 'Event description', 'Anything', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
-(88, 'c6499078-9004-4541-b61e-88405003a0e8.png', '[\"9f234295-00db-437b-9788-917e034700e4.png\", \"8eed25f7-8cbe-4f98-91b5-ec339c49f060.png\"]', 'youtube112312312312.com', 'Gulshan block 1', 500, 1, 'Event details 123123', '[\"09780920-1aef-438e-8467-9b89b2448bda.png\", \"a7496042-6fb1-48d8-97dd-4856a1bdb8b1.png\"]', 'Event description', 'Anything', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
-(89, 'c1936860-691a-4416-9040-2f8dfec2d9ff.png', '[\"ab0fb002-db90-4ff0-b962-24ea0ede90a4.png\", \"e8177fbe-78bb-471a-abb3-cced92004991.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"4df643a8-60b5-4393-ab0d-fc4173a6b209.png\", \"2508ac62-7336-4464-9e32-ea04923499ea.png\"]', 'Event description', 'Anything', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
-(90, 'b519dee5-42a0-4b83-b184-fbe51ece182a.png', '[\"f94a03f2-ec64-42f6-8ce8-b153944855a1.png\", \"1dfe8cb5-3c47-4d98-9199-1d028e753131.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"ebfc5050-96e4-425a-b749-533493caa86a.png\", \"6496f1bf-746a-4705-ac55-840a02a929fa.png\"]', 'Event description', 'Anything', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
-(91, 'eb136ce9-b2b0-496c-8c33-c8ed15a46bb2.png', '[\"b5ec7406-1210-4785-b488-798d5335406e.png\", \"5df3e277-2ebb-4b1b-b76e-cbef5ef34ff4.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"3fe0a1b9-100a-4f91-8173-69a4f3dbb0f2.png\", \"c977f023-7eae-4372-8618-1bec31a92ba9.png\"]', 'Event description', 'Anything', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
-(92, 'f009db8d-f83c-4286-b08f-4502eac0280b.png', '[\"978a0c24-847e-4fdd-bd84-0c73bfef74ae.png\", \"fdd78bfa-84d0-46de-825b-3aa18c9299e2.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"0074fc93-e4e2-4fd3-b3a9-c171307444e2.png\", \"00ec510c-b897-45a5-be38-15f9bbdcf4db.png\"]', 'Event description', 'Anything', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
-(93, '250c8f17-ff39-493e-b5ca-b3faec1bc89a.png', '[\"c143feae-d952-4ad1-85f5-13c727f4c478.png\", \"dbc836ba-cefe-4a26-88a1-b409a3c0febd.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"3a8e6be1-4f6b-4a39-80c7-d8afeceb67c4.png\", \"b6205e84-a619-42a8-8a8b-bd0b32adb30f.png\"]', 'Event description', 'Anything', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
-(94, 'c3c56b61-cb28-43a4-923c-4c32f27e2df1.png', '[\"3f0e3afb-d2ab-4113-8914-9ecef2efe23e.png\", \"a97f287a-fa49-4af9-9186-3176e2f81f9d.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"2c1a1044-7f21-410d-8f36-0c987165e445.png\", \"4bd6d042-b37e-42d6-81cd-cb36f8f00460.png\"]', 'Event description', 'Anything', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
-(95, 'dcfdb331-e3be-4b1f-9cd1-d33c6a6aace1.png', '[\"a33ade92-e523-4274-8f88-0a344aa73a2f.png\", \"3b140c89-db64-4a7b-8751-4316f2dbcee9.png\"]', 'youtube.com', 'Gulshan block 7', 200, 1, 'Event details 123123', '[\"04aacce9-54f7-430e-9d64-2c28654e43b7.png\", \"838b31af-ee6f-4fd4-ade3-50adc1a37f37.png\"]', 'Event description', 'Anything', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
-(96, 'c4434531-e1d3-4b01-ae40-ac734405eaba.png', '[\"5bab3e4b-d8f1-4232-aa1a-75fe3fe2d6ea.png\", \"81bbf65f-c8ee-4794-b85b-fadba3a3bca8.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"1ab0fe80-472f-485e-bf38-456949d06093.png\", \"0b46a00a-df65-4dad-a52c-c65f54ab9016.png\"]', 'Event description', 'Anything', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
-(97, 'f1db03a2-dc6e-4352-8bf5-77da96b4bdf5.png', '[\"268c3a37-108b-4f5c-ad95-f0ed0e686311.png\", \"7b3277aa-c556-4439-aa23-5a652cec9c32.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"fe0eec55-b899-4272-b441-8d57e618e002.png\", \"6c8893d5-c0dc-4e75-89db-bd1fb1173976.png\"]', 'Event description', 'Anything', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
-(98, '7846ea78-8c13-43fd-9673-aa4ebc7a2a16.png', '[\"fbc7112b-cffe-4ce6-af82-e26cb1d1509c.png\", \"d02a28ae-4ac7-4071-96c3-f09624cef4b8.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"a2285dec-9d85-4ba6-aa13-e2fa87a59401.png\", \"e8255571-c2c8-43ad-99ad-30b02922ce48.png\"]', 'Event description', 'Anything', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
-(99, '84226ea2-76e5-4c9c-b4da-5b30bc6a227f.png', '[\"48f8fa7b-4900-462d-9f71-8d1ba2043aca.png\", \"4a4815e0-140b-41e8-91d8-85c9dc2c7705.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"d067bd32-ccfd-4b80-8428-caa6a24ebbac.png\", \"d886d0cf-44d1-490b-a460-993a66e7382f.png\"]', 'Event description', 'Anything', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
-(109, '68c0adfc-d69c-4a3f-af89-5d2780350b08.png', '[\"f2fd9651-b550-4822-a732-dd3952053f87.png\", \"39b84b81-9fbd-4bae-84fa-5a646d54026b.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"d8fdc413-4f1b-4748-b0f8-148c8a888d47.png\", \"be9a7bc6-9f58-47dc-a702-8a7b5a43e34a.png\"]', 'Event description', 'Anything', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
-(118, '33cfeba6-5178-472f-a88c-1c8165e00dd5.png', '[\"88fc8730-c741-4793-9e51-17c24048e6d0.png\", \"59aba01f-dab1-4f83-abb7-9168adc0958a.png\"]', 'base64_encoded_video', '123 Main Street, City...', 50, 1, 'Event details go here', '[\"feff347b-7b7b-420f-acdc-2a1016adddbb.png\", \"7057a55a-f109-4b98-851c-894db5968c45.png\"]', 'Event description goes here', 'Party', 16, 'Service details go here', 40.7128, -74.006, 'Sample Location', NULL, NULL),
-(119, '99723a29-5d99-4ecd-b8a5-9bed7727e013.png', '[\"1cb20e73-7358-4fa1-ae32-3b9b119e5dc1.png\", \"b394fba6-48bf-42d8-a85f-1e37afb12640.png\"]', 'base64_encoded_video', '123 Main Street, City', 50, 1, 'Event details go here', '[\"2b1e517b-aa2d-4080-b3d2-e43937ecc7cb.png\", \"b4699e4b-67a2-47a1-865d-c56a1dc32fdd.png\"]', 'Event description goes here', 'Party', 16, 'Service details go here', 40.7128, -74.006, 'Sample Location', NULL, NULL),
-(120, 'ae4703d0-a9fd-4c00-8ed9-76aeef10f525.png', '[\"73f58d4a-0f85-44ae-9afa-00497f2c3ebf.png\", \"e2c805d7-8415-4020-bdaf-4c4a1765ee9e.png\"]', 'base64_encoded_video', '123 Main Street, City', 50, 1, 'Event details go here', '[\"0af26236-c753-4058-a1f1-b9d980f609ab.png\", \"9452de49-fecd-4be1-b9aa-fc8e9a767965.png\"]', 'Event description goes here', 'Party', 16, 'Service details go here', 40.7128, -74.006, 'Sample Location', NULL, NULL),
-(121, '0d465097-1861-4a8d-ac69-857ca857509a.png', '[\"e5c89fdd-750a-45fb-bd1d-2d994ea30f54.png\", \"62d00178-4980-4616-9314-942299d8ceb0.png\"]', 'base64_encoded_video', '123 Main Street, City', 50, 1, 'Event details go here', '[\"7e66e40a-fc61-46de-9faf-cbd0ebe7b119.png\", \"1648d427-9645-4ad9-bdb2-8e47af25bd82.png\"]', 'Event description goes here', 'Party', 16, 'Service details go here', 40.7128, -74.006, 'Sample Location', NULL, NULL),
-(122, '9e863a4e-5d6b-492e-8fcd-418307bcce8c.png', '[\"bafe97d8-59c1-42f1-8304-30b1a27ea31f.png\", \"cf9c2b05-e182-4a79-a381-c094ecaeb307.png\"]', 'base64_encoded_video', '123 Main Street, City', 50, 1, 'Event details go here', '[\"30af555b-75db-42b8-a5f9-be2be22bc564.png\", \"2c50dff1-d9db-4c42-8368-eba817acd78d.png\"]', 'Event description goes here', 'Party', 16, 'Service details go here', 40.7128, -74.006, 'Sample Location', NULL, NULL),
-(123, '4354fe92-744d-41d9-80af-d4bf2df64c66.png', '[\"d97cafb4-2461-4382-a262-101f9e15dc03.png\", \"08fab056-1295-4c97-826b-0e31d8341765.png\"]', 'base64_encoded_video', '123 Main Street, City', 50, 1, 'Event details go here', '[\"1041ca43-0873-4cc1-8fcf-6003f3be828d.png\", \"6770e0b7-9315-478a-9c45-2025b8c92c94.png\"]', 'Event description goes here', 'Party', 16, 'Service details go here', 40.7128, -74.006, 'Sample Location', 'Something', 50),
-(124, 'fa543f8f-9f8d-49e7-9e32-29d01a7ef73c.png', '[\"4dd27cfd-d894-44db-be3a-b2b8c6f80af8.png\", \"f879035d-f32f-48cd-af2a-76bb8027357f.png\"]', 'base64_encoded_video', '123 Main Street, City', 50, 1, 'Event details go here', '[\"824b51a5-d4bd-4049-81b6-f216fd369477.png\", \"64c3036e-34e8-484c-ba53-45e3a5d1a254.png\"]', 'Event description goes here', 'Party', 16, 'Service details go here', 40.7128, -74.006, 'Sample Location', 'Something', 50);
+(1, '18fabf02-221b-401c-90a6-dc5d012b73ab.png', '[\"9b056398-ec4a-4522-8dce-0b6e4ee650da.png\", \"db1c10fd-e7b9-466a-a5af-0112824c36c6.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 10, 1, 'details', '[\"06ad8829-280d-43b6-9483-1a097ad48e33.png\"]', 'description', 'birthday', 10, NULL, 24.929, 67.0971, 'Delizia', NULL, NULL),
+(2, 'b0af4b12-aa95-4218-a9a5-13d36579180b.png', '[\"69166b02-97f6-411b-b6f2-bd4e57b520c6.png\", \"cd836160-67b0-4813-beac-b5009264a378.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"4007c72c-be69-4fc9-b41f-6f3882a463f2.png\"]', 'description', 'concert', 10, NULL, 24.9289, 67.097, 'Pieinthesky', NULL, NULL),
+(3, '629ff76a-073d-45a0-92ff-87610a85cb4e.png', '[\"30efaa63-18fc-4bba-b8a2-41cfe88ccb96.png\", \"53f520a1-e644-42d7-824f-79d1074820df.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 10000, 1, 'details', '[\"3ed2dadc-3829-4f11-86e6-3a41b495e70f.png\"]', 'Birthday', 'wedding', 10, NULL, 24.9288, 67.0969, 'Kaybees', NULL, NULL),
+(4, '5b49050f-167f-4218-a1f6-6d88580549ec.png', '[\"5214eb22-c75a-42fd-af1a-ed39694fc7b5.png\", \"5b57d947-c14d-486d-8ecd-444715395d3b.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"0b0ae605-cdff-4c74-85de-0635975db9cf.png\"]', 'Its a shop', 'wedding', 10, NULL, 24.9287, 67.0968, 'Kababjees', NULL, NULL),
+(5, '749e744c-6b1b-4415-9c8c-a0d4a3c8dcd7.png', '[\"009ffe35-818c-4ef3-8c1c-22877797d546.png\", \"1091ac8c-414a-4973-bc50-10357985cc1b.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 1000, 1, 'details', '[\"decf26e4-bfa3-4fc4-8c36-c7de3855677b.png\"]', 'Birthday', 'wedding', 10, NULL, 24.9286, 67.0967, 'The Bakers', NULL, NULL),
+(6, '45a3259a-6963-488a-9164-23d294c3af28.png', '[\"b05fbba7-d0d7-4a5b-8b9f-e87092493880.png\", \"b8f23972-4a41-45e5-ad0f-927464abd858.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"1b643bb6-3537-4d5c-b220-d1480c1fcca1.png\"]', 'Meeting', 'wedding', 10, NULL, 24.9285, 67.0966, 'Delicacy', NULL, NULL),
+(7, '7a9d4ecf-6861-4ba4-aa04-594c365e9665.png', '[\"4ff2ae06-a1f9-4912-94f8-6ea073961e0f.png\", \"3858aea0-ae4f-48bd-b5d0-a030fa8e5d29.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 1000, 1, 'details', '[\"7cd2599c-0ad7-4bc7-be80-572c602e02a4.png\"]', 'Birthday', 'wedding', 10, NULL, 24.9284, 67.0965, 'Delizia', NULL, NULL),
+(8, '7a8ec041-ec14-4885-aee3-7ec282b4f09a.png', '[\"ce7ece10-aa97-418e-b999-0c92ce5f15e0.png\", \"a83681a6-3d58-46a1-8e2e-bd8b11f78b05.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"0b2957d2-fa5d-452e-b022-15b6f216f0b1.png\"]', 'Birthday', 'wedding', 10, NULL, 24.9283, 67.0964, 'Pieinthesky', NULL, NULL),
+(9, 'ba0f8d0a-bded-429b-8b7b-240bf8bd2c9c.png', '[\"fa3ce8ff-93d6-479c-a8de-64fe2b77928e.png\", \"cb45790d-b17e-40fe-93d9-bfe2daf79759.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"9100c354-957b-43c7-8a16-9fd249b40b69.png\"]', 'Birthday', 'concert', 10, NULL, 24.9282, 67.0963, 'The Bakers', NULL, NULL),
+(10, '20b49afa-f623-4a96-af57-587a42ab7aeb.png', '[\"e2eb7bc0-4336-4546-a2b3-644133263bb3.png\", \"4ae0480a-7b73-49cb-836e-d4cc743357ae.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"9197f633-784b-41e3-b75d-51cfea8e2678.png\"]', 'Birthday', 'wedding', 10, NULL, 24.9281, 67.0962, 'Delicacy', NULL, NULL),
+(11, '1ec67c4f-248c-44e6-9c3c-383e639bbf14.png', '[\"c08d3a06-3be1-4c16-862a-d2025c303098.png\", \"7fa9945c-a061-481b-a648-c6f1d9538223.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100000, 1, 'details', '[\"a6315cab-15a6-4037-865d-48f3bc01ce91.png\"]', 'Birthday', 'concert', 10, NULL, 24.928, 67.0961, 'Kababjees', NULL, NULL),
+(12, 'd9613205-0dfc-4b33-afa1-99685d5d632f.png', '[\"d05367b8-0fb1-45af-87f1-84e3f4f55055.png\", \"bf2859fe-d4b3-45b6-b499-cd38f3a2696b.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"85d61838-c292-47e2-9f09-186bbc263a20.png\"]', 'Birthday', 'trade shows', 10, NULL, 24.9279, 67.096, 'The sweets', NULL, NULL),
+(13, 'dba59259-f5eb-4ac2-9065-064dfd2b7b00.png', '[\"e04f0374-5263-4e79-be9f-38e66ed6d258.png\", \"b0b83840-172e-4929-a5aa-cae2e82b8e81.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"bfee9161-7a20-4044-910e-78cb002ace5e.png\"]', 'Birthday', 'wedding', 6, NULL, 24.9278, 67.0959, 'KFC', NULL, NULL),
+(14, 'cc6245d4-ad5c-4705-bcdd-403e8a5c12e2.png', '[\"d371dc37-3c08-43f3-867b-8af51879ff14.png\", \"d17d4d39-d24c-47ad-b8fb-f339ee9b2277.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"cf0c295a-9444-4f51-a8a4-4087d4f4c9e4.png\"]', 'Testing Birthday', 'trade shows', 11, NULL, 24.9277, 67.0958, 'Mc Donald', NULL, NULL),
+(15, 'a1869d44-adbd-46fa-ba9a-4377a21c8f28.png', '[\"e055ac08-98dc-42bc-af7b-ea06d47cab1f.png\", \"f4e2e5ce-9655-4026-9ba5-9b253c3b13c0.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"2bd0ebe3-9532-4078-a195-9e35b06f47a5.png\"]', 'Testing Birthday', 'wedding', 11, NULL, 24.9276, 67.0957, 'Delizia', NULL, NULL),
+(16, '6416f843-cecf-4928-a582-edd0d89734ba.png', '[\"596984ea-94c5-41ab-bb49-47f65f620e9e.png\", \"9dfd7d0b-0720-47ef-aefc-c7512b4e6294.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"0e4fbc35-34c1-4122-a2f2-2a7f474b288a.png\"]', 'Testing Birthday', 'trade shows', 11, 'bn das', 24.9275, 67.0956, 'Kababjees', NULL, NULL),
+(17, '4a91a0bc-8215-4418-a185-0201bcde6f88.png', '[\"e857f928-257a-4919-ace8-a31171a7a35d.png\", \"b468da9b-e5aa-4dd2-ac50-15be0d534083.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"4cde4a15-9d54-447a-880a-c3578f9d478d.png\"]', 'Testing Birthday', 'concert', 11, 'serepuveicew', 24.9274, 67.0955, 'KFC', NULL, NULL),
+(18, 'a4ee942e-fb7e-4862-a36d-06d550d05ad3.png', '[\"2cd0cc40-c86b-40d7-957a-e9687be0556e.png\", \"bd9c0f25-aa41-4aeb-951c-eac506280ae5.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"957c2666-81ba-4ca8-8954-e2261e1e3dc0.png\"]', 'Testing Birthday', 'wedding', 11, 'servicenas', 24.9273, 67.0955, 'Broadway Pizza', NULL, NULL),
+(19, '92393fa7-5f78-4f00-80c3-5c5b5a6f8f0a.png', '[\"066142a0-27a6-4bd4-a2ab-49c8fe821e29.png\", \"9fae2664-b447-484b-b801-679e57b89654.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"7194f8ba-7ca4-45f5-9c3b-9b7d255556eb.png\"]', 'Testing Birthday', 'concert', 11, 'n fafhbfkd', 24.9272, 66.954, 'Pizzeria', NULL, NULL),
+(20, '28df872a-7ef8-498a-8d49-a9d9260c7d36.png', '[\"29f33dd7-e16b-4440-986f-6e42c295bf61.png\", \"ba6297f9-de35-493e-858c-30fade31b458.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 10, 1, 'details', '[\"1ae10cb7-e473-4fbb-9e3c-77b54eea7c68.png\"]', 'Testing Birthday', 'trade shows', 11, 'nas f sdk', 24.9271, 67.0953, 'Burger o  clock', NULL, NULL),
+(21, 'f1e0a15b-bc89-4258-b36a-f92b5d2c73cf.png', '[\"fa4b5430-af8d-4fc8-b0bc-a2832c3abc49.png\", \"1e52ab04-bdcc-49b4-9b6d-cbaa66345759.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"6b2b535c-1c3c-4630-a039-24e4ce9f9c6a.png\"]', 'Testing Birthday', 'conferences', 11, 'nsjidfb', 24.927, 67.0952, 'Subway', NULL, NULL),
+(22, 'bafa61f0-4dcd-4d73-96dd-19f92e9b13a8.png', '[\"dc8a689e-4cf4-4c08-9a72-c8d1d3bd42db.png\", \"7696a7dc-798d-48c1-aec5-4acffc038cce.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"5c803a90-c387-487b-8d37-f3b81560858d.png\"]', 'Testing Birthday', 'wedding', 11, 'Wow !!', 24.9268, 67.095, 'Delizia', NULL, NULL),
+(26, 'd7d929e3-48c8-42f6-895c-86f971f9a5e4.png', '[\"92487783-1796-47cd-9a1d-007521fff100.png\", \"1887b593-4d46-4a58-b6f1-454b430c2729.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"30385e1c-c3fb-4b91-8097-1b72f02f0834.png\"]', 'Birthday', 'wedding', 6, 'A class service', 24.0123, 67.0123, 'the maze', NULL, NULL),
+(27, '4db7cc10-36e5-4b89-b9e4-d1b19c7b3648.png', '[\"7f4ee5ba-534f-4a8e-815a-55973d41fe79.png\", \"9061c89e-7031-4340-bf22-f66f9f5a57e1.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"2d82d838-acbd-43f0-9874-3a69a209a6ca.png\"]', 'Birthday', 'wedding', 6, 'A class service', 24, 67, 'The maze', NULL, NULL),
+(28, '54a2033b-f307-4028-8fa6-a6edea487f73.png', '[\"eafdd5ad-31e6-44d7-9399-92e764e8a403.png\", \"cd731e9c-8ca7-4cb8-b634-f41010666c01.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 10000000, 1, 'details', '[\"4cd0f039-cb39-4042-8b2a-cd722ea54950.png\"]', 'Birthday', 'conferences', 6, 'A class service', 24.927, 67.0951, 'Delizia', NULL, NULL),
+(31, '57258934-a0f0-4ded-94fe-db0abc7f2639.png', '[\"58697109-9ab4-469e-b687-5d379dadf748.png\", \"0cfe7348-1720-4348-a4e0-65e835a5ea4c.png\"]', 'Video ssjdnfsdjknsdgjkjsdnetails', 'Vendor Address', 100, 1, 'details', '[\"4eb19179-aa37-4416-b174-8e3daf6ce66f.png\"]', 'Birthday', 'wedding', 15, 'A class service', 24.6, 64.2, 'Kababjees Bakers', NULL, NULL),
+(35, 'd9aa7422-40f6-4f09-8da4-f188679e98b9.png', '[\"61f70f88-1019-4f78-9325-8c5d0510944c.png\", \"a66d1336-ed79-46bc-b7d9-7f73d51d7fd9.png\"]', 'base64_encoded_video', 'Sample Address', 1000000, 1, 'Event details...', '[\"4ce57aaf-183c-4e00-993c-bd30f839815d.png\"]', 'Event description...', 'conferences', 15, 'A class service', 123.456, 78.9, 'Tassaract', NULL, NULL),
+(57, 'b37c97f1-c011-4f4a-84fa-4ad07b329b9c.png', '[\"0fc9501e-bba8-4396-b7f6-9568d80a26fd.png\", \"d3d5a31e-9a4e-41c8-b53c-22f635b96331.png\"]', 'youtube.com', 'Gulshan block 6', 50, 1, 'Event details 123123', '[\"5b2d257a-1702-48c2-95b4-f8d4ea41eaeb.png\", \"dc1ad8e0-fdc0-4a0f-b8c2-6c6582a43d25.png\"]', 'Event description', 'wedding', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
+(58, '2567eb1b-35e4-4dcd-93ff-6abf00f4fa01.png', '[\"929b5602-7b17-4dcc-aac3-3ded0c70c960.png\", \"51c75bc8-8b3d-470b-9a79-a48034aa5df6.png\"]', 'youtube.com', 'Gulshan block 6', 500, 1, 'Event details 123123', '[\"5616d729-e317-4aa0-968d-3d6692d420fe.png\", \"b260cad2-3726-408c-824e-bb3f0ee60226.png\"]', 'Event description', 'wedding', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
+(59, '2cf6c14a-f1a5-45f5-9713-14b1c46cc934.png', '[\"adae9f03-dabb-4059-8905-c26561663129.png\", \"c9e1d265-6929-42f8-ba4d-da807957a050.png\"]', 'youtube.com', 'Gulshan block 6', 500, 1, 'Event details 123123', '[\"d188da07-5307-4b48-b208-060f97a00c92.png\", \"32789744-7700-46e0-9372-65e35c847309.png\"]', 'Event description', 'conferences', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
+(60, 'bc610554-225a-4b03-ae41-4e2aa13192a7.png', '[\"8b0777df-adc7-4b17-a455-93cdf9110fe3.png\", \"130017d8-2492-4779-b3e7-0523397d8fdc.png\"]', 'youtube.com', 'Gulshan block 6', 500, 1, 'Event details 123123', '[\"659ef286-cd03-45bb-91db-38b5ec78a49f.png\", \"0fc1558d-6362-4d59-ac6a-141c526b2742.png\"]', 'Event description', 'conferences', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
+(61, '5f00fef3-3abf-4a71-9ba7-ff7ef0232ed2.png', '[\"a278eef5-ca3d-4ae5-bdea-0999fc0ffaa3.png\", \"3301ff72-fdba-4394-bcea-1fdf3d2e8be1.png\"]', 'youtube.com', 'Gulshan block 6', 500, 1, 'Event details 123123', '[\"9fa0f89b-3d16-48d3-807c-4c344660f41e.png\", \"686ac33d-914e-46c2-bc82-0eb11834703c.png\"]', 'Event description', 'wedding', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
+(62, 'ef6be7c1-e869-457b-a56d-be7814144750.png', '[\"304ee178-35c2-489e-bbd7-2967ff138e18.png\", \"a29dd544-1ccb-4ed9-814c-e3b3c3db4fe2.png\"]', 'youtube.com', 'Gulshan block 6', 500, 1, 'Event details 123123', '[\"9b7560d4-c8e8-4c2a-a959-45c6b24d4660.png\", \"e5a35f9e-9539-4f97-8a25-2483d6e0d523.png\"]', 'Event description', 'networking', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
+(63, '13a43530-02e6-4a85-9e17-5c7fd5ab9576.png', '[\"a4962fa8-2b5f-4b4d-b070-5078adfe3893.png\", \"f1b94a9b-8927-449a-969a-0592ea62f10f.png\"]', 'youtube.com', 'Gulshan block 6', 500, 1, 'Event details 123123', '[\"35101962-58b1-42a0-8740-be3960e85496.png\", \"bdafa16e-211f-49bf-87ad-fc1628c23549.png\"]', 'Event description', 'wedding', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
+(64, '16ac297f-b705-48d4-90fe-12f508506e00.png', '[\"772807e1-6d8a-4bde-b14d-7d4c5ed60938.png\", \"33432356-1b1f-49d1-9528-d2851827785b.png\"]', 'youtube.com', 'Gulshan block 6', 500, 1, 'Event details 123123', '[\"903062ae-9c5c-4e54-b520-86fd176a0c3e.png\", \"dc70829b-d986-4e39-a602-55534cb15d68.png\"]', 'Event description', 'wedding', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
+(65, 'fa91da15-3fdd-4b9f-bf5f-1165a838f1cf.png', '[\"8e3505ba-f33c-438d-8896-2631981802b5.png\", \"b8163bcd-e903-42e2-a115-00e7195c49d8.png\"]', 'youtube.com', 'Gulshan block 6', 500, 1, 'Event details 123123', '[\"f9a47477-9558-44c9-8f10-305f433e593b.png\", \"c9e16b7e-45fd-4c36-9805-29fbffd806fc.png\"]', 'Event description', 'wedding', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
+(66, 'c5f47585-ca9a-49d5-921b-f8d88a3720f4.png', '[\"eafd8dec-5891-4235-a646-46d5d250bfa4.png\", \"4f1fa2bd-f32d-423a-a64a-1512fdb14521.png\"]', 'youtube.com', 'Gulshan block 6', 500, 1, 'Event details 123123', '[\"76deeb43-0771-47b3-a5bf-cfed6809946f.png\", \"8e8cd11a-35f0-4f4d-a1c4-2a543a77df7e.png\"]', 'Event description', 'networking', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
+(67, '5a08084b-66ee-4283-9ed9-e1337b14888b.png', '[\"548287ed-aab1-402c-b329-b6cb6300738e.png\", \"5132b8d0-9c7b-42dc-9ac0-2fd4aa87c8ab.png\"]', 'youtube.com', 'Gulshan block 6', 500, 1, 'Event details 123123', '[\"57f1b4ae-c8bf-4ead-9e08-7bbc59125e2b.png\", \"4b00c6d6-085a-4ada-94eb-d86fb9e42c37.png\"]', 'Event description', 'wedding', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
+(68, 'ef9e58b9-fee5-473f-a6e8-ff8891a32ff0.png', '[\"ca8e32eb-43de-4a2d-8137-f20f3f823ffd.png\", \"4d4b66fe-b30a-499a-805a-8ca9aa55a6dd.png\"]', 'youtube.com', 'Gulshan block 6', 500, 1, 'Event details 123123', '[\"0dfd141d-1356-4fce-bd55-27514f2193bd.png\", \"46fdb0e0-a9f7-48c9-b95a-2914c72e61f6.png\"]', 'Event description', 'wedding', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
+(69, '35ff3611-65dd-456a-aca0-ee3912f59e08.png', '[\"81e4010a-97f9-494c-8604-c3f3d8ef3a33.png\", \"35a1ddb4-f12e-43b5-826e-fea1e6a565c4.png\"]', 'youtube.com', 'Gulshan block 6', 500, 1, 'Event details 123123', '[\"b79e486e-8f74-46ee-95c4-4301aa7d31f8.png\", \"68f136ee-8081-4e66-8b12-05aa8bb24df2.png\"]', 'Event description', 'networking', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
+(70, '9d017ee3-1abe-4a2b-9d5e-cc67ac7021f2.png', '[\"2067ce7e-8977-42ea-88a8-cb202f720ae1.png\", \"cba83637-4425-4440-9266-4b9b9e3757e7.png\"]', 'youtube.com', 'Gulshan block 6', 500, 1, 'Event details 123123', '[\"f0a6b122-0d44-47b6-9c0a-5e9d8260d2dc.png\", \"124fdbdf-fedd-4822-b6d5-1b8d810ddb64.png\"]', 'Event description', 'wedding', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
+(71, 'cd9fe236-be55-4171-b0fe-f4b26c8533a8.png', '[\"4f76be94-c983-4732-933a-5eb8a4e4b226.png\", \"16a8a930-6405-423c-8ccc-148981d0afaf.png\"]', 'youtube.com', 'Gulshan block 6', 500, 1, 'Event details 123123', '[\"59c04d5d-e589-408a-a805-74862a1a0ea1.png\", \"284b7bba-aa57-4db9-8ae5-b4088c38d768.png\"]', 'Event description', 'wedding', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
+(72, 'ff59826c-0ac2-4c0f-97af-88f44317b17d.png', '[\"9741c7e9-4f87-47c3-a555-02cf186ad087.png\", \"8ff955ce-04ff-4fe9-9588-ccb09bddbde8.png\"]', 'youtube.com', 'Gulshan block 6', 500, 1, 'Event details 123123', '[\"c04e601c-68ff-493b-8384-167afb8853c7.png\", \"72bb1dcc-6c34-4d32-adf6-e8e8d7eda953.png\"]', 'Event description', 'networking', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
+(73, 'b85515d5-de73-459e-bf4a-a36daf015f14.png', '[\"65a4b7a0-5628-4666-92d7-cef8f038f1bb.png\", \"4c0d3e2f-818f-4bf8-9a27-fcc89557b5a6.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"9d2f159f-227d-4715-950c-b50a0d9bee0b.png\", \"79b93c2d-2c9c-478b-a78a-a5dd9d575430.png\"]', 'Event description', 'wedding', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
+(74, '281815d8-c9eb-4ca3-bf93-ec1a72a6a62e.png', '[\"2cd9ba04-d0cd-4a53-a186-aa5ffbdd81f1.png\", \"0275eafb-9246-412e-bfec-ad1991adeba0.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"06171d05-d071-4322-ae29-cdfd8efb1478.png\", \"55dd68a4-d318-48a3-82b1-2dd4de83f2c7.png\"]', 'Event description', 'wedding', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
+(75, '508320a5-5275-4433-a46a-1e10ff9b4c66.png', '[\"11dcf68e-984a-4c02-b9d5-6cde81441b55.png\", \"e415f6fc-3341-46d2-bd65-c02e80d79b7a.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"51f8d573-eba6-4cc1-9419-6c583dc60030.png\", \"761aa657-aa85-4324-b0e7-343881bc7f4f.png\"]', 'Event description', 'networking', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
+(76, '19da535f-f3cb-4af2-9eac-3ab2f2e12ce5.png', '[\"17d039ce-7f95-4c79-b1b2-c2d0c5d79270.png\", \"89b2d7ae-3424-417f-ab63-19f03448f6fa.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"0ef1839b-ed06-4dcc-9cae-032e099164f8.png\", \"00ea1ce6-2d3a-44a8-b368-fc9de6b06a5d.png\"]', 'Event description', 'wedding', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
+(77, 'c4eadc7a-faa7-40bb-8dad-c20624f2b1a3.png', '[\"4e3f623b-1fc8-460c-9640-a0d36ed32e35.png\", \"a8a2941c-8fdb-4ed8-a351-64e9141850a2.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"2885ace8-9201-4722-b63d-1d2514faae62.png\", \"f755d9ee-7951-4a7f-ac46-6e87c43dd8fd.png\"]', 'Event description', 'Graduations', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
+(78, 'f5851b9c-b6ce-47b9-905f-8a25254624ee.png', '[\"559bdc86-4cfc-474b-8711-de3dbcc5bf91.png\", \"2e7baa7e-d100-4d76-8a30-868cc195cf7b.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"e6dd4765-939b-4f45-bf5f-4386383daad4.png\", \"f1c708b9-6f88-4592-9f78-482621d69bc2.png\"]', 'Event description', 'wedding', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
+(79, 'eee89261-0d6a-4972-ab0e-5b9311313fda.png', '[\"e8c9f42a-48fb-42b1-b10d-b16b491bd773.png\", \"67a6dcce-7b87-4b99-868c-157d1d514cef.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"fb344021-d972-45d5-9445-7deb2ab88e4d.png\", \"0e9f5ce9-093f-4d0b-9da7-cc9ce5100c17.png\"]', 'Event description', 'wedding', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
+(80, '2a2277ef-b2fd-4347-a882-d787f5308e38.png', '[\"1bf21bfb-3fbc-49cc-971e-2e84f96b3bb0.png\", \"5743932d-5e09-4fcf-b09a-b00f969467cf.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"0e9f74cc-8bc6-4748-9b77-f7d0890a94be.png\", \"78e4224a-3650-468a-90a8-cb3a8a61df22.png\"]', 'Event description', 'Graduations', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
+(81, '67ca1db4-726d-4dd4-8fdb-c1ec44ec1ab0.png', '[\"846223f9-e690-4371-adcf-891a507270f6.png\", \"8813619c-d686-4ead-8b50-b5d07a08a0d1.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"ced6a109-25ed-4e63-9ab5-1926e80bcb0e.png\", \"1a470ce2-fcc5-4d5e-b29c-e8018540cb98.png\"]', 'Event description', 'launches', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
+(88, 'c6499078-9004-4541-b61e-88405003a0e8.png', '[\"9f234295-00db-437b-9788-917e034700e4.png\", \"8eed25f7-8cbe-4f98-91b5-ec339c49f060.png\"]', 'youtube112312312312.com', 'Gulshan block 1', 500, 1, 'Event details 123123', '[\"09780920-1aef-438e-8467-9b89b2448bda.png\", \"a7496042-6fb1-48d8-97dd-4856a1bdb8b1.png\"]', 'Event description', 'Graduations', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
+(89, 'c1936860-691a-4416-9040-2f8dfec2d9ff.png', '[\"ab0fb002-db90-4ff0-b962-24ea0ede90a4.png\", \"e8177fbe-78bb-471a-abb3-cced92004991.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"4df643a8-60b5-4393-ab0d-fc4173a6b209.png\", \"2508ac62-7336-4464-9e32-ea04923499ea.png\"]', 'Event description', 'wedding', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
+(90, 'b519dee5-42a0-4b83-b184-fbe51ece182a.png', '[\"f94a03f2-ec64-42f6-8ce8-b153944855a1.png\", \"1dfe8cb5-3c47-4d98-9199-1d028e753131.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"ebfc5050-96e4-425a-b749-533493caa86a.png\", \"6496f1bf-746a-4705-ac55-840a02a929fa.png\"]', 'Event description', 'wedding', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
+(91, 'eb136ce9-b2b0-496c-8c33-c8ed15a46bb2.png', '[\"b5ec7406-1210-4785-b488-798d5335406e.png\", \"5df3e277-2ebb-4b1b-b76e-cbef5ef34ff4.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"3fe0a1b9-100a-4f91-8173-69a4f3dbb0f2.png\", \"c977f023-7eae-4372-8618-1bec31a92ba9.png\"]', 'Event description', 'launches', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
+(92, 'f009db8d-f83c-4286-b08f-4502eac0280b.png', '[\"978a0c24-847e-4fdd-bd84-0c73bfef74ae.png\", \"fdd78bfa-84d0-46de-825b-3aa18c9299e2.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"0074fc93-e4e2-4fd3-b3a9-c171307444e2.png\", \"00ec510c-b897-45a5-be38-15f9bbdcf4db.png\"]', 'Event description', 'wedding', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
+(93, '250c8f17-ff39-493e-b5ca-b3faec1bc89a.png', '[\"c143feae-d952-4ad1-85f5-13c727f4c478.png\", \"dbc836ba-cefe-4a26-88a1-b409a3c0febd.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"3a8e6be1-4f6b-4a39-80c7-d8afeceb67c4.png\", \"b6205e84-a619-42a8-8a8b-bd0b32adb30f.png\"]', 'Event description', 'wedding', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
+(94, 'c3c56b61-cb28-43a4-923c-4c32f27e2df1.png', '[\"3f0e3afb-d2ab-4113-8914-9ecef2efe23e.png\", \"a97f287a-fa49-4af9-9186-3176e2f81f9d.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"2c1a1044-7f21-410d-8f36-0c987165e445.png\", \"4bd6d042-b37e-42d6-81cd-cb36f8f00460.png\"]', 'Event description', 'wedding', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
+(95, 'dcfdb331-e3be-4b1f-9cd1-d33c6a6aace1.png', '[\"a33ade92-e523-4274-8f88-0a344aa73a2f.png\", \"3b140c89-db64-4a7b-8751-4316f2dbcee9.png\"]', 'youtube.com', 'Gulshan block 7', 200, 1, 'Event details 123123', '[\"04aacce9-54f7-430e-9d64-2c28654e43b7.png\", \"838b31af-ee6f-4fd4-ade3-50adc1a37f37.png\"]', 'Event description', 'wedding', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
+(96, 'c4434531-e1d3-4b01-ae40-ac734405eaba.png', '[\"5bab3e4b-d8f1-4232-aa1a-75fe3fe2d6ea.png\", \"81bbf65f-c8ee-4794-b85b-fadba3a3bca8.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"1ab0fe80-472f-485e-bf38-456949d06093.png\", \"0b46a00a-df65-4dad-a52c-c65f54ab9016.png\"]', 'Event description', 'wedding', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
+(97, 'f1db03a2-dc6e-4352-8bf5-77da96b4bdf5.png', '[\"268c3a37-108b-4f5c-ad95-f0ed0e686311.png\", \"7b3277aa-c556-4439-aa23-5a652cec9c32.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"fe0eec55-b899-4272-b441-8d57e618e002.png\", \"6c8893d5-c0dc-4e75-89db-bd1fb1173976.png\"]', 'Event description', 'launches', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
+(98, '7846ea78-8c13-43fd-9673-aa4ebc7a2a16.png', '[\"fbc7112b-cffe-4ce6-af82-e26cb1d1509c.png\", \"d02a28ae-4ac7-4071-96c3-f09624cef4b8.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"a2285dec-9d85-4ba6-aa13-e2fa87a59401.png\", \"e8255571-c2c8-43ad-99ad-30b02922ce48.png\"]', 'Event description', 'launches', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
+(99, '84226ea2-76e5-4c9c-b4da-5b30bc6a227f.png', '[\"48f8fa7b-4900-462d-9f71-8d1ba2043aca.png\", \"4a4815e0-140b-41e8-91d8-85c9dc2c7705.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"d067bd32-ccfd-4b80-8428-caa6a24ebbac.png\", \"d886d0cf-44d1-490b-a460-993a66e7382f.png\"]', 'Event description', 'birthday', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
+(109, '68c0adfc-d69c-4a3f-af89-5d2780350b08.png', '[\"f2fd9651-b550-4822-a732-dd3952053f87.png\", \"39b84b81-9fbd-4bae-84fa-5a646d54026b.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"d8fdc413-4f1b-4748-b0f8-148c8a888d47.png\", \"be9a7bc6-9f58-47dc-a702-8a7b5a43e34a.png\"]', 'Event description', 'launches', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
+(118, '33cfeba6-5178-472f-a88c-1c8165e00dd5.png', '[\"88fc8730-c741-4793-9e51-17c24048e6d0.png\", \"59aba01f-dab1-4f83-abb7-9168adc0958a.png\"]', 'base64_encoded_video', '123 Main Street, City...', 50, 1, 'Event details go here', '[\"feff347b-7b7b-420f-acdc-2a1016adddbb.png\", \"7057a55a-f109-4b98-851c-894db5968c45.png\"]', 'Event description goes here', 'birthday', 16, 'Service details go here', 40.7128, -74.006, 'Sample Location', NULL, NULL),
+(119, '99723a29-5d99-4ecd-b8a5-9bed7727e013.png', '[\"1cb20e73-7358-4fa1-ae32-3b9b119e5dc1.png\", \"b394fba6-48bf-42d8-a85f-1e37afb12640.png\"]', 'base64_encoded_video', '123 Main Street, City', 50, 1, 'Event details go here', '[\"2b1e517b-aa2d-4080-b3d2-e43937ecc7cb.png\", \"b4699e4b-67a2-47a1-865d-c56a1dc32fdd.png\"]', 'Event description goes here', 'concert', 16, 'Service details go here', 40.7128, -74.006, 'Sample Location', NULL, NULL),
+(120, 'ae4703d0-a9fd-4c00-8ed9-76aeef10f525.png', '[\"73f58d4a-0f85-44ae-9afa-00497f2c3ebf.png\", \"e2c805d7-8415-4020-bdaf-4c4a1765ee9e.png\"]', 'base64_encoded_video', '123 Main Street, City', 50, 1, 'Event details go here', '[\"0af26236-c753-4058-a1f1-b9d980f609ab.png\", \"9452de49-fecd-4be1-b9aa-fc8e9a767965.png\"]', 'Event description goes here', 'wedding', 16, 'Service details go here', 40.7128, -74.006, 'Sample Location', NULL, NULL),
+(121, '0d465097-1861-4a8d-ac69-857ca857509a.png', '[\"e5c89fdd-750a-45fb-bd1d-2d994ea30f54.png\", \"62d00178-4980-4616-9314-942299d8ceb0.png\"]', 'base64_encoded_video', '123 Main Street, City', 50, 1, 'Event details go here', '[\"7e66e40a-fc61-46de-9faf-cbd0ebe7b119.png\", \"1648d427-9645-4ad9-bdb2-8e47af25bd82.png\"]', 'Event description goes here', 'birthday', 16, 'Service details go here', 40.7128, -74.006, 'Sample Location', NULL, NULL),
+(122, '9e863a4e-5d6b-492e-8fcd-418307bcce8c.png', '[\"bafe97d8-59c1-42f1-8304-30b1a27ea31f.png\", \"cf9c2b05-e182-4a79-a381-c094ecaeb307.png\"]', 'base64_encoded_video', '123 Main Street, City', 50, 1, 'Event details go here', '[\"30af555b-75db-42b8-a5f9-be2be22bc564.png\", \"2c50dff1-d9db-4c42-8368-eba817acd78d.png\"]', 'Event description goes here', 'wedding', 16, 'Service details go here', 40.7128, -74.006, 'Sample Location', NULL, NULL),
+(123, '4354fe92-744d-41d9-80af-d4bf2df64c66.png', '[\"d97cafb4-2461-4382-a262-101f9e15dc03.png\", \"08fab056-1295-4c97-826b-0e31d8341765.png\"]', 'base64_encoded_video', '123 Main Street, City', 50, 1, 'Event details go here', '[\"1041ca43-0873-4cc1-8fcf-6003f3be828d.png\", \"6770e0b7-9315-478a-9c45-2025b8c92c94.png\"]', 'Event description goes here', 'wedding', 16, 'Service details go here', 40.7128, -74.006, 'Sample Location', 'Something', 50),
+(124, 'fa543f8f-9f8d-49e7-9e32-29d01a7ef73c.png', '[\"4dd27cfd-d894-44db-be3a-b2b8c6f80af8.png\", \"f879035d-f32f-48cd-af2a-76bb8027357f.png\"]', 'base64_encoded_video', '123 Main Street, City', 50, 1, 'Event details go here', '[\"824b51a5-d4bd-4049-81b6-f216fd369477.png\", \"64c3036e-34e8-484c-ba53-45e3a5d1a254.png\"]', 'Event description goes here', 'wedding', 16, 'Service details go here', 40.7128, -74.006, 'Sample Location', 'Something', 50);
 
 -- --------------------------------------------------------
 
@@ -327,15 +327,15 @@ INSERT INTO `eventtiming` (`id`, `event_id`, `day_of_week`, `start_time`, `end_t
 (73, 80, 'Tuesday', '11:00:00', '19:00:00', 1),
 (74, 81, 'Monday', '10:00:00', '18:00:00', 1),
 (75, 81, 'Tuesday', '11:00:00', '19:00:00', 1),
-(88, 88, 'Monday', '10:00:00', '18:00:00', 1),
-(89, 88, 'Tuesday', '11:00:00', '19:00:00', 1),
-(90, 89, 'Monday', '10:00:00', '18:00:00', 1),
-(91, 89, 'Tuesday', '11:00:00', '19:00:00', 1),
-(92, 89, 'Wednesday', '08:00:00', '23:59:59', 1),
-(93, 89, 'Thursday', '08:00:00', '23:59:59', 1),
-(94, 89, 'Friday', '08:00:00', '23:59:59', 1),
-(95, 89, 'Saturday', '08:00:00', '23:59:59', 1),
-(96, 89, 'Sunday', '08:00:00', '23:59:59', 1),
+(88, 88, 'Monday', '12:00:00', '22:00:00', 1),
+(89, 88, 'Tuesday', '12:00:00', '22:00:00', 1),
+(90, 89, 'Monday', '12:00:00', '22:00:00', 1),
+(91, 89, 'Tuesday', '12:00:00', '22:00:00', 1),
+(92, 89, 'Wednesday', '12:00:00', '22:00:00', 1),
+(93, 89, 'Thursday', '12:00:00', '22:00:00', 1),
+(94, 89, 'Friday', '12:00:00', '22:00:00', 1),
+(95, 89, 'Saturday', '12:00:00', '22:00:00', 1),
+(96, 89, 'Sunday', '12:00:00', '22:00:00', 1),
 (97, 90, 'Monday', '10:00:00', '18:00:00', 1),
 (98, 90, 'Tuesday', '11:00:00', '19:00:00', 1),
 (99, 91, 'Monday', '10:00:00', '18:00:00', 1),
@@ -381,7 +381,12 @@ INSERT INTO `eventtiming` (`id`, `event_id`, `day_of_week`, `start_time`, `end_t
 (157, 124, 'Monday', '10:00:00', '18:00:00', 1),
 (158, 124, 'Tuesday', '09:00:00', '17:00:00', 1),
 (159, 124, 'Wednesday', '10:00:00', '18:00:00', 1),
-(160, 124, 'Thursday', '09:00:00', '17:00:00', 1);
+(160, 124, 'Thursday', '09:00:00', '17:00:00', 1),
+(161, 88, 'Wednesday', '12:00:00', '22:00:00', 1),
+(162, 88, 'Thursday', '12:00:00', '22:00:00', 1),
+(163, 88, 'Friday', '12:00:00', '22:00:00', 1),
+(164, 88, 'Saturday', '12:00:00', '22:00:00', 1),
+(165, 88, 'Sunday', '12:00:00', '22:00:00', 1);
 
 -- --------------------------------------------------------
 
@@ -404,7 +409,7 @@ CREATE TABLE `extra_facility` (
 
 INSERT INTO `extra_facility` (`id`, `name`, `image`, `event_id`, `rate`, `unit`) VALUES
 (5, 'Valet Parking', '[\"9727f52f-8dc4-416a-bc24-a643022e5fd6.png\", \"9b378a69-71ea-41fb-bd36-db159b9b7f31.png\"]', 88, 100, 'hour'),
-(6, 'water bottle', '[\"a5d272fc-2c4f-408e-b5b9-6c574c2ac615.png\", \"e32c8129-de25-4234-a69a-3a42d35f0bc6.png\"]', 88, 200, 'unit'),
+(6, 'water bottle', '[\"a5d272fc-2c4f-408e-b5b9-6c574c2ac615.png\", \"e32c8129-de25-4234-a69a-3a42d35f0bc6.png\"]', 88, 200, 'item'),
 (17, 'art galleries', '[\"61404a80-035d-4873-897d-b1fb1814229b.png\", \"956a2671-cfb9-420c-adcf-d99cceaf0b01.png\"]', 109, 50, 'hour'),
 (18, 'museums', '[\"94da3696-c2b9-42ed-b012-2258117a041b.png\", \"5d255696-ee8a-4397-a8e9-0bcec1870ec1.png\"]', 109, 80, 'hour'),
 (19, 'extra 112', '[\"1554b9e9-8a11-42c5-9ac4-0ee225489060.png\", \"61691640-234a-42b0-8a11-4095a21982d9.png\"]', 118, 100, 'hour'),
@@ -458,8 +463,8 @@ CREATE TABLE `favorites` (
 
 INSERT INTO `favorites` (`id`, `user_id`, `event_id`) VALUES
 (10, 55, 15),
-(11, 55, 8),
-(12, 55, 2);
+(11, 55, 123),
+(12, 55, 8);
 
 -- --------------------------------------------------------
 
@@ -532,6 +537,27 @@ INSERT INTO `password_reset_token` (`id`, `user_id`, `token`, `created_at`, `exp
 (1, 1, 'smZZLThS2TVq_H-CjNMh18Fo3E3JhYAQAsmgd8n7ukI', '2023-10-06 15:32:46', '2023-10-06 16:32:46'),
 (3, 5, 'mVoQS4QG9eABjvKNP1wrda1Nndrm-GiTMShMyp48KgA', '2023-10-06 15:52:04', '2023-10-06 16:52:04'),
 (5, 45, 'KVWt3P5m71K47VOJ7jvB9I87esNMq_QIQqR02x8V5fo', '2023-11-08 10:14:44', '2023-11-08 11:14:44');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `preferences`
+--
+
+CREATE TABLE `preferences` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `event_preference` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`event_preference`)),
+  `vendor_preference` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`vendor_preference`)),
+  `guest_count` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `preferences`
+--
+
+INSERT INTO `preferences` (`id`, `user_id`, `event_preference`, `vendor_preference`, `guest_count`) VALUES
+(1, 55, '[\"concert\", \"trade shows\", \"birthday\", \"wedding\"]', '[\"my_area\", \"top_rated\", \"cheapest\"]', 50);
 
 -- --------------------------------------------------------
 
@@ -688,8 +714,8 @@ INSERT INTO `user` (`id`, `email`, `password_hash`, `access_token`, `role`, `pro
 (51, 'just1.03@gmail.com', '$2b$12$nqXV2GHiaT9DodRwnNoEwe16cAPGh0K5/hy4CMSzPUrOM8f2M9jIG', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwMzIzOTU5MCwianRpIjoiZDliZDI2OGYtMTM3Zi00ZDAzLTk5MzgtMDM0YWExNTY5ZTY5IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6Imp1c3QxLjAzQGdtYWlsLmNvbSIsIm5iZiI6MTcwMzIzOTU5MCwiZXhwIjoxNzAzMjQwNDkwfQ.6YEevXnKorm', 'user', 'ab7ebf3d-c31f-4e69-aff2-f126a22a8578.png', NULL, 0, NULL, NULL, NULL),
 (52, 'abdulrafayatiq@gmail.com.com', '$2b$12$6tmvlYLzyYiZtllws6mCwOHOK/gS3p1xkzyNWA1ZHDHKMJrwtUXBK', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwMTk0ODc1MywianRpIjoiZDY1ZjQxY2UtMzgyZS00NDZjLWJmZDYtYTE0OTk0ZWMxZDhiIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFiZHVscmFmYXlhdGlxQGdtYWlsLmNvbS5jb20iLCJuYmYiOjE3MDE5NDg3NTMsImV4cCI6MTcwMTk0OTY1M3', 'vendor', 'ab7ebf3d-c31f-4e69-aff2-f126a22a8578.png', 14, 0, NULL, NULL, NULL),
 (53, 'justvendor.03@gmail.com', '$2b$12$45f9pZi8ic2dUAErRFN5CuLXd1AEuUkPhgr8f3K6zn6VUZ9aJqhaO', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwMjQ2NzQ1NCwianRpIjoiZTJlNTQ5NTEtODZjZS00MDIxLThkYTAtZjJhNmQ2YjJhOTYzIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6Imp1c3R2ZW5kb3IuMDNAZ21haWwuY29tIiwibmJmIjoxNzAyNDY3NDU0LCJleHAiOjE3MDI0NjgzNTR9.TNPyj', 'vendor', NULL, 15, 0, NULL, NULL, NULL),
-(54, 'abdulrafayatiq123.03@gmail.com', '$2b$12$U4aqywc9wSvbZkoqa/7dc.te5z.YXu00HLeSP4.OnYQ2n38Ls5dRG', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwODU5NzAxOSwianRpIjoiNjJlMTcwYjItZTdmMC00MjMwLTlmZTItZWU5YjkxMDQ5Yjg3IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFiZHVscmFmYXlhdGlxMTIzLjAzQGdtYWlsLmNvbSIsIm5iZiI6MTcwODU5NzAxOSwiZXhwIjoxNzA4NTk3OT', 'vendor', NULL, 16, 0, NULL, NULL, NULL),
-(55, 'abdulrafayatiq123456.03@gmail.com', '$2b$12$09vHC2/suja0qn8kbJ.hmeNJLz9MCkiqOyCwlIn79XnxE7FSMVDAy', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcxMDE1NTM4NCwianRpIjoiN2RiODU0ZjItMjQ4MC00NjkyLWFiNjktMDY5NmJmMzQ4ZjU1IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFiZHVscmFmYXlhdGlxMTIzNDU2LjAzQGdtYWlsLmNvbSIsIm5iZiI6MTcxMDE1NTM4NCwiZXhwIjoxNzEwMTU2Mjg0fQ.3iEmV__qVuacrUFtnvc0FurrWl-fkYj_d5tfRsibx80', 'user', NULL, NULL, 0, NULL, NULL, NULL),
+(54, 'abdulrafayatiq123.03@gmail.com', '$2b$12$U4aqywc9wSvbZkoqa/7dc.te5z.YXu00HLeSP4.OnYQ2n38Ls5dRG', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcxMjIyODMzMiwianRpIjoiZjU1M2ZhZjItNzZlZC00ZjdiLThjYjAtMTI2OTEzNjc1YTJiIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFiZHVscmFmYXlhdGlxMTIzLjAzQGdtYWlsLmNvbSIsIm5iZiI6MTcxMjIyODMzMiwiZXhwIjoxNzEyMjI5MjMyfQ.gNQjduO02IG4rwwjpsXIZRlRosnd5GQc_mMlKufKRtk', 'vendor', NULL, 16, 0, NULL, NULL, NULL),
+(55, 'abdulrafayatiq123456.03@gmail.com', '$2b$12$09vHC2/suja0qn8kbJ.hmeNJLz9MCkiqOyCwlIn79XnxE7FSMVDAy', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcxMjMwMDQ1NywianRpIjoiMGU0ODY1YzEtY2VhZC00YmQzLWE1NDctZDg0NWEwNmIyYzAxIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFiZHVscmFmYXlhdGlxMTIzNDU2LjAzQGdtYWlsLmNvbSIsIm5iZiI6MTcxMjMwMDQ1NywiZXhwIjoxNzEyMzAxMzU3fQ.4emU__NzE100HnJoRA4DxPW0vFvfBLIJcFowW6raeLw', 'user', NULL, NULL, 0, NULL, NULL, NULL),
 (56, 'abdulrafayatiq10.03@gmail.com', '$2b$12$pAcd4u8i/MDQPF.9PE2XBOUV7q1ol8opER87g5UZ45L2gHFUIv8dK', NULL, 'vendor', NULL, 20, 0, '9102', NULL, NULL),
 (57, 'samscoutt.03@gmail.com', '$2b$12$6Rll0VLJ1nFnHzkOZ4P2a..lw9Y9v3QVhKb9gvNKlIzapiVLU.ntS', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwODA4Nzk5OSwianRpIjoiNzkwZjM2YzAtM2MzYi00Y2JhLTkzY2UtZmEzZWNkMDMzNmU1IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6InNhbXNjb3V0dC4wM0BnbWFpbC5jb20iLCJuYmYiOjE3MDgwODc5OTksImV4cCI6MTcwODA4ODg5OX0.UHUlj5', 'vendor', NULL, 21, 0, '3019', NULL, NULL),
 (59, 'abdulrafayatiq123alfnsk.03@gmail.com', '$2b$12$5IfaRl.R4/FsvFGrylyqr.nP1MaqvABV0jjRnhqnSay7vOVPVtN36', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwODYwODk2NywianRpIjoiNjkyMmYyN2QtN2MyMC00MzA5LWIwMTctNDk3OTAyNTZmMDk4IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFiZHVscmFmYXlhdGlxMTIzYWxmbnNrLjAzQGdtYWlsLmNvbSIsIm5iZiI6MTcwODYwODk2NywiZXhwIjoxNzA4NjA5ODY3fQ.OW1lshbYmyMdaaue_48rnozhYWVZBzEKfufwEaoUeGo', 'vendor', NULL, 22, 0, NULL, NULL, NULL),
@@ -725,7 +751,7 @@ INSERT INTO `vendor` (`id`, `full_name`, `phone_number`, `location`, `biography`
 (13, 'Rafay The Vendor', '0900833922', 'Karachi', 'Testing Biography', 0),
 (14, 'Bob The Builder', '090078601', 'Karachi', 'Luxury Wedding Celebration Venue 123124nfsd', 0),
 (15, 'Just Vendor', '1234567890', 'Karachi', 'Just a simple vendor.', 0),
-(16, 'John Doe', '1234567890', 'Some Location', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.', 47498),
+(16, 'John Doe', '1234567890', 'Some Location', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.', 47548),
 (20, '', '', '', '', 0),
 (21, '', '', '', '', 0),
 (22, '', '', '', '', 0),
@@ -810,6 +836,13 @@ ALTER TABLE `password_reset_token`
   ADD KEY `user_id` (`user_id`);
 
 --
+-- Indexes for table `preferences`
+--
+ALTER TABLE `preferences`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
 -- Indexes for table `review`
 --
 ALTER TABLE `review`
@@ -847,13 +880,13 @@ ALTER TABLE `vendor`
 -- AUTO_INCREMENT for table `booking`
 --
 ALTER TABLE `booking`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=222;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=254;
 
 --
 -- AUTO_INCREMENT for table `booking_extra_facility`
 --
 ALTER TABLE `booking_extra_facility`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- AUTO_INCREMENT for table `event`
@@ -865,7 +898,7 @@ ALTER TABLE `event`
 -- AUTO_INCREMENT for table `eventtiming`
 --
 ALTER TABLE `eventtiming`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=161;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=166;
 
 --
 -- AUTO_INCREMENT for table `extra_facility`
@@ -896,6 +929,12 @@ ALTER TABLE `notification`
 --
 ALTER TABLE `password_reset_token`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT for table `preferences`
+--
+ALTER TABLE `preferences`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `review`
@@ -977,6 +1016,12 @@ ALTER TABLE `inquiry`
 --
 ALTER TABLE `password_reset_token`
   ADD CONSTRAINT `password_reset_token_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`);
+
+--
+-- Constraints for table `preferences`
+--
+ALTER TABLE `preferences`
+  ADD CONSTRAINT `preferences_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`);
 
 --
 -- Constraints for table `review`
