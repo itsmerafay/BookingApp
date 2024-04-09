@@ -3646,7 +3646,7 @@ def vendor_events():
 #         }), 500
 
 
-
+# working api
 @app.route('/create_booking_validate', methods=["POST"])
 @jwt_required()
 def create_booking_validate():
