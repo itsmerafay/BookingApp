@@ -1,3 +1,8 @@
+4/9/2024 2:27
+~ Updated problems for parameters and rating issues
+~ api : custom_event_search
+
+
 4/5/2024 12:16
 ~ Updated features for booking validation
 ~ api : create_booking_validate

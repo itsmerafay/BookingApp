@@ -419,6 +419,7 @@ class Ratings:
             return 0
         else:
             return round(float(total_avg_rating), 2)
+        
 class DateTimeConversions:
     @staticmethod
     def convert_to_datetime(date_str, time_str):
