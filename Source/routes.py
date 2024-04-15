@@ -843,7 +843,7 @@ def signin():
     # if not user.verified:
     #     return jsonify({"status":False,"message":"not_verified"})
     # Generate the access token
-    access_token = create_access_token(identity=email)
+    access_token = create_access_token(identity=email, expires_delta=False)
 
     # Update the user's access_token column with the new access token
     user.access_token = access_token
@@ -3646,6 +3646,204 @@ def vendor_events():
 #         }), 500
 
 
+# # working api
+# @app.route('/create_booking_validate', methods=["POST"])
+# @jwt_required()
+# def create_booking_validate():
+#     try:
+#         data = request.get_json()
+#         user = get_current_user()
+
+#         if not user:
+#             return jsonify({
+#                 "status": False,
+#                 "message": "User not authenticated !!"
+#             }), 401
+            
+#         if user.role != "user":
+#             return jsonify({
+#                 "status": False,
+#                 "message": "Unauthorized access: Only users can create bookings."
+#             }), 401
+
+#         full_name = data.get('full_name')
+#         email = data.get('email')
+#         guest_count = data.get('guest_count')
+#         additional_notes = data.get('additional_notes', '')
+#         start_date = data.get('start_date')
+#         end_date = data.get('end_date')
+#         all_day = data.get('all_day')
+#         event_id = data.get('event_id')
+#         event_type = data.get("event_type")
+#         apply_extra_facility_for_complete_event = data.get("apply_extra_facility_for_complete_event", False)
+#         extra_facilities = data.get("extra_facilities", [])
+
+#         desired_day_of_week = datetime.strptime(start_date, "%Y-%m-%d").strftime("%A")
+#         event_timings = eventtiming.query.filter_by(event_id=event_id, day_of_week=desired_day_of_week).first()
+
+#         if not event_timings:
+#             return jsonify({
+#                 "status": False,
+#                 "message": "Event timings not found. Unable to create booking !!"
+#             }), 400
+
+#         if not all([full_name, email, guest_count, start_date, end_date, event_id]):
+#             return jsonify({
+#                 "status": False,
+#                 "message": "All necessary fields must be set !!"
+#             }), 400
+
+#         event = Event.query.filter_by(id=event_id).first()
+
+#         if event.guest_capacity is not None and guest_count is not None:
+#             if guest_count > event.guest_capacity:
+#                 return jsonify({
+#                     "status": False,
+#                     "message": "This event has a maximum capacity of {} guests.".format(event.guest_capacity)
+#                 }), 400
+
+#         start_time = datetime.strptime(data.get("start_time", str(event_timings.start_time)), "%H:%M:%S").time()
+#         end_time = datetime.strptime(data.get("end_time", str(event_timings.end_time)), "%H:%M:%S").time()
+
+#         if start_time >= end_time:
+#             return jsonify({
+#                 "status":False,
+#                 "message":"Invalid Timing (start_time is greater than the end time)"
+#             }), 400
+
+#         if start_time < event_timings.start_time or end_time > event_timings.end_time:
+#             return jsonify({
+#                 "status": False,
+#                 "message": "Booking timings out of range for this day."
+#             }), 400
+
+#         if all_day:
+#             start_time = event_timings.start_time
+#             end_time = event_timings.end_time
+
+#         # Calculate event hours
+#         start_datetime = datetime.combine(datetime.strptime(start_date, "%Y-%m-%d"), start_time)
+#         end_datetime = datetime.combine(datetime.strptime(end_date, "%Y-%m-%d"), end_time)
+#         event_hours = (end_datetime - start_datetime).total_seconds() / 3600  # Convert seconds to hours
+
+#         overlapping_booking = Booking.query.filter(
+#             (Booking.event_id == event_id) &
+#             (Booking.start_date <= start_date) &
+#             (Booking.end_date >= end_date) &
+#             (Booking.start_time <= start_time) &
+#             (Booking.end_time == end_time)
+#         ).first()
+
+#         if overlapping_booking:
+#             return jsonify({
+#                 "status": False,
+#                 "message": "Event is already booked."
+#             }), 400
+
+#         extra_facility_cost = 0
+#         subtotal = event_hours * event.rate
+
+#         if apply_extra_facility_for_complete_event:
+#             for facility in extra_facilities:
+#                 facility_id = facility.get("extra_facility_id")
+#                 if facility_id:
+#                     selected_extra_facility = ExtraFacility.query.filter_by(id=facility_id, event_id=event_id).first()
+
+#                     if selected_extra_facility:
+#                         unit_price_count = facility.get("unit_price_count", 0)
+#                         extra_facility_hours = facility.get("extra_facility_hours", 0)
+#                         if selected_extra_facility.unit == "item":
+#                             extra_facility_cost += unit_price_count * selected_extra_facility.rate
+#                         elif selected_extra_facility.unit == "hour":
+#                             extra_facility_cost += extra_facility_hours * selected_extra_facility.rate
+#                         else:
+#                             return jsonify({
+#                                 "status": False,
+#                                 "message": "Invalid input. This extra facility is not based on hours."
+#                             }), 400
+
+
+#         if event and event_timings.available:
+#             print(event_hours)
+#             booking = Booking(
+#                 user_id=user.id,
+#                 full_name=full_name,
+#                 email=email,
+#                 guest_count=guest_count,
+#                 additional_notes=additional_notes,
+#                 start_date=start_date,
+#                 end_date=end_date,
+#                 start_time=start_time,
+#                 end_time=end_time,
+#                 all_day=all_day,
+#                 event_id=event_id,
+#                 event_type=event_type
+#             )
+#             db.session.add(booking)
+
+#             vendor = Vendor.query.filter_by(id=event.vendor_id).first()
+#             if vendor:
+#                 vendor.wallet += subtotal
+
+#             for facility in extra_facilities:
+#                 facility_id = facility.get("extra_facility_id")
+#                 if facility_id:
+#                     selected_extra_facility = ExtraFacility.query.filter_by(id=facility_id, event_id=event_id).first()
+
+#                     if selected_extra_facility:
+#                         unit_price_count = facility.get("unit_price_count", 0)
+#                         extra_facility_hours = facility.get("extra_facility_hours", 0)
+#                         if selected_extra_facility.unit == "item":
+#                             extra_facility_cost += unit_price_count * selected_extra_facility.rate
+#                         elif selected_extra_facility.unit == "hour":
+#                             extra_facility_cost += extra_facility_hours * selected_extra_facility.rate
+#                         else:
+#                             return jsonify({
+#                                 "status": False,
+#                                 "message": "Invalid input. This extra facility is not based on hours."
+#                             }), 400
+
+#                         booking_extra_facility = BookingExtraFacility(
+#                             booking_id=booking.id,
+#                             unit=selected_extra_facility.unit,
+#                             extra_facility_id=facility_id,
+#                             quantity=unit_price_count if selected_extra_facility.unit == "item" else extra_facility_hours
+#                         )
+#                         db.session.add(booking_extra_facility)
+
+#             tax_percentage = 0.15
+#             print(extra_facility_cost)
+#             subtotal += extra_facility_cost
+#             tax_amount = subtotal * tax_percentage
+#             total_price = subtotal + tax_amount 
+#         else:
+#             return jsonify({
+#                 "status": False,
+#                 "message": "Event is not available for booking on this day."
+#             }), 400
+
+#         return jsonify({
+#             "status": True,
+#             "Summary": {
+#                 "event_hours": "{:.2f} Hours".format(event_hours),
+#                 "guest_count": str(guest_count),
+#                 "event_rate": "{:.2f}$".format(event.rate),
+#                 "subtotal": "{:.2f}$".format(subtotal),
+#                 "extra_facility_cost": "{:.2f}$".format(extra_facility_cost),
+#                 "tax": "{:.2f}$ (15%)".format(tax_amount),
+#                 "total_price": "{:.2f} $".format(total_price)
+#             }
+#         }), 200
+
+#     except Exception as e:
+#         print(e)
+#         return jsonify({
+#             "status": False,
+#             "message": str(e)
+#         }), 500
+
+
+
 # working api
 @app.route('/create_booking_validate', methods=["POST"])
 @jwt_required()
@@ -3825,13 +4023,13 @@ def create_booking_validate():
         return jsonify({
             "status": True,
             "Summary": {
-                "event_hours": "{:.2f} Hours".format(event_hours),
-                "guest_count": str(guest_count),
-                "event_rate": "{:.2f}$".format(event.rate),
-                "subtotal": "{:.2f}$".format(subtotal),
-                "extra_facility_cost": "{:.2f}$".format(extra_facility_cost),
-                "tax": "{:.2f}$ (15%)".format(tax_amount),
-                "total_price": "{:.2f} $".format(total_price)
+                "event_hours": round(event_hours, 2),  # Round event_hours to two decimal places
+                "guest_count": guest_count,
+                "event_rate": round(event.rate, 2),  # Round event.rate to two decimal places
+                "subtotal": round(subtotal, 2),  # Round subtotal to two decimal places
+                "extra_facility_cost": round(extra_facility_cost, 2),  # Round extra_facility_cost to two decimal places
+                "tax": round(tax_amount, 2),  # Round tax_amount to two decimal places
+                "total_price": round(total_price, 2)  # Round total_price to two decimal places
             }
         }), 200
 

@@ -411,6 +411,7 @@ class Validations:
             return jsonify({
                 'message':'There should be atleast one special character in your password'
             })
+
 class Ratings:
     def get_average_rating(event_id):
         total_avg_rating = db.session.query(func.avg(Review.average_rating)).filter(Review.event_id == event_id).scalar()
