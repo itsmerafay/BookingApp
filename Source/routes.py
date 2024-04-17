@@ -1,5 +1,6 @@
 import random
 from sqlalchemy import func, or_
+from datetime import date
 from utils import Validations
 from app import app, db, mail
 from sqlalchemy.orm import joinedload
@@ -419,113 +420,6 @@ def google_login():
 
 
 
-###############################     Route For Create Inquiry     ######################################
-
-
-@app.route("/create_inquiry", methods = ["POST"])
-@jwt_required()
-def create_inquiry():
-    try:
-        data = request.get_json()
-        user = get_current_user()
-
-        if not user:
-            return jsonify({
-                "status":False,
-                "message": "User not authenticated !!"
-            }), 401
-            
-        if user.role != "user":
-            return jsonify({
-                "status": False,
-                "message": "Unauthorized access: Only users can create bookings."
-            }), 401
-
-        event_id = data.get("event_id")
-
-        event = Event.query.filter_by(id = event_id)
-        if not event:
-            return jsonify({
-                "status":False,
-                "message":"Event doesn't exist !!"
-            }), 404
-        
-        new_inquiry = Inquiry(
-            event_id = event_id,
-            user_id = user.id,
-            full_name=data.get("full_name"),
-            email=data.get("email"),
-            guest_count=data.get("guest_count"),
-            additional_notes=data.get("additional_notes"),
-            start_date = data.get("start_date"),
-            end_date = data.get("end_date"),
-            start_time = data.get("start_time"),
-            end_time = data.get("end_time"),
-            all_day = data.get("all_day", False),
-            event_type = data.get("event_type"),
-        )
-        db.session.add(new_inquiry)
-        db.session.commit()
-
-        return jsonify({
-            "status":True,
-            "message":"Successfully submitted the inquiry !!"
-        }), 200
-
-    
-    
-    except Exception as e:
-        return jsonify({
-            "status":False,
-            "message": str(e)
-        }), 500
-
-
-
-
-
-# new
-# for both user and vendor
-# get specific inquiry with inqiry_id for both user and vendor
-@app.route("/get_specific_inquiry/<int:inquiry_id>", methods = ["GET"])
-@jwt_required()
-def get_specific_inquiry(inquiry_id):
-    try:
-        user = get_current_user()
-
-        if not user:
-            return jsonify({
-                "status":False,
-                "message": "User not authenticated !!"
-            }), 401
-            
-        if user.role == "user":
-            inquiry = Inquiry.query.filter_by(user_id = user.id, id = inquiry_id).first()
-
-        elif user.role == "vendor":
-            inquiry = Inquiry.query.join(Event).filter(Event.vendor_id == user.vendor.id , Inquiry.id == inquiry_id).first()
-
-        if not inquiry:
-            return jsonify({
-                "status":False,
-                "message":"Inquiry doesn't exist !!"
-            }), 404
-
-        inquiries_data = inquiry.as_dict()
-        
-        
-        return jsonify({
-            "status":True,
-            "inquiries_data":inquiries_data
-        }), 200
-
-    
-    
-    except Exception as e:
-        return jsonify({
-            "status":False,
-            "message": str(e)
-        }), 500
 
 
 @app.route("/update_event/<int:event_id>", methods = ["PUT"])
@@ -1631,7 +1525,615 @@ def all_reviews():
         return jsonify({"error": "An error occurred while fetching rated reviews."}), 500
 
 
-# new
+##############################    Inquiry      ####################################
+
+# # 1
+# @app.route("/create_inquiry", methods=["POST"])
+# @jwt_required()
+# def create_inquiry():
+#     try:
+#         data = request.get_json()
+#         user = get_current_user()
+
+#         if not user:
+#             return jsonify({
+#                 "status": False,
+#                 "message": "User not authenticated !!"
+#             }), 401
+
+#         if user.role != "user":
+#             return jsonify({
+#                 "status": False,
+#                 "message": "Unauthorized access: Only users can create bookings."
+#             }), 401
+
+#         event_id = data.get("event_id")
+
+#         # Execute the query to get the Event object
+#         event = Event.query.filter_by(id=event_id).first()
+
+#         if not event:
+#             return jsonify({
+#                 "status": False,
+#                 "message": "Event doesn't exist !!"
+#             }), 404
+
+#         new_inquiry = Inquiry(
+#             event_id=event_id,
+#             user_id=user.id,
+#             full_name=data.get("full_name"),
+#             email=data.get("email"),
+#             guest_count=data.get("guest_count"),
+#             additional_notes=data.get("additional_notes"),
+#             start_date=data.get("start_date"),
+#             end_date=data.get("end_date"),
+#             start_time=data.get("start_time"),
+#             end_time=data.get("end_time"),
+#             all_day=data.get("all_day", False),
+#             event_type=data.get("event_type"),
+#         )
+#         db.session.add(new_inquiry)
+#         db.session.commit()
+
+#         return jsonify({
+#             "status": True,
+#             "message": "Successfully submitted the inquiry !!"
+#         }), 200
+
+#     except Exception as e:
+#         return jsonify({
+#             "status": False,
+#             "message": str(e)
+#         }), 500
+
+
+# # 2
+# @app.route("/create_inquiry", methods=["POST"])
+# @jwt_required()
+# def create_inquiry():
+#     try:
+#         data = request.get_json()
+#         user = get_current_user()
+
+#         if not user:
+#             return jsonify({
+#                 "status": False,
+#                 "message": "User not authenticated !!"
+#             }), 401
+
+#         if user.role != "user":
+#             return jsonify({
+#                 "status": False,
+#                 "message": "Unauthorized access: Only users can create inquiries."
+#             }), 401
+
+#         event_id = data.get("event_id")
+#         event = Event.query.get(event_id)
+#         if not event:
+#             return jsonify({
+#                 "status": False,
+#                 "message": "Event doesn't exist !!"
+#             }), 404
+
+#         # Extract extra facilities data from request
+#         extra_facilities = data.get("extra_facilities", [])
+
+#         new_inquiry = Inquiry(
+#             event_id=event_id,
+#             user_id=user.id,
+#             full_name=data.get("full_name"),
+#             email=data.get("email"),
+#             guest_count=data.get("guest_count"),
+#             additional_notes=data.get("additional_notes"),
+#             start_date=data.get("start_date"),
+#             end_date=data.get("end_date"),
+#             start_time=data.get("start_time"),
+#             end_time=data.get("end_time"),
+#             all_day=data.get("all_day", False),
+#             event_type=data.get("event_type"),
+#             extra_facilities=extra_facilities  # Save extra facilities data
+#         )
+#         db.session.add(new_inquiry)
+#         db.session.commit()
+
+#         return jsonify({
+#             "status": True,
+#             "message": "Successfully submitted the inquiry !!"
+#         }), 200
+
+#     except Exception as e:
+#         return jsonify({
+#             "status": False,
+#             "message": str(e)
+#         }), 500
+
+# 3
+@app.route("/create_inquiry", methods=["POST"])
+@jwt_required()
+def create_inquiry():
+    try:
+        data = request.get_json()
+        user = get_current_user()
+
+        if not user:
+            return jsonify({
+                "status": False,
+                "message": "User not authenticated !!"
+            }), 401
+
+        if user.role != "user":
+            return jsonify({
+                "status": False,
+                "message": "Unauthorized access: Only users can create inquiries."
+            }), 403
+
+        event_id = data.get("event_id")
+
+        # Check if the event exists
+        event = Event.query.filter_by(id=event_id).first()
+
+        if not event:
+            return jsonify({
+                "status": False,
+                "message": "Event doesn't exist !!"
+            }), 404
+
+        desired_day_of_week = datetime.strptime(data.get("start_date"), "%Y-%m-%d").strftime("%A")
+        event_timings = eventtiming.query.filter_by(event_id=event_id, day_of_week=desired_day_of_week).first()
+
+        if not event_timings:
+            return jsonify({
+                "status": False,
+                "message": "Event timings not found. Unable to create inquiry !!"
+            }), 400
+        
+        full_name = data.get("full_name")
+        email = data.get("email")
+        guest_capacity = data.get("guest_capacity")
+        start_date = data.get("start_date")
+        end_date = data.get("end_date")
+        start_time = data.get("start_time")
+        end_time = data.get("end_time")
+        all_day = data.get("all_day")
+
+        if not all([full_name, email, guest_capacity, start_date, end_date, event_id]):
+            return jsonify({
+                "status": False,
+                "message": "All necessary fields must be set !!"
+            }), 400
+
+        # If it's not an all-day event, check start_time and end_time
+        if not all_day and not all([start_time, end_time]):
+            return jsonify({
+                "status": False,
+                "message": "All necessary fields must be set !!"
+            }), 400
+
+        if event.guest_capacity is not None:
+            if guest_capacity > event.guest_capacity:
+                return jsonify({
+                    "status": False,
+                    "message": "Guest count exceeds the maximum capacity ({}) for this event.".format(event.guest_capacity)
+                }), 400
+
+        if not event_timings.available:
+            return jsonify({
+                "status": False,
+                "message": "Event is not available at the specified time !!"
+            }), 400
+
+        # Check if the event is already booked
+        overlapping_booking = Booking.query.filter(
+            (Booking.event_id == event_id) &
+            (Booking.start_date <= end_date) &  
+            (Booking.end_date >= start_date) &  
+            (Booking.start_time < end_time) &   
+            (Booking.end_time > start_time)     
+        ).first()
+
+        if overlapping_booking:
+            return jsonify({
+                "status": False,
+                "message": "Event is already booked for the specified time period !!"
+            }), 400
+
+        new_inquiry = Inquiry(
+            event_id=event_id,
+            user_id=user.id,
+            full_name=full_name,
+            email=email,
+            guest_count=guest_capacity,
+            additional_notes=data.get("additional_notes"),
+            start_date=start_date,
+            end_date=end_date,
+            start_time=start_time,
+            end_time=end_time,
+            all_day=data.get("all_day", False),
+            event_type=data.get("event_type"),
+        )
+        db.session.add(new_inquiry)
+        db.session.commit()
+
+        return jsonify({
+            "status": True,
+            "message": "Successfully submitted the inquiry !!"
+        }), 200
+
+    except Exception as e:
+        return jsonify({
+            "status": False,
+            "message": str(e)
+        }), 500
+
+
+
+
+
+
+
+
+# # new
+# # for both user and vendor
+# # get specific inquiry with inqiry_id for both user and vendor
+# @app.route("/get_specific_inquiry/<int:inquiry_id>", methods = ["GET"])
+# @jwt_required()
+# def get_specific_inquiry(inquiry_id):
+#     try:
+#         user = get_current_user()
+
+#         if not user:
+#             return jsonify({
+#                 "status":False,
+#                 "message": "User not authenticated !!"
+#             }), 401
+            
+#         if user.role == "user":
+#             inquiry = Inquiry.query.filter_by(user_id = user.id, id = inquiry_id).first()
+
+#         elif user.role == "vendor":
+#             inquiry = Inquiry.query.join(Event).filter(Event.vendor_id == user.vendor.id , Inquiry.id == inquiry_id).first()
+
+#         if not inquiry:
+#             return jsonify({
+#                 "status":False,
+#                 "message":"Inquiry doesn't exist !!"
+#             }), 404
+
+#         inquiries_data = inquiry.as_dict()
+        
+        
+#         return jsonify({
+#             "status":True,
+#             "inquiries_data":inquiries_data
+#         }), 200
+
+    
+    
+#     except Exception as e:
+#         return jsonify({
+#             "status":False,
+#             "message": str(e)
+#         }), 500
+
+
+# # new
+# # for both user and vendor
+# # get specific inquiry with inquiry_id for both user and vendor
+# @app.route("/get_specific_inquiry/<int:inquiry_id>", methods=["GET"])
+# @jwt_required()
+# def get_specific_inquiry(inquiry_id):
+#     try:
+#         user = get_current_user()
+
+#         if not user:
+#             return jsonify({
+#                 "status": False,
+#                 "message": "User not authenticated !!"
+#             }), 401
+
+#         if user.role == "user":
+#             inquiry = Inquiry.query.filter_by(user_id=user.id, id=inquiry_id).first()
+
+#         elif user.role == "vendor":
+#             inquiry = Inquiry.query.join(Event).filter(Event.vendor_id == user.vendor.id, Inquiry.id == inquiry_id).first()
+
+#         if not inquiry:
+#             return jsonify({
+#                 "status": False,
+#                 "message": "Inquiry doesn't exist !!"
+#             }), 404
+
+#         inquiries_data = inquiry.as_dict()
+
+#         # Calculate Summary
+#         event_id = inquiries_data.get("event_id")
+#         event = Event.query.filter_by(id=event_id).first()
+
+#         if not event:
+#             return jsonify({
+#                 "status": False,
+#                 "message": "Event associated with the inquiry not found !!"
+#             }), 404
+        
+#         start_time = inquiries_data.get("start_time")
+#         end_time = inquiries_data.get("end_time")
+#         start_datetime = datetime.strptime(start_time, "%H:%M:%S")
+#         end_datetime = datetime.strptime(end_time, "%H:%M:%S")
+#         booking_duration_hours = round((end_datetime - start_datetime).total_seconds() / 3600, 2)
+
+#         subtotal = round(booking_duration_hours * event.rate, 2)
+
+#         # Calculate extra facility cost if any
+#         extra_facilities = inquiries_data.get("extra_facilities", [])
+#         extra_facility_cost = sum(facility.get("unit_price_count", 0) * facility.get("rate", 0) for facility in extra_facilities)
+
+#         # Calculate tax
+#         tax_percentage = 0.15
+#         tax_amount = round(subtotal * tax_percentage, 2)
+
+#         # Calculate total price
+#         total_price = round(subtotal + tax_amount, 2)
+
+#         summary = {
+#             "event_hours": booking_duration_hours,
+#             "guest_count": inquiries_data.get("guest_count"),
+#             "event_rate": event.rate,
+#             "subtotal": subtotal,
+#             "extra_facility_cost": extra_facility_cost,
+#             "tax": tax_amount,
+#             "total_price": total_price
+#         }
+
+#         return jsonify({
+#             "status": True,
+#             "inquiries_data": inquiries_data,
+#             "Summary": summary
+#         }), 200
+
+#     except Exception as e:
+#         return jsonify({
+#             "status": False,
+#             "message": str(e)
+#         }), 500
+
+
+# # new
+# # for both user and vendor
+# # get specific inquiry with inquiry_id for both user and vendor
+# @app.route("/get_specific_inquiry/<int:inquiry_id>", methods=["GET"])
+# @jwt_required()
+# def get_specific_inquiry(inquiry_id):
+#     try:
+#         user = get_current_user()
+
+#         if not user:
+#             return jsonify({
+#                 "status": False,
+#                 "message": "User not authenticated !!"
+#             }), 401
+
+#         if user.role == "user":
+#             inquiry = Inquiry.query.filter_by(user_id=user.id, id=inquiry_id).first()
+
+#         elif user.role == "vendor":
+#             inquiry = Inquiry.query.join(Event).filter(Event.vendor_id == user.vendor.id, Inquiry.id == inquiry_id).first()
+
+#         if not inquiry:
+#             return jsonify({
+#                 "status": False,
+#                 "message": "Inquiry doesn't exist !!"
+#             }), 404
+
+#         inquiries_data = inquiry.as_dict()
+
+#         # Calculate Summary
+#         event_id = inquiries_data.get("event_id")
+#         event = Event.query.filter_by(id=event_id).first()
+
+#         if not event:
+#             return jsonify({
+#                 "status": False,
+#                 "message": "Event associated with the inquiry not found !!"
+#             }), 404
+
+#         start_time = inquiries_data.get("start_time")
+#         end_time = inquiries_data.get("end_time")
+
+#         # Parse time string to datetime.time objects
+#         start_time_obj = datetime.strptime(start_time, "%H:%M:%S").time()
+#         end_time_obj = datetime.strptime(end_time, "%H:%M:%S").time()
+
+#         # Ensure end time is greater than start time
+#         if start_time_obj >= end_time_obj:
+#             return jsonify({
+#                 "status": False,
+#                 "message": "Invalid Timing (start_time is greater than or equal to the end time)"
+#             }), 400
+
+#         # Calculate event hours
+#         start_datetime = datetime.combine(datetime.today(), start_time_obj)
+#         end_datetime = datetime.combine(datetime.today(), end_time_obj)
+
+#         booking_duration_hours = (end_datetime - start_datetime).total_seconds() / 3600
+#         extra_facilities = inquiries_data.get("extra_facilities", [])
+#         extra_facility_cost = 0
+
+#         for facility in extra_facilities:
+#             facility_id = facility.get("extra_facility_id")
+
+#             if facility_id:
+#                 selected_extra_facility = ExtraFacility.query.filter_by(id=facility_id, event_id=event_id).first()
+
+#                 if selected_extra_facility:
+#                     unit_price_count = facility.get("unit_price_count")
+#                     extra_facility_hours = facility.get("extra_facility_hours")
+#                     apply_extra_facility_for_complete_event = facility.get("apply_extra_facility_for_complete_event")
+
+#                     if unit_price_count is not None:
+#                         if selected_extra_facility.unit == "unit":
+#                             extra_facility_cost += unit_price_count * selected_extra_facility.rate
+
+#                     elif extra_facility_hours is not None:
+#                         if selected_extra_facility.unit == "hour":
+#                             extra_facility_cost += extra_facility_hours * selected_extra_facility.rate
+
+#                     elif apply_extra_facility_for_complete_event:
+#                         extra_facility_cost += selected_extra_facility.rate * booking_duration_hours
+
+#                 else:
+#                     return jsonify({
+#                         "status": False,
+#                         "message": "Invalid input. Selected extra facility is not available for the specified event."
+#                     }), 400
+
+#         subtotal = booking_duration_hours * event.rate
+#         subtotal += extra_facility_cost
+
+#         tax_percentage = 0.15
+#         tax_amount = round(subtotal * tax_percentage, 2)
+
+#         total_price = round(subtotal + tax_amount, 2)
+
+#         summary = {
+#             "event_hours": round(booking_duration_hours, 2),  # Round event_hours to two decimal places
+#             "guest_count": inquiries_data.get("guest_count"),
+#             "event_rate": round(event.rate, 2),  # Round event.rate to two decimal places
+#             "subtotal": round(subtotal, 2),  # Round subtotal to two decimal places
+#             "extra_facility_cost": round(extra_facility_cost, 2),  # Round extra_facility_cost to two decimal places
+#             "tax": round(tax_amount, 2),  # Round tax_amount to two decimal places
+#             "total_price": round(total_price, 2)  # Round total_price to two decimal places
+#         }
+
+
+#         return jsonify({
+#             "status": True,
+#             "inquiries_data": inquiries_data,
+#             "Summary": summary
+#         }), 200
+
+#     except Exception as e:
+#         return jsonify({
+#             "status": False,
+#             "message": str(e)
+#         }), 500
+
+
+
+# API route for getting a specific inquiry
+@app.route("/get_specific_inquiry/<int:inquiry_id>", methods=["GET"])
+@jwt_required()
+def get_specific_inquiry(inquiry_id):
+    try:
+        # Get the current user
+        user = get_current_user()
+
+        # Check if the user is authenticated
+        if not user:
+            return jsonify({
+                "status": False,
+                "message": "User not authenticated !!"
+            }), 401
+
+        # Query the inquiry based on the user's role
+        if user.role == "user":
+            inquiry = Inquiry.query.filter_by(user_id=user.id, id=inquiry_id).first()
+        elif user.role == "vendor":
+            inquiry = Inquiry.query.join(Event).filter(Event.vendor_id == user.vendor.id, Inquiry.id == inquiry_id).first()
+
+        # Check if the inquiry exists
+        if not inquiry:
+            return jsonify({
+                "status": False,
+                "message": "Inquiry doesn't exist !!"
+            }), 404
+
+        # Convert inquiry data to dictionary
+        inquiries_data = inquiry.as_dict()
+
+        # Calculate Summary
+        event_id = inquiries_data.get("event_id")
+        event = Event.query.filter_by(id=event_id).first()
+
+        # Check if the event associated with the inquiry exists
+        if not event:
+            return jsonify({
+                "status": False,
+                "message": "Event associated with the inquiry not found !!"
+            }), 404
+                
+        # Calculate booking duration in hours
+        start_time = inquiries_data.get("start_time")
+        end_time = inquiries_data.get("end_time")
+        start_datetime = datetime.strptime(start_time, "%H:%M:%S").time()
+        end_datetime = datetime.strptime(end_time, "%H:%M:%S").time()
+        booking_duration_hours = (datetime.combine(date.today(), end_datetime) - datetime.combine(date.today(), start_datetime)).total_seconds() / 3600
+
+        # Calculate subtotal
+        subtotal = booking_duration_hours * event.rate
+
+        # Calculate extra facility cost
+        extra_facility_cost = 0
+        for facility in inquiries_data.get("extra_facilities", []):
+            facility_id = facility.get("extra_facility_id")
+            quantity = facility.get("unit_price_count", 0)  # Default to 0 if not specified
+
+            if "unit_price_count" in facility:
+                quantity = facility["unit_price_count"]
+            elif "extra_facility_hours" in facility:
+                quantity = facility["extra_facility_hours"]
+
+            if facility_id:
+                selected_extra_facility = ExtraFacility.query.filter_by(id=facility_id, event_id=event_id).first()
+
+                if selected_extra_facility:
+                    # Calculate the cost based on the quantity of the extra facility
+                    extra_facility_cost += quantity * selected_extra_facility.rate
+                else:
+                    return jsonify({
+                        "status": False,
+                        "message": "Invalid input. Selected extra facility is not available for the specified event."
+                    }), 400
+
+        # Calculate tax amount
+        subtotal += extra_facility_cost  # Include extra facility cost in subtotal
+        tax_percentage = 0.15
+        tax_amount = round(subtotal * tax_percentage, 2)
+
+        # Calculate total price
+        total_price = round(subtotal + tax_amount, 2)
+
+        # Prepare summary dictionary
+        summary = {
+            "event_hours": round(booking_duration_hours, 2),
+            "guest_count": inquiries_data.get("guest_count"),
+            "event_rate": round(event.rate, 2),
+            "subtotal": round(subtotal, 2),
+            "extra_facility_cost": round(extra_facility_cost, 2),
+            "tax": round(tax_amount, 2),
+            "total_price": round(total_price, 2)
+        }
+
+        # Return the response
+        return jsonify({
+            "status": True,
+            "inquiries_data": inquiries_data,
+            "Summary": summary
+        }), 200
+
+    except Exception as e:
+        return jsonify({
+            "status": False,
+            "message": str(e)
+        }), 500
+
+
+
+
+
+
+
+
+# # new
 # for vendor
 # get all_inquiries for vendor irrespective of the event_id or inq.id
 @app.route("/get_all_my_inquiries_vendor", methods = ["GET"])
@@ -1674,6 +2176,7 @@ def get_all_my_inquiries():
             "status":False,
             "message": str(e)
         }), 500
+
 
 # for user
 @app.route("/get_all_my_inquiries_user", methods = ["GET"])
@@ -1722,8 +2225,8 @@ def get_all_my_inquiries_user():
 
 
 
+
 # for vendor getting specifc inquiries for events
-    
 @app.route("/get_my_inquiry_vendor/<int:event_id>", methods = ["GET"])
 @jwt_required()
 def get_my_inquiry_vendor(event_id):
@@ -1770,6 +2273,19 @@ def get_my_inquiry_vendor(event_id):
             "status":False,
             "message": str(e)
         }), 500
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 @app.route('/all_reviewssss', methods=["GET"])
 @jwt_required()
@@ -3866,7 +4382,7 @@ def create_booking_validate():
 
         full_name = data.get('full_name')
         email = data.get('email')
-        guest_count = data.get('guest_count')
+        guest_count = data.get('guest_capacity')
         additional_notes = data.get('additional_notes', '')
         start_date = data.get('start_date')
         end_date = data.get('end_date')
@@ -4284,6 +4800,221 @@ def create_booking_validate():
 
 
 
+# # currently working 
+# @app.route('/create_booking', methods=["POST"])
+# @jwt_required()
+# def create_booking():
+#     try:
+#         data = request.get_json()
+#         user = get_current_user()
+
+#         if not user:
+#             return jsonify({
+#                 "status": False,
+#                 "message": "User not authenticated !!"
+#             }), 401
+
+#         if user.role != "user":
+#             return jsonify({
+#                 "status": False,
+#                 "message": "Unauthorized access: Only users can create bookings."
+#             }), 403
+
+#         full_name = data.get('full_name')
+#         email = data.get('email')
+#         guest_count = data.get('guest_count')
+#         additional_notes = data.get('additional_notes', '')
+#         start_date = data.get('start_date')
+#         end_date = data.get('end_date')
+#         all_day = data.get('all_day')
+#         event_id = data.get('event_id')
+#         event_type = data.get("event_type")
+#         apply_extra_facility_for_complete_event = data.get("apply_extra_facility_for_complete_event", False)
+#         extra_facilities = data.get("extra_facilities", [])
+
+#         desired_day_of_week = datetime.strptime(start_date, "%Y-%m-%d").strftime("%A")
+#         event_timings = eventtiming.query.filter_by(event_id=event_id, day_of_week=desired_day_of_week).first()
+
+#         if not event_timings:
+#             return jsonify({
+#                 "status": False,
+#                 "message": "Event timings not found. Unable to create booking !!"
+#             }), 400
+
+#         if not all([full_name, email, guest_count, start_date, end_date, event_id, event_type]):
+#             return jsonify({
+#                 "status": False,
+#                 "message": "All necessary fields must be set !!"
+#             }), 400
+
+#         event = Event.query.filter_by(id=event_id).first()
+#         if event.guest_capacity is not None and guest_count > event.guest_capacity:
+#             return jsonify({
+#                 "status": False,
+#                 "message": f"Guest count exceeds the maximum capacity ({event.guest_capacity}) for this event."
+#             }), 400
+        
+#         start_time = datetime.strptime(data.get("start_time", str(event_timings.start_time)), "%H:%M:%S").time()
+#         end_time = datetime.strptime(data.get("end_time", str(event_timings.end_time)), "%H:%M:%S").time()
+
+#         if start_time >= end_time:
+#             return jsonify({
+#                 "status": False,
+#                 "message": "Invalid booking timings. End time must be after start time."
+#             }), 400
+
+#         if start_time < event_timings.start_time or end_time > event_timings.end_time:
+#             return jsonify({
+#                 "status": False,
+#                 "message": "Booking timings out of range for this day."
+#             }), 400
+
+#         # If it's an all-day event, set start_time and end_time accordingly
+#         if all_day:
+#             start_time = event_timings.start_time
+#             end_time = event_timings.end_time
+#         else:
+#             start_time = start_time
+#             end_time = end_time
+
+#         # Calculate booking duration in hours
+#         booking_duration_hours = (datetime.combine(datetime.min, end_time) - datetime.combine(datetime.min, start_time)).seconds / 3600
+
+#         overlapping_booking = Booking.query.filter(
+#             (Booking.event_id == event_id) &
+#             (Booking.start_date <= start_date) &
+#             (Booking.end_date >= end_date) &
+#             (Booking.start_time <= start_time) &
+#             (Booking.end_time == end_time)
+#         ).first()
+
+#         if overlapping_booking:
+#             return jsonify({
+#                 "status": False,
+#                 "message": "Event is already booked !!"
+#             })
+
+#         extra_facility_cost = 0
+
+#         for facility in extra_facilities:
+#             facility_id = facility.get("extra_facility_id")
+
+#             if facility_id:
+#                 selected_extra_facility = ExtraFacility.query.filter_by(id=facility_id, event_id=event_id).first()
+
+#                 if selected_extra_facility:
+#                     unit_price_count = facility.get("unit_price_count")
+#                     extra_facility_hours = facility.get("extra_facility_hours")
+#                     apply_extra_facility_for_complete_event = facility.get("apply_extra_facility_for_complete_event")
+
+#                     if unit_price_count is not None:
+#                         if selected_extra_facility.unit == "unit":
+#                             extra_facility_cost += unit_price_count * selected_extra_facility.rate
+
+#                     elif extra_facility_hours is not None:
+#                         if selected_extra_facility.unit == "hour":
+#                             extra_facility_cost += extra_facility_hours * selected_extra_facility.rate
+
+#                     elif apply_extra_facility_for_complete_event:
+#                         extra_facility_cost += selected_extra_facility.rate * booking_duration_hours
+
+#                 else:
+#                     return jsonify({
+#                         "status": False,
+#                         "message": "Invalid input. Selected extra facility is not available for the specified event."
+#                     }), 400
+
+#         extra_facilities_event = event.extra_facilities
+#         subtotal = booking_duration_hours * event.rate
+#         subtotal += extra_facility_cost
+
+#         tax_percentage = 0.15
+#         tax_amount = subtotal * tax_percentage
+
+#         total_price = subtotal + tax_amount
+
+#         if event and event_timings.available:
+#             booking = Booking(
+#                 user_id=user.id,
+#                 full_name=full_name,
+#                 email=email,
+#                 guest_count=guest_count,
+#                 additional_notes=additional_notes,
+#                 start_date=start_date,
+#                 end_date=end_date,
+#                 start_time=start_time,
+#                 end_time=end_time,
+#                 all_day=all_day,
+#                 event_id=event_id,
+#                 event_type=event_type
+#             )
+
+#             db.session.add(booking)
+#             db.session.flush()
+
+#             for facility in extra_facilities:
+#                 facility_id = facility.get("extra_facility_id")
+#                 unit_price_count = facility.get("unit_price_count")
+#                 extra_facility_hours = facility.get("extra_facility_hours")
+#                 apply_extra_facility_for_complete_event = facility.get("apply_extra_facility_for_complete_event")
+
+#                 if facility_id:
+#                     selected_extra_facility = ExtraFacility.query.filter_by(id=facility_id, event_id=event_id).first()
+
+#                     if selected_extra_facility:
+#                         if unit_price_count is not None:
+#                             unit = "unit"
+#                             quantity = unit_price_count
+#                         elif apply_extra_facility_for_complete_event or extra_facility_hours is not None:
+#                             unit = "hour"
+#                             quantity = extra_facility_hours
+#                         else:
+#                             return jsonify({
+#                                 "status": False,
+#                                 "message": "Unit is not specified !!"
+#                             }), 404
+
+#                         booking_extra_facility = BookingExtraFacility(
+#                             booking_id=booking.id,
+#                             unit=unit,
+#                             extra_facility_id=facility_id,
+#                             quantity=quantity
+#                         )
+#                         db.session.add(booking_extra_facility)
+
+#             vendor = Vendor.query.filter_by(id=event.vendor_id).first()
+
+#             if vendor:
+#                 vendor.wallet += subtotal
+#                 db.session.commit()
+
+#             return jsonify({
+#                 "status": True,
+#                 "Summary": {
+#                     "event_hours": f"{booking_duration_hours} Hours",
+#                     "guest_count": f"{guest_count}",
+#                     "event_rate": f"{event.rate}$",
+#                     "subtotal": f"{subtotal}$",
+#                     "extra_facility_cost": f"{extra_facility_cost}",
+#                     "tax": f"{tax_amount}$ (15%)",
+#                     "total_price": f"{total_price} $"
+#                 }
+#             }), 200
+
+#         else:
+#             return jsonify({
+#                 "status": False,
+#                 "message": f"{event.location_name} is not operating today !!"
+#             }), 400
+
+#     except Exception as e:
+#         return jsonify({
+#             "status": False,
+#             "message": str(e)
+#         }), 500
+
+
+
 # currently working 
 @app.route('/create_booking', methods=["POST"])
 @jwt_required()
@@ -4496,6 +5227,7 @@ def create_booking():
             "status": False,
             "message": str(e)
         }), 500
+
 
 
 ######################### STRIPE PAYMENT INTENT #########################

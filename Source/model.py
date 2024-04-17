@@ -222,6 +222,10 @@ class Inquiry(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     cancelled = db.Column(db.Boolean, default=False)
 
+
+    extra_facilities = db.Column(db.JSON, nullable=True)
+
+
     # event = db.relationship("Event", backref="inquiries")
     # user = db.relationship("User", backref="inquiries_user")
 
@@ -231,7 +235,7 @@ class Inquiry(db.Model):
 
     # event = db.relationship('Event', back_populates='event_timing')
 
-    # event_timing = db.relationship("eventtiming", back_populates="event")
+    # event_timing = db.relationship("eventtiming", back_populates="event") 
 
 
 
@@ -240,8 +244,8 @@ class Inquiry(db.Model):
         inquiry_dict = {c.name: getattr(self, c.name) for c in self.__table__.columns}
         # converting time objects into string
         for key, value in inquiry_dict.items():
-            if isinstance(value,time):
-                inquiry_dict[key] = value.strftime("%H:%M:%S") if value else None 
+            if isinstance(value,(date,time)):
+                inquiry_dict[key] = value.isoformat() if value else None 
         event_details = {
             "location_name":self.event.location_name if self.event else None,
         }

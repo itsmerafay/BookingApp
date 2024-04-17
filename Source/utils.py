@@ -458,6 +458,7 @@ class BookingAvailability:
             return True
         else:
             return False
+        
 class Filterations:
     # Filteration based event location
     @staticmethod
