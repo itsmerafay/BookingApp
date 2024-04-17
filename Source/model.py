@@ -106,11 +106,14 @@ class Vendor(db.Model):
     location = db.Column(db.String(255), nullable=False)
     biography = db.Column(db.String(1024), nullable=False)
     wallet = db.Column(db.Float, server_default = '0.0' ,default = 0.0)
+    paypal_email = db.Column(db.String(255), nullable=True)
+    paypal_token = db.Column(db.String(255), nullable=True)
+
     # Define the reverse relationship from Vendor to User
     user = db.relationship('User', back_populates='vendor')
     event = db.relationship('Event', back_populates='vendor')
     def as_dict(self):
-       return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
     def is_profile_complete(self):
         required_fields = [self.full_name, self.phone_number, self.location, self.biography]
         return all(field is not None and field.strip() != '' for field in required_fields)
@@ -248,9 +251,14 @@ class Inquiry(db.Model):
                 inquiry_dict[key] = value.isoformat() if value else None 
         event_details = {
             "location_name":self.event.location_name if self.event else None,
+            "vendor":{
+                "paypal_email": self.event.vendor.paypal_email,
+                "paypal_token": self.event.vendor.paypal_token
+            }
         }
 
         inquiry_dict["event_details"] = event_details
+        print(f"Inquiry Dict : {inquiry_dict}")
         return inquiry_dict
 
 

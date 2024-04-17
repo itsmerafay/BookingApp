@@ -31,6 +31,63 @@ sys.dont_write_bytecode = True
 stripe.api_key = app.config["STRIPE_SECRET_KEY"]
 load_dotenv()
 
+######################### PayPal User ############################
+
+@app.route('/paypal_user', methods=['POST'])
+@jwt_required()
+def paypal_user():
+    try:
+        if request.method=="POST":
+            data = request.get_json()
+            user = get_current_user()
+
+            if not user or user.role != "vendor":
+                return jsonify({
+                    "status": False ,
+                    "message": "Applicable for vendors only"
+                }), 403
+
+            paypal_email = data.get("paypal_email")
+            paypal_token = data.get("paypal_token")
+
+            if not all([paypal_email,paypal_token]):
+                return jsonify({
+                        "status":False,
+                        "message":"Both paypal email and paypal token should be provided"  
+                    }), 400
+
+            vendor = Vendor.query.filter_by(id=user.vendor_id).first()
+            if vendor:
+                vendor.paypal_email = paypal_email
+                vendor.paypal_token = paypal_token
+                db.session.commit()
+                return jsonify({
+                    "status": True,
+                    "message": "Successfully added the paypal email and token ",
+                    "role": user.role,
+                    "vendor_id": user.vendor_id,
+                    "user_id":user.id
+                }), 200
+            
+            else:
+                return jsonify({
+                    "status": True,
+                    "message": "Successfully added the paypal email and token ",
+                    "role": user.role,
+                    "id": user.vendor_id,
+                }), 404
+            
+
+    except Exception as e:
+        return jsonify({
+            "status": False,
+            "message": str(e)
+        }), 500
+
+
+
+
+
 
 ######################### Set User Preferences ############################
 
@@ -1768,137 +1825,6 @@ def create_inquiry():
         }), 500
 
 
-
-
-
-
-
-
-# # new
-# # for both user and vendor
-# # get specific inquiry with inqiry_id for both user and vendor
-# @app.route("/get_specific_inquiry/<int:inquiry_id>", methods = ["GET"])
-# @jwt_required()
-# def get_specific_inquiry(inquiry_id):
-#     try:
-#         user = get_current_user()
-
-#         if not user:
-#             return jsonify({
-#                 "status":False,
-#                 "message": "User not authenticated !!"
-#             }), 401
-            
-#         if user.role == "user":
-#             inquiry = Inquiry.query.filter_by(user_id = user.id, id = inquiry_id).first()
-
-#         elif user.role == "vendor":
-#             inquiry = Inquiry.query.join(Event).filter(Event.vendor_id == user.vendor.id , Inquiry.id == inquiry_id).first()
-
-#         if not inquiry:
-#             return jsonify({
-#                 "status":False,
-#                 "message":"Inquiry doesn't exist !!"
-#             }), 404
-
-#         inquiries_data = inquiry.as_dict()
-        
-        
-#         return jsonify({
-#             "status":True,
-#             "inquiries_data":inquiries_data
-#         }), 200
-
-    
-    
-#     except Exception as e:
-#         return jsonify({
-#             "status":False,
-#             "message": str(e)
-#         }), 500
-
-
-# # new
-# # for both user and vendor
-# # get specific inquiry with inquiry_id for both user and vendor
-# @app.route("/get_specific_inquiry/<int:inquiry_id>", methods=["GET"])
-# @jwt_required()
-# def get_specific_inquiry(inquiry_id):
-#     try:
-#         user = get_current_user()
-
-#         if not user:
-#             return jsonify({
-#                 "status": False,
-#                 "message": "User not authenticated !!"
-#             }), 401
-
-#         if user.role == "user":
-#             inquiry = Inquiry.query.filter_by(user_id=user.id, id=inquiry_id).first()
-
-#         elif user.role == "vendor":
-#             inquiry = Inquiry.query.join(Event).filter(Event.vendor_id == user.vendor.id, Inquiry.id == inquiry_id).first()
-
-#         if not inquiry:
-#             return jsonify({
-#                 "status": False,
-#                 "message": "Inquiry doesn't exist !!"
-#             }), 404
-
-#         inquiries_data = inquiry.as_dict()
-
-#         # Calculate Summary
-#         event_id = inquiries_data.get("event_id")
-#         event = Event.query.filter_by(id=event_id).first()
-
-#         if not event:
-#             return jsonify({
-#                 "status": False,
-#                 "message": "Event associated with the inquiry not found !!"
-#             }), 404
-        
-#         start_time = inquiries_data.get("start_time")
-#         end_time = inquiries_data.get("end_time")
-#         start_datetime = datetime.strptime(start_time, "%H:%M:%S")
-#         end_datetime = datetime.strptime(end_time, "%H:%M:%S")
-#         booking_duration_hours = round((end_datetime - start_datetime).total_seconds() / 3600, 2)
-
-#         subtotal = round(booking_duration_hours * event.rate, 2)
-
-#         # Calculate extra facility cost if any
-#         extra_facilities = inquiries_data.get("extra_facilities", [])
-#         extra_facility_cost = sum(facility.get("unit_price_count", 0) * facility.get("rate", 0) for facility in extra_facilities)
-
-#         # Calculate tax
-#         tax_percentage = 0.15
-#         tax_amount = round(subtotal * tax_percentage, 2)
-
-#         # Calculate total price
-#         total_price = round(subtotal + tax_amount, 2)
-
-#         summary = {
-#             "event_hours": booking_duration_hours,
-#             "guest_count": inquiries_data.get("guest_count"),
-#             "event_rate": event.rate,
-#             "subtotal": subtotal,
-#             "extra_facility_cost": extra_facility_cost,
-#             "tax": tax_amount,
-#             "total_price": total_price
-#         }
-
-#         return jsonify({
-#             "status": True,
-#             "inquiries_data": inquiries_data,
-#             "Summary": summary
-#         }), 200
-
-#     except Exception as e:
-#         return jsonify({
-#             "status": False,
-#             "message": str(e)
-#         }), 500
-
-
 # # new
 # # for both user and vendor
 # # get specific inquiry with inquiry_id for both user and vendor
@@ -2051,6 +1977,7 @@ def get_specific_inquiry(inquiry_id):
 
         # Convert inquiry data to dictionary
         inquiries_data = inquiry.as_dict()
+        print(inquiries_data)
 
         # Calculate Summary
         event_id = inquiries_data.get("event_id")
