@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 05, 2024 at 09:19 AM
+-- Generation Time: Apr 17, 2024 at 11:06 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -36,7 +36,7 @@ CREATE TABLE `alembic_version` (
 --
 
 INSERT INTO `alembic_version` (`version_num`) VALUES
-('c542a3167785');
+('bab3572b80e6');
 
 -- --------------------------------------------------------
 
@@ -135,7 +135,8 @@ INSERT INTO `booking` (`id`, `event_id`, `user_id`, `full_name`, `email`, `guest
 (189, 118, 55, 'Jane Smith', 'jane.smith@example.com', 10, 'Nothing', '2024-02-06', '2024-02-06', '15:00:00', '17:00:00', 0, '2024-01-30 14:44:56', 'Wedding', 0, NULL),
 (212, 123, 55, 'Jane Smith', 'jane.smith@example.com', 52, 'Nothing', '2024-02-07', '2024-02-07', '15:00:00', '17:00:00', 0, '2024-02-20 12:09:12', 'Wedding', 0, NULL),
 (220, 123, 55, 'Jane Smith', 'jane.smith@example.com', 50, '', '2034-02-27', '2034-02-27', '10:00:00', '13:00:00', 0, '2024-03-05 10:02:18', 'Wedding', 0, NULL),
-(222, 124, 55, 'Jane Smith', 'jane.smith@example.com', 50, '', '2034-02-27', '2034-02-27', '10:00:00', '11:00:00', 0, '2024-03-13 07:01:56', 'Wedding', 0, NULL);
+(260, 124, 55, 'Jane Smith', 'jane.smith@example.com', 50, '', '2034-02-27', '2034-02-27', '10:00:00', '11:00:00', 0, '2024-04-16 11:32:32', 'Wedding', 0, NULL),
+(262, 123, 55, 'Jane Smith', 'jane.smith@example.com', 12, 'Nothing', '2024-03-07', '2024-03-07', '15:00:00', '17:00:00', 0, '2024-04-16 14:27:25', 'Wedding', 0, NULL);
 
 -- --------------------------------------------------------
 
@@ -159,7 +160,8 @@ CREATE TABLE `booking_extra_facility` (
 INSERT INTO `booking_extra_facility` (`id`, `booking_id`, `extra_facility_id`, `unit`, `quantity`, `image`) VALUES
 (6, 189, 19, 'unit', 2, NULL),
 (7, 189, 20, 'hour', 2, NULL),
-(8, 212, 47, 'unit', 2, NULL);
+(8, 212, 47, 'unit', 2, NULL),
+(37, 262, 6, 'unit', 2, NULL);
 
 -- --------------------------------------------------------
 
@@ -245,7 +247,7 @@ INSERT INTO `event` (`id`, `thumbnail`, `other_images`, `video_showcase`, `addre
 (79, 'eee89261-0d6a-4972-ab0e-5b9311313fda.png', '[\"e8c9f42a-48fb-42b1-b10d-b16b491bd773.png\", \"67a6dcce-7b87-4b99-868c-157d1d514cef.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"fb344021-d972-45d5-9445-7deb2ab88e4d.png\", \"0e9f5ce9-093f-4d0b-9da7-cc9ce5100c17.png\"]', 'Event description', 'wedding', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
 (80, '2a2277ef-b2fd-4347-a882-d787f5308e38.png', '[\"1bf21bfb-3fbc-49cc-971e-2e84f96b3bb0.png\", \"5743932d-5e09-4fcf-b09a-b00f969467cf.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"0e9f74cc-8bc6-4748-9b77-f7d0890a94be.png\", \"78e4224a-3650-468a-90a8-cb3a8a61df22.png\"]', 'Event description', 'Graduations', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
 (81, '67ca1db4-726d-4dd4-8fdb-c1ec44ec1ab0.png', '[\"846223f9-e690-4371-adcf-891a507270f6.png\", \"8813619c-d686-4ead-8b50-b5d07a08a0d1.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"ced6a109-25ed-4e63-9ab5-1926e80bcb0e.png\", \"1a470ce2-fcc5-4d5e-b29c-e8018540cb98.png\"]', 'Event description', 'launches', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
-(88, 'c6499078-9004-4541-b61e-88405003a0e8.png', '[\"9f234295-00db-437b-9788-917e034700e4.png\", \"8eed25f7-8cbe-4f98-91b5-ec339c49f060.png\"]', 'youtube112312312312.com', 'Gulshan block 1', 500, 1, 'Event details 123123', '[\"09780920-1aef-438e-8467-9b89b2448bda.png\", \"a7496042-6fb1-48d8-97dd-4856a1bdb8b1.png\"]', 'Event description', 'Graduations', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
+(88, 'c6499078-9004-4541-b61e-88405003a0e8.png', '[\"9f234295-00db-437b-9788-917e034700e4.png\", \"8eed25f7-8cbe-4f98-91b5-ec339c49f060.png\"]', 'youtube112312312312.com', 'Gulshan block 1', 500, 1, 'Event details 123123', '[\"09780920-1aef-438e-8467-9b89b2448bda.png\", \"a7496042-6fb1-48d8-97dd-4856a1bdb8b1.png\"]', 'Event description', 'Graduations', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, 50),
 (89, 'c1936860-691a-4416-9040-2f8dfec2d9ff.png', '[\"ab0fb002-db90-4ff0-b962-24ea0ede90a4.png\", \"e8177fbe-78bb-471a-abb3-cced92004991.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"4df643a8-60b5-4393-ab0d-fc4173a6b209.png\", \"2508ac62-7336-4464-9e32-ea04923499ea.png\"]', 'Event description', 'wedding', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
 (90, 'b519dee5-42a0-4b83-b184-fbe51ece182a.png', '[\"f94a03f2-ec64-42f6-8ce8-b153944855a1.png\", \"1dfe8cb5-3c47-4d98-9199-1d028e753131.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"ebfc5050-96e4-425a-b749-533493caa86a.png\", \"6496f1bf-746a-4705-ac55-840a02a929fa.png\"]', 'Event description', 'wedding', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
 (91, 'eb136ce9-b2b0-496c-8c33-c8ed15a46bb2.png', '[\"b5ec7406-1210-4785-b488-798d5335406e.png\", \"5df3e277-2ebb-4b1b-b76e-cbef5ef34ff4.png\"]', 'youtube.com', 'Gulshan block 7', 500, 1, 'Event details 123123', '[\"3fe0a1b9-100a-4f91-8173-69a4f3dbb0f2.png\", \"c977f023-7eae-4372-8618-1bec31a92ba9.png\"]', 'Event description', 'launches', 16, 'General', 24.11, 67.11, 'Tassaract', NULL, NULL),
@@ -487,17 +489,30 @@ CREATE TABLE `inquiry` (
   `all_day` tinyint(1) DEFAULT NULL,
   `event_type` varchar(255) DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
-  `cancelled` tinyint(1) DEFAULT NULL
+  `cancelled` tinyint(1) DEFAULT NULL,
+  `extra_facilities` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`extra_facilities`))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `inquiry`
 --
 
-INSERT INTO `inquiry` (`id`, `event_id`, `user_id`, `full_name`, `email`, `guest_count`, `additional_notes`, `start_date`, `end_date`, `start_time`, `end_time`, `all_day`, `event_type`, `created_at`, `cancelled`) VALUES
-(2, 70, 55, 'Rafay and Rafay', 'johndoe@example.com', 5, 'Special requests for the event.', '2024-01-12', '2024-01-12', '12:00:00', '13:20:23', 0, 'Bussiness Meeting', '2024-01-11 13:13:14', 0),
-(3, 70, 55, 'Rafay and Rafay', 'asbfjkdnf@gmail.com', 5, 'Special requests for the event.', '2024-01-12', '2024-01-12', '12:00:00', '13:20:23', 0, 'Bussiness Meeting', '2024-01-11 13:13:32', 0),
-(4, 123, 55, 'John Doe', 'john.doe@example.com', 5, 'We\'re celebrating a birthday!', '2024-03-15', '2024-03-16', '14:00:00', '18:00:00', 0, 'Birthday Party', '2024-02-20 10:52:46', 0);
+INSERT INTO `inquiry` (`id`, `event_id`, `user_id`, `full_name`, `email`, `guest_count`, `additional_notes`, `start_date`, `end_date`, `start_time`, `end_time`, `all_day`, `event_type`, `created_at`, `cancelled`, `extra_facilities`) VALUES
+(2, 70, 55, 'Rafay and Rafay', 'johndoe@example.com', 5, 'Special requests for the event.', '2024-01-12', '2024-01-12', '12:00:00', '13:20:23', 0, 'Bussiness Meeting', '2024-01-11 13:13:14', 0, NULL),
+(3, 70, 55, 'Rafay and Rafay', 'asbfjkdnf@gmail.com', 5, 'Special requests for the event.', '2024-01-12', '2024-01-12', '12:00:00', '13:20:23', 0, 'Bussiness Meeting', '2024-01-11 13:13:32', 0, NULL),
+(4, 123, 55, 'John Doe', 'john.doe@example.com', 5, 'We\'re celebrating a birthday!', '2024-03-15', '2024-03-16', '14:00:00', '18:00:00', 0, 'Birthday Party', '2024-02-20 10:52:46', 0, NULL),
+(5, 123, 55, 'John Doe', 'john.doe@example.com', 5, 'We\'re celebrating a birthday!', '2024-03-15', '2024-03-16', '14:00:00', '18:00:00', 0, 'Birthday Party', '2024-04-16 11:13:21', 0, '[{\"extra_facility_id\": 6, \"unit_price_count\": 3}, {\"extra_facility_id\": 5, \"extra_facility_hours\": 2}]'),
+(6, 12, 55, 'John Doe', 'john.doe@example.com', 115, 'We\'re celebrating a birthday!', '2024-03-15', '2024-03-16', '14:00:00', '24:59:00', 0, 'Birthday Party', '2024-04-16 11:15:53', 0, NULL),
+(10, 88, 55, 'John Doe', 'john.doe@example.com', 5, 'nothing', '2024-04-10', '2024-04-10', '12:00:00', '21:00:55', 0, 'Wedding', '2024-04-16 12:12:09', 0, '[{\"extra_facility_id\": 6, \"unit_price_count\": 3}, {\"extra_facility_id\": 5, \"extra_facility_hours\": 2}]'),
+(11, 88, 55, 'John Doe', 'john.doe@example.com', 5, 'nothing', '2024-04-10', '2024-04-10', '12:00:00', '21:00:55', 0, 'Wedding', '2024-04-16 12:21:43', 0, NULL),
+(12, 124, 55, 'Jane Smith', 'jane.smith@example.com', 50, 'kasfnasdnl', '2034-02-27', '2034-02-27', '10:00:00', '11:00:00', 0, 'Wedding', '2024-04-16 12:22:14', 0, NULL),
+(13, 88, 55, 'John Doe', 'john.doe@example.com', 5, NULL, '2024-04-10', '2024-04-10', '12:00:00', '21:00:55', 0, 'Wedding', '2024-04-16 12:23:36', 0, '[{\"extra_facility_id\": 6, \"unit_price_count\": 3}, {\"extra_facility_id\": 5, \"extra_facility_hours\": 2}]'),
+(14, 88, 55, 'John Doe', 'john.doe@example.com', 5, NULL, '2025-06-09', '2025-06-09', '12:00:00', '15:00:55', 0, 'Wedding', '2024-04-16 12:25:35', 0, NULL),
+(15, 88, 55, 'John Doe', 'john.doe@example.com', 500, NULL, '2029-06-09', '2029-06-09', '12:00:00', '15:00:55', 0, 'Wedding', '2024-04-16 12:26:31', 0, '[{\"extra_facility_id\": 6, \"unit_price_count\": 3}, {\"extra_facility_id\": 5, \"extra_facility_hours\": 2}]'),
+(16, 88, 55, 'John Doe', 'john.doe@example.com', 50, NULL, '2029-06-09', '2029-06-09', '12:00:00', '15:00:55', 0, 'Wedding', '2024-04-16 12:56:25', 0, NULL),
+(17, 124, 55, 'Jane Smith', 'jane.smith@example.com', 50, NULL, '2035-02-27', '2035-02-27', '10:00:00', '11:00:00', 0, 'Wedding', '2024-04-16 12:57:23', 0, NULL),
+(18, 124, 55, 'Jane Smith', 'jane.smith@example.com', 50, NULL, '2035-02-27', '2035-02-27', '10:00:00', '11:00:00', 0, 'Wedding', '2024-04-16 13:04:30', 0, NULL),
+(22, 88, 55, 'John Doe', 'john.doe@example.com', 50, NULL, '2029-06-09', '2029-06-09', '12:00:00', '15:00:55', 0, 'Wedding', '2024-04-17 07:54:45', 0, '[{\"extra_facility_id\": 6, \"unit_price_count\": 3}, {\"extra_facility_id\": 5, \"extra_facility_hours\": 2}]');
 
 -- --------------------------------------------------------
 
@@ -714,8 +729,8 @@ INSERT INTO `user` (`id`, `email`, `password_hash`, `access_token`, `role`, `pro
 (51, 'just1.03@gmail.com', '$2b$12$nqXV2GHiaT9DodRwnNoEwe16cAPGh0K5/hy4CMSzPUrOM8f2M9jIG', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwMzIzOTU5MCwianRpIjoiZDliZDI2OGYtMTM3Zi00ZDAzLTk5MzgtMDM0YWExNTY5ZTY5IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6Imp1c3QxLjAzQGdtYWlsLmNvbSIsIm5iZiI6MTcwMzIzOTU5MCwiZXhwIjoxNzAzMjQwNDkwfQ.6YEevXnKorm', 'user', 'ab7ebf3d-c31f-4e69-aff2-f126a22a8578.png', NULL, 0, NULL, NULL, NULL),
 (52, 'abdulrafayatiq@gmail.com.com', '$2b$12$6tmvlYLzyYiZtllws6mCwOHOK/gS3p1xkzyNWA1ZHDHKMJrwtUXBK', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwMTk0ODc1MywianRpIjoiZDY1ZjQxY2UtMzgyZS00NDZjLWJmZDYtYTE0OTk0ZWMxZDhiIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFiZHVscmFmYXlhdGlxQGdtYWlsLmNvbS5jb20iLCJuYmYiOjE3MDE5NDg3NTMsImV4cCI6MTcwMTk0OTY1M3', 'vendor', 'ab7ebf3d-c31f-4e69-aff2-f126a22a8578.png', 14, 0, NULL, NULL, NULL),
 (53, 'justvendor.03@gmail.com', '$2b$12$45f9pZi8ic2dUAErRFN5CuLXd1AEuUkPhgr8f3K6zn6VUZ9aJqhaO', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwMjQ2NzQ1NCwianRpIjoiZTJlNTQ5NTEtODZjZS00MDIxLThkYTAtZjJhNmQ2YjJhOTYzIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6Imp1c3R2ZW5kb3IuMDNAZ21haWwuY29tIiwibmJmIjoxNzAyNDY3NDU0LCJleHAiOjE3MDI0NjgzNTR9.TNPyj', 'vendor', NULL, 15, 0, NULL, NULL, NULL),
-(54, 'abdulrafayatiq123.03@gmail.com', '$2b$12$U4aqywc9wSvbZkoqa/7dc.te5z.YXu00HLeSP4.OnYQ2n38Ls5dRG', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcxMjIyODMzMiwianRpIjoiZjU1M2ZhZjItNzZlZC00ZjdiLThjYjAtMTI2OTEzNjc1YTJiIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFiZHVscmFmYXlhdGlxMTIzLjAzQGdtYWlsLmNvbSIsIm5iZiI6MTcxMjIyODMzMiwiZXhwIjoxNzEyMjI5MjMyfQ.gNQjduO02IG4rwwjpsXIZRlRosnd5GQc_mMlKufKRtk', 'vendor', NULL, 16, 0, NULL, NULL, NULL),
-(55, 'abdulrafayatiq123456.03@gmail.com', '$2b$12$09vHC2/suja0qn8kbJ.hmeNJLz9MCkiqOyCwlIn79XnxE7FSMVDAy', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcxMjMwMDQ1NywianRpIjoiMGU0ODY1YzEtY2VhZC00YmQzLWE1NDctZDg0NWEwNmIyYzAxIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFiZHVscmFmYXlhdGlxMTIzNDU2LjAzQGdtYWlsLmNvbSIsIm5iZiI6MTcxMjMwMDQ1NywiZXhwIjoxNzEyMzAxMzU3fQ.4emU__NzE100HnJoRA4DxPW0vFvfBLIJcFowW6raeLw', 'user', NULL, NULL, 0, NULL, NULL, NULL),
+(54, 'abdulrafayatiq123.03@gmail.com', '$2b$12$U4aqywc9wSvbZkoqa/7dc.te5z.YXu00HLeSP4.OnYQ2n38Ls5dRG', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcxMzI2NDgxNiwianRpIjoiYmVhYjE0MTctNzNhNy00ZjRlLWE5NDQtOGE1NzkzMzJlMjNjIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFiZHVscmFmYXlhdGlxMTIzLjAzQGdtYWlsLmNvbSIsIm5iZiI6MTcxMzI2NDgxNn0.ywMDJfU6KMpU1LTcHoC9on1xzAc55uDodIT8y9lWnmA', 'vendor', NULL, 16, 0, NULL, NULL, NULL),
+(55, 'abdulrafayatiq123456.03@gmail.com', '$2b$12$09vHC2/suja0qn8kbJ.hmeNJLz9MCkiqOyCwlIn79XnxE7FSMVDAy', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcxMzI2NTIyMSwianRpIjoiYzEwZWQwZDQtMTAyMS00ZWU1LWE5ZGUtZjliNjdhNzA2OGUyIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFiZHVscmFmYXlhdGlxMTIzNDU2LjAzQGdtYWlsLmNvbSIsIm5iZiI6MTcxMzI2NTIyMX0.nAUJuGUVuw3azt1a060gAigQAc4p9jlNjEM-hFGLEaQ', 'user', NULL, NULL, 0, NULL, NULL, NULL),
 (56, 'abdulrafayatiq10.03@gmail.com', '$2b$12$pAcd4u8i/MDQPF.9PE2XBOUV7q1ol8opER87g5UZ45L2gHFUIv8dK', NULL, 'vendor', NULL, 20, 0, '9102', NULL, NULL),
 (57, 'samscoutt.03@gmail.com', '$2b$12$6Rll0VLJ1nFnHzkOZ4P2a..lw9Y9v3QVhKb9gvNKlIzapiVLU.ntS', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwODA4Nzk5OSwianRpIjoiNzkwZjM2YzAtM2MzYi00Y2JhLTkzY2UtZmEzZWNkMDMzNmU1IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6InNhbXNjb3V0dC4wM0BnbWFpbC5jb20iLCJuYmYiOjE3MDgwODc5OTksImV4cCI6MTcwODA4ODg5OX0.UHUlj5', 'vendor', NULL, 21, 0, '3019', NULL, NULL),
 (59, 'abdulrafayatiq123alfnsk.03@gmail.com', '$2b$12$5IfaRl.R4/FsvFGrylyqr.nP1MaqvABV0jjRnhqnSay7vOVPVtN36', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcwODYwODk2NywianRpIjoiNjkyMmYyN2QtN2MyMC00MzA5LWIwMTctNDk3OTAyNTZmMDk4IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFiZHVscmFmYXlhdGlxMTIzYWxmbnNrLjAzQGdtYWlsLmNvbSIsIm5iZiI6MTcwODYwODk2NywiZXhwIjoxNzA4NjA5ODY3fQ.OW1lshbYmyMdaaue_48rnozhYWVZBzEKfufwEaoUeGo', 'vendor', NULL, 22, 0, NULL, NULL, NULL),
@@ -751,7 +766,7 @@ INSERT INTO `vendor` (`id`, `full_name`, `phone_number`, `location`, `biography`
 (13, 'Rafay The Vendor', '0900833922', 'Karachi', 'Testing Biography', 0),
 (14, 'Bob The Builder', '090078601', 'Karachi', 'Luxury Wedding Celebration Venue 123124nfsd', 0),
 (15, 'Just Vendor', '1234567890', 'Karachi', 'Just a simple vendor.', 0),
-(16, 'John Doe', '1234567890', 'Some Location', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.', 47548),
+(16, 'John Doe', '1234567890', 'Some Location', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.', 47698),
 (20, '', '', '', '', 0),
 (21, '', '', '', '', 0),
 (22, '', '', '', '', 0),
@@ -880,13 +895,13 @@ ALTER TABLE `vendor`
 -- AUTO_INCREMENT for table `booking`
 --
 ALTER TABLE `booking`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=254;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=270;
 
 --
 -- AUTO_INCREMENT for table `booking_extra_facility`
 --
 ALTER TABLE `booking_extra_facility`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
 
 --
 -- AUTO_INCREMENT for table `event`
@@ -916,7 +931,7 @@ ALTER TABLE `favorites`
 -- AUTO_INCREMENT for table `inquiry`
 --
 ALTER TABLE `inquiry`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT for table `notification`
