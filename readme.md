@@ -1,3 +1,7 @@
+4/15/2024 2:48
+~ bug fixing for create_inquiry api
+
+
 4/15/2024 2:07
 ~ get_specific_inquiry
 _ models.py

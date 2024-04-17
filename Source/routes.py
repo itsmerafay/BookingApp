@@ -1695,6 +1695,7 @@ def create_inquiry():
         start_time = data.get("start_time")
         end_time = data.get("end_time")
         all_day = data.get("all_day")
+        extra_facilities = data.get("extra_facilities",[])
 
         if not all([full_name, email, guest_capacity, start_date, end_date, event_id]):
             return jsonify({
@@ -1750,6 +1751,7 @@ def create_inquiry():
             end_time=end_time,
             all_day=data.get("all_day", False),
             event_type=data.get("event_type"),
+            extra_facilities=extra_facilities
         )
         db.session.add(new_inquiry)
         db.session.commit()
@@ -2075,7 +2077,7 @@ def get_specific_inquiry(inquiry_id):
         extra_facility_cost = 0
         for facility in inquiries_data.get("extra_facilities", []):
             facility_id = facility.get("extra_facility_id")
-            quantity = facility.get("unit_price_count", 0)  # Default to 0 if not specified
+            # quantity = facility.get("unit_price_count", 0)  # Default to 0 if not specified
 
             if "unit_price_count" in facility:
                 quantity = facility["unit_price_count"]
