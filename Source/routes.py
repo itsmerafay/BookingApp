@@ -2062,6 +2062,7 @@ def get_specific_inquiry(inquiry_id):
                 "status": False,
                 "message": "Event associated with the inquiry not found !!"
             }), 404
+        
                 
         # Calculate booking duration in hours
         start_time = inquiries_data.get("start_time")
@@ -2074,29 +2075,31 @@ def get_specific_inquiry(inquiry_id):
         subtotal = booking_duration_hours * event.rate
 
         # Calculate extra facility cost
+        extra_facilities = inquiries_data.get("extra_facilities")
         extra_facility_cost = 0
-        for facility in inquiries_data.get("extra_facilities", []):
-            facility_id = facility.get("extra_facility_id")
-            # quantity = facility.get("unit_price_count", 0)  # Default to 0 if not specified
+        if extra_facilities:
+            for facility in inquiries_data.get("extra_facilities", []):
+                facility_id = facility.get("extra_facility_id")
+                # quantity = facility.get("unit_price_count", 0)  # Default to 0 if not specified
 
-            if "unit_price_count" in facility:
-                quantity = facility["unit_price_count"]
-            elif "extra_facility_hours" in facility:
-                quantity = facility["extra_facility_hours"]
+                if "unit_price_count" in facility:
+                    quantity = facility["unit_price_count"]
+                elif "extra_facility_hours" in facility:
+                    quantity = facility["extra_facility_hours"]
 
-            if facility_id:
-                selected_extra_facility = ExtraFacility.query.filter_by(id=facility_id, event_id=event_id).first()
+                if facility_id:
+                    selected_extra_facility = ExtraFacility.query.filter_by(id=facility_id, event_id=event_id).first()
 
-                if selected_extra_facility:
-                    # Calculate the cost based on the quantity of the extra facility
-                    extra_facility_cost += quantity * selected_extra_facility.rate
-                else:
-                    return jsonify({
-                        "status": False,
-                        "message": "Invalid input. Selected extra facility is not available for the specified event."
-                    }), 400
+                    if selected_extra_facility:
+                        # Calculate the cost based on the quantity of the extra facility
+                        extra_facility_cost += quantity * selected_extra_facility.rate
+                    else:
+                        return jsonify({
+                            "status": False,
+                            "message": "Invalid input. Selected extra facility is not available for the specified event."
+                        }), 400
 
-        # Calculate tax amount
+        # Calculate tax amount          
         subtotal += extra_facility_cost  # Include extra facility cost in subtotal
         tax_percentage = 0.15
         tax_amount = round(subtotal * tax_percentage, 2)

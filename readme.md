@@ -1,8 +1,11 @@
-4/15/2024 2:48
+4/17/2024 3:08
+~ bug fixing for get_specific_inquiry api for extra_facilities availability
+
+4/17/2024 2:48
 ~ bug fixing for create_inquiry api
 
 
-4/15/2024 2:07
+4/17/2024 2:07
 ~ get_specific_inquiry
 _ models.py
 ~ new sql file is attached
