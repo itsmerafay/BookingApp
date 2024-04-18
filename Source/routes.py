@@ -25,11 +25,106 @@ import string
 from firebase_admin import auth
 from dotenv import load_dotenv
 from google.auth.exceptions import InvalidValue
-import stripe 
+import stripe
 sys.dont_write_bytecode = True
 
 stripe.api_key = app.config["STRIPE_SECRET_KEY"]
 load_dotenv()
+
+
+# from datetime import datetime
+# from flask import jsonify, request
+# from flask_jwt_extended import jwt_required, get_jwt_identity
+# from paypalhttp import Environment, PayPalHttpClient, PayoutsPostRequest
+
+# # Initialize PayPal environment
+# environment = Environment(
+#     client_id='YOUR_PAYPAL_CLIENT_ID',
+#     client_secret='YOUR_PAYPAL_CLIENT_SECRET'
+# )
+# client = PayPalHttpClient(environment)
+
+# def create_payout(withdrawal_amount, recipient_email):
+#     request = PayoutsPostRequest()
+#     request.request_body({
+#         "sender_batch_header": {
+#             "sender_batch_id": "Payouts_" + str(datetime.now().strftime("%Y_%m_%d_%H_%M_%S")),
+#             "email_subject": "You have a payout!",
+#             "email_message": "You have received a payout! Thanks for using our service!"
+#         },
+#         "items": [
+#             {
+#                 "recipient_type": "EMAIL",
+#                 "amount": {"value": str(withdrawal_amount), "currency": "USD"},
+#                 "note": "Withdrawal from your account",
+#                 "sender_item_id": str(datetime.now().strftime("%Y%m%d%H%M%S")),
+#                 "receiver": recipient_email
+#             }
+#         ]
+#     })
+
+#     return request
+
+# @app.route("/withdraw", methods=["POST"])
+# @jwt_required()
+# def withdraw():
+#     try:
+#         user_id = get_jwt_identity()
+
+#         if not user_id:
+#             return jsonify({"status": False, "message": "User not authenticated !!"}), 401
+
+#         user = User.query.filter_by(id=user_id).first()
+
+#         if user.role == "vendor":
+#             vendor = Vendor.query.filter_by(id=user.vendor_id).first()
+
+#             if vendor and vendor.wallet >= 30:
+#                 data = request.get_json()
+#                 withdrawal_amount = data.get("withdrawal_amount")
+#                 recipient_email = data.get("paypal_email")  # Assuming you pass PayPal email along with withdrawal request
+
+#                 # Create PayPal Payout request
+#                 request = create_payout(withdrawal_amount, recipient_email)
+
+#                 # Execute Payout request
+#                 response = client.execute(request)
+
+#                 if response.status_code == 201:
+#                     # PayPal Payout successful, update wallet balance
+#                     vendor.wallet -= withdrawal_amount
+#                     db.session.commit()
+
+#                     return jsonify({
+#                         "status": True,
+#                         "message": "Withdrawal success!!",
+#                         "new_wallet_balance": vendor.wallet
+#                     }), 200
+#                 else:
+#                     # PayPal Payout failed
+#                     error_message = response.result.error.message if response.result.error else "Unknown error"
+#                     return jsonify({
+#                         "status": False,
+#                         "message": f"PayPal Payout failed: {error_message}"
+#                     }), 400
+#             else:
+#                 return jsonify({
+#                     "status": False,
+#                     "message": "The amount should be greater than 30 for making any withdrawal"
+#                 }), 404
+#         else:
+#             return jsonify({
+#                 "status": False,
+#                 "message": "Only vendors are allowed for making the withdrawal !!"
+#             }), 404
+
+#     except Exception as e:
+#         return jsonify({"status": False, "message": str(e)}), 500
+
+
+
+
+
 
 ######################### PayPal User ############################
 
@@ -1143,6 +1238,9 @@ def withdraw():
         }), 500
 
 
+
+
+
 # @app.route("/update_event_extra_facility/<int:event_id>", methods=["PUT"])
 # @jwt_required()
 # def update_event_extra_facility(event_id):
@@ -1962,7 +2060,7 @@ def get_specific_inquiry(inquiry_id):
                 "message": "User not authenticated !!"
             }), 401
 
-        # Query the inquiry based on the user's role
+        # Query the inquiry based on the user's role.
         if user.role == "user":
             inquiry = Inquiry.query.filter_by(user_id=user.id, id=inquiry_id).first()
         elif user.role == "vendor":
@@ -2884,6 +2982,308 @@ def refresh_token():
 #             "message": str(e)
 #         }), 500
 
+
+
+
+
+
+# # newlylllllllllll
+# @app.route("/home_events", methods=["POST"])
+# @jwt_required()
+# def home_events():
+#     try:
+#         data = request.get_json()
+#         user = get_current_user()
+
+#         if not user:
+#             return jsonify({
+#                 "status": False,
+#                 "message": "User not authenticated !!"
+#             }), 401
+
+#         requested_availability = data.get("is_available")
+#         user_location = (data.get("latitude"), data.get("longitude"))  # Retrieve user's location from request data
+#         max_distance = 0.5
+
+#         events = Event.query.join(Event.vendor).join(Vendor.user).order_by(func.random()).limit(15).all()
+
+#         serialized_events = []
+#         for event in events:
+#             current_date_time = datetime.now()
+
+#             if requested_availability:
+#                 is_event_available = any(
+#                     BookingAvailability.check_availability(booking, current_date_time)
+#                     for booking in event.bookings
+#                     if not booking.all_day and not booking.cancelled
+#                     or (booking.start_date <= current_date_time.date() <= booking.end_date)
+#                 )
+
+#                 if not is_event_available:
+#                     continue
+
+#             if any(booking.all_day for booking in event.bookings):
+#                 continue
+
+#             total_bookings = sum(1 for booking in event.bookings)
+
+#             serialized_event = {
+#                 "event_id": event.id,
+#                 "vendor_id": event.vendor_id,
+#                 "event_type": event.event_type,
+#                 "event_rate": event.rate,
+#                 "event_address": event.address,
+#                 "event_latitude": event.latitude,
+#                 "event_longitude": event.longitude,
+#                 "event_ratings": Ratings.get_average_rating(event.id),
+#                 "total_bookings": total_bookings,
+#                 "location_name": event.location_name,  # assuming you have a location_name attribute
+#                 "fixed_price": event.fixed_price,  # assuming you have a fixed_price attribute
+#                 "thumbnail": event.thumbnail,  # assuming you have a thumbnail attribute
+#                 # "favorite":is_favorite,
+#                 "vendor_details": {
+#                     "vendor_id": event.vendor.id,
+#                     "vendor_profile_image": event.vendor.user[0].profile_image,
+#                 }
+#             }
+#             serialized_events.append(serialized_event)
+
+#             fav_event_ids = [favorite.event_id for favorite in Favorites.query.filter_by(user_id=user.id).all()]
+#             is_favorite = event.id in fav_event_ids
+#             serialized_event["favorite"] = is_favorite
+
+#         prefered_filter = data.get("prefered_filter")
+#         if prefered_filter:
+#             serialized_events = Filterations.apply_filters(serialized_events, prefered_filter, user_location, max_distance)
+        
+#         unique_events = []
+#         already_had_event_ids = set()
+#         for event in serialized_events:
+#             event_id = event["event_id"]
+#             if event_id not in already_had_event_ids:
+#                 unique_events.append(event)
+#                 already_had_event_ids.add(event_id)
+
+#         return jsonify({
+#             "status": True,
+#             "Events": unique_events,
+#             "Total_Events": len(unique_events)
+#         }), 200
+
+#     except Exception as e:
+#         return jsonify({
+#             "status": False,
+#             "message": str(e)
+#         }), 500
+
+
+# from geopy.distance import geodesic
+
+# # newlylllllllllll
+# @app.route("/home_events", methods=["POST"])
+# @jwt_required()
+# def home_events():
+#     try:
+#         data = request.get_json()
+#         user = get_current_user()
+
+#         if not user:
+#             return jsonify({
+#                 "status": False,
+#                 "message": "User not authenticated !!"
+#             }), 401
+
+#         requested_availability = data.get("is_available")
+#         user_location = (data.get("latitude"), data.get("longitude"))  # Retrieve user's location from request data
+#         max_distance = 0.5
+
+#         events = Event.query.join(Event.vendor).join(Vendor.user).order_by(func.random()).limit(15).all()
+
+#         serialized_events = []
+#         for event in events:
+#             current_date_time = datetime.now()
+
+#             if requested_availability:
+#                 is_event_available = any(
+#                     BookingAvailability.check_availability(booking, current_date_time)
+#                     for booking in event.bookings
+#                     if not booking.all_day and not booking.cancelled
+#                     or (booking.start_date <= current_date_time.date() <= booking.end_date)
+#                 )
+
+#                 if not is_event_available:
+#                     continue
+
+#             if any(booking.all_day for booking in event.bookings):
+#                 continue
+
+#             total_bookings = sum(1 for booking in event.bookings)
+
+#             # Calculate distance between event location and user location
+#             event_location = (event.latitude, event.longitude)
+#             distance = geodesic(user_location, event_location).kilometers
+#             # print(dist)
+
+#             if distance > max_distance:
+#                 continue
+
+#             serialized_event = {
+#                 "event_id": event.id,
+#                 "vendor_id": event.vendor_id,
+#                 "event_type": event.event_type,
+#                 "event_rate": event.rate,
+#                 "event_address": event.address,
+#                 "event_latitude": event.latitude,
+#                 "event_longitude": event.longitude,
+#                 "event_ratings": Ratings.get_average_rating(event.id),
+#                 "total_bookings": total_bookings,
+#                 "location_name": event.location_name,  
+#                 "fixed_price": event.fixed_price, 
+#                 "thumbnail": event.thumbnail,  
+#                 # "distance_km":distance,
+#                 # "favorite":is_favorite,
+#                 "vendor_details": {
+#                     "vendor_id": event.vendor.id,
+#                     "vendor_profile_image": event.vendor.user[0].profile_image,
+#                 }
+#             }
+#             serialized_events.append(serialized_event)
+
+#             fav_event_ids = [favorite.event_id for favorite in Favorites.query.filter_by(user_id=user.id).all()]
+#             is_favorite = event.id in fav_event_ids
+#             serialized_event["favorite"] = is_favorite
+
+#         prefered_filter = data.get("prefered_filter")
+#         if prefered_filter:
+#             serialized_events = Filterations.apply_filters(serialized_events, prefered_filter, user_location, max_distance)
+        
+#         unique_events = []
+#         already_had_event_ids = set()
+#         for event in serialized_events:
+#             event_id = event["event_id"]
+#             if event_id not in already_had_event_ids:
+#                 unique_events.append(event)
+#                 already_had_event_ids.add(event_id)
+
+#         return jsonify({
+#             "status": True,
+#             "Events": unique_events,
+#             "Total_Events": len(unique_events)
+#         }), 200
+
+#     except Exception as e:
+#         return jsonify({
+#             "status": False,
+#             "message": str(e)
+#         }), 500
+
+
+
+# # newlylllllllllll
+# @app.route("/home_events", methods=["POST"])
+# @jwt_required()
+# def home_events():
+#     try:
+#         data = request.get_json()
+#         user = get_current_user()
+
+#         if not user:
+#             return jsonify({
+#                 "status": False,
+#                 "message": "User not authenticated !!"
+#             }), 401
+
+#         requested_availability = data.get("is_available")
+#         user_location = (data.get("latitude"), data.get("longitude")) 
+#         max_distance = 15
+
+#         events = Event.query.join(Event.vendor).join(Vendor.user).order_by(func.random()).limit(15).all()
+
+#         serialized_events = []
+#         for event in events:
+#             current_date_time = datetime.now()
+
+#             if requested_availability:
+#                 is_event_available = any(
+#                     BookingAvailability.check_availability(booking, current_date_time)
+#                     for booking in event.bookings
+#                     if not booking.all_day and not booking.cancelled
+#                     or (booking.start_date <= current_date_time.date() <= booking.end_date)
+#                 )
+
+#                 if not is_event_available:
+#                     continue
+
+#             if any(booking.all_day for booking in event.bookings):
+#                 continue
+
+#             total_bookings = sum(1 for booking in event.bookings)
+
+#             # Calculate distance between event location and user location
+#             event_location = (event.latitude, event.longitude)
+#             distance_km = geodesic(user_location, event_location).kilometers
+
+#             if distance_km > max_distance:
+#                 continue
+
+#             serialized_event = {
+#                 "event_id": event.id,
+#                 "vendor_id": event.vendor_id,
+#                 "event_type": event.event_type,
+#                 "event_rate": event.rate,
+#                 "event_address": event.address,
+#                 "event_latitude": event.latitude,
+#                 "event_longitude": event.longitude,
+#                 "distance_km": distance_km,  # Include distance_km in the serialized event
+#                 "event_ratings": Ratings.get_average_rating(event.id),
+#                 "total_bookings": total_bookings,
+#                 "location_name": event.location_name,  # assuming you have a location_name attribute
+#                 "fixed_price": event.fixed_price,  # assuming you have a fixed_price attribute
+#                 "thumbnail": event.thumbnail,  # assuming you have a thumbnail attribute
+#                 # "favorite":is_favorite,
+#                 "vendor_details": {
+#                     "vendor_id": event.vendor.id,
+#                     "vendor_profile_image": event.vendor.user[0].profile_image,
+#                 }
+#             }
+#             serialized_events.append(serialized_event)
+
+#             fav_event_ids = [favorite.event_id for favorite in Favorites.query.filter_by(user_id=user.id).all()]
+#             is_favorite = event.id in fav_event_ids
+#             serialized_event["favorite"] = is_favorite
+
+#         prefered_filter = data.get("prefered_filter")
+#         if prefered_filter:
+#             serialized_events = Filterations.apply_filters(serialized_events, prefered_filter, user_location, max_distance)
+        
+#         unique_events = []
+#         already_had_event_ids = set()
+#         for event in serialized_events:
+#             event_id = event["event_id"]
+#             if event_id not in already_had_event_ids:
+#                 unique_events.append(event)
+#                 already_had_event_ids.add(event_id)
+
+#         return jsonify({
+#             "status": True,
+#             "Events": unique_events,
+#             "Total_Events": len(unique_events)
+#         }), 200
+
+#     except Exception as e:
+#         return jsonify({
+#             "status": False,
+#             "message": str(e)
+#         }), 500
+
+
+
+
+# import logging
+
+# # Set up logging
+# logging.basicConfig(level=logging.DEBUG)
+
 # newlylllllllllll
 @app.route("/home_events", methods=["POST"])
 @jwt_required()
@@ -2899,8 +3299,8 @@ def home_events():
             }), 401
 
         requested_availability = data.get("is_available")
-        user_location = (data.get("latitude"), data.get("longitude"))  # Retrieve user's location from request data
-        max_distance = 300000
+        user_location = (data.get("latitude"), data.get("longitude")) 
+        max_distance = 90
 
         events = Event.query.join(Event.vendor).join(Vendor.user).order_by(func.random()).limit(15).all()
 
@@ -2924,6 +3324,16 @@ def home_events():
 
             total_bookings = sum(1 for booking in event.bookings)
 
+            # Calculate distance between event location and user location
+            event_location = (event.latitude, event.longitude)
+            distance_km = geodesic(user_location, event_location).kilometers
+
+            # Log the distance for each event
+            # logging.debug(f"Event ID: {event.id}, Distance: {distance_km} km")
+
+            if distance_km > max_distance:
+                continue
+
             serialized_event = {
                 "event_id": event.id,
                 "vendor_id": event.vendor_id,
@@ -2932,6 +3342,7 @@ def home_events():
                 "event_address": event.address,
                 "event_latitude": event.latitude,
                 "event_longitude": event.longitude,
+                "distance_km": distance_km,  # Include distance_km in the serialized event
                 "event_ratings": Ratings.get_average_rating(event.id),
                 "total_bookings": total_bookings,
                 "location_name": event.location_name,  # assuming you have a location_name attribute

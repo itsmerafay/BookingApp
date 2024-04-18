@@ -50,3 +50,5 @@ virtualenv==20.24.2
 Werkzeug==2.3.7
 WTForms==3.0.1
 firebase-admin==6.3.0
+# paypalrestsdk==1.1.0
+paypalhttp==1.0.1
