@@ -1,3 +1,7 @@
+4/22/2024 3:32
+~ updated : custom_event_search --- fix for ratings
+
+
 4/22/2024 1:42
 ~ updated : home_events api with filterations and nested filterations
 
