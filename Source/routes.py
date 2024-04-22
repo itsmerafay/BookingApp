@@ -1,4 +1,5 @@
 import random
+from operator import itemgetter
 from sqlalchemy import func, or_
 from datetime import date
 from utils import Validations
@@ -2718,272 +2719,6 @@ def refresh_token():
 
 
 
-# # # corrected home_events
-# @app.route("/home_events", methods=["POST"])
-# @jwt_required()
-# def home_events():
-#     try:
-#         data = request.get_json()
-#         user = get_current_user()
-
-#         if not user:
-#             return jsonify({
-#                 "status": False,
-#                 "message": "User not authenticated !!"
-#             }), 401
-
-#         requested_availability = data.get("is_available")
-#         user_location = (data.get("latitude"), data.get("longitude"))  # Retrieve user's location from request data
-#         max_distance = 300000
-
-#         event_types = Event.query.with_entities(Event.event_type).distinct().all()
-
-#         events_by_types = {}
-#         for event_type in event_types:
-#             events = (
-#                 Event.query.join(Event.vendor)
-#                     .join(Vendor.user)
-#                     # .filter(Event.event_type == event_type[0])
-#                     .order_by(func.random())
-#                     .limit(15)
-#                     .all()
-#             )
-
-#             events_data = []
-#             for event in events:
-#                 current_date_time = datetime.now()
-
-#                 if requested_availability:
-#                                         # Check event availability considering booking and cancellation
-#                     is_event_available = any(
-#                         BookingAvailability.check_availability(booking, current_date_time)
-#                         for booking in event.bookings
-#                         if not booking.all_day and not booking.cancelled
-#                         or (booking.start_date <= current_date_time.date() <= booking.end_date)
-#                     )
-
-
-#                     if not is_event_available:
-#                         continue
-
-#                 # Check the condition from Booking table before adding to the response
-#                 if any(booking.all_day for booking in event.bookings):
-#                     continue  # Skip this event if the condition is met
-
-#                 # Calculate total bookings
-#                 total_bookings = sum(1 for booking in event.bookings)
-
-#                 serialized_event = {
-#                     "event_id": event.id,
-#                     "vendor_id": event.vendor_id,
-#                     "event_type": event.event_type,
-#                     "event_rate": event.rate,
-#                     "event_address": event.address,
-#                     "event_latitude": event.latitude,
-#                     "event_longitude": event.longitude,
-#                     "event_ratings": Ratings.get_average_rating(event.id),
-#                     "total_bookings": total_bookings  # Include total bookings in the response
-#                     # Add other necessary event details
-#                 }
-#                 events_data.append(serialized_event)
-
-#             prefered_filter = data.get("prefered_filter")
-#             if prefered_filter:
-#                 events_data = Filterations.apply_filters(events_data, prefered_filter, user_location, max_distance)
-#             else:
-#                 continue
-            
-#             events_by_types[event_type[0]] = events_data
-
-#         return jsonify({
-#             "status": True,
-#             "events_by_events_types": events_by_types
-#         }), 200
-
-#     except Exception as e:
-#         return jsonify({
-#             "status": False,
-#             "message": str(e)
-#         }), 500
-
-
-# # working
-# @app.route("/home_events", methods=["POST"])
-# @jwt_required()
-# def home_events():
-#     try:
-#         data = request.get_json()
-#         user = get_current_user()
-
-#         if not user:
-#             return jsonify({
-#                 "status": False,
-#                 "message": "User not authenticated !!"
-#             }), 401
-
-#         requested_availability = data.get("is_available")
-#         user_location = (data.get("latitude"), data.get("longitude"))  # Retrieve user's location from request data
-#         max_distance = 300000
-
-#         events = []
-#         event_types = Event.query.with_entities(Event.event_type).distinct().all()
-
-#         for event_type in event_types:
-#             events.extend(
-#                 Event.query.join(Event.vendor)
-#                     .join(Vendor.user)
-#                     .order_by(func.random())
-#                     .limit(15)
-#                     .all()
-#             )
-
-#         serialized_events = []
-#         for event in events:
-#             current_date_time = datetime.now()
-
-#             if requested_availability:
-#                 is_event_available = any(
-#                     BookingAvailability.check_availability(booking, current_date_time)
-#                     for booking in event.bookings
-#                     if not booking.all_day and not booking.cancelled
-#                     or (booking.start_date <= current_date_time.date() <= booking.end_date)
-#                 )
-
-#                 if not is_event_available:
-#                     continue
-
-#             if any(booking.all_day for booking in event.bookings):
-#                 continue
-
-#             total_bookings = sum(1 for booking in event.bookings)
-
-#             serialized_event = {
-#                 "event_id": event.id,
-#                 "vendor_id": event.vendor_id,
-#                 "event_type": event.event_type,
-#                 "event_rate": event.rate,
-#                 "event_address": event.address,
-#                 "event_latitude": event.latitude,
-#                 "event_longitude": event.longitude,
-#                 "event_ratings": Ratings.get_average_rating(event.id),
-#                 "total_bookings": total_bookings,
-#                 "location_name": event.location_name,  # assuming you have a location_name attribute
-#                 "fixed_price": event.fixed_price,  # assuming you have a fixed_price attribute
-#                 "thumbnail": event.thumbnail,  # assuming you have a thumbnail attribute
-#                 "vendor_details": {
-#                     "vendor_id": event.vendor.id,
-#                     "vendor_profile_image": event.vendor.user[0].profile_image,
-#                 }
-#             }
-#             serialized_events.append(serialized_event)
-
-#         prefered_filter = data.get("prefered_filter")
-#         if prefered_filter:
-#             serialized_events = Filterations.apply_filters(serialized_events, prefered_filter, user_location, max_distance)
-
-#         return jsonify({
-#             "status": True,
-#             "Events": serialized_events,
-#             "Total_Events": len(serialized_events)
-#         }), 200
-
-#     except Exception as e:
-#         return jsonify({
-#             "status": False,
-#             "message": str(e)
-#         }), 500
-
-
-
-# @app.route("/home_events", methods=["POST"])
-# @jwt_required()
-# def home_events():
-#     try:
-#         data = request.get_json()
-#         user = get_current_user()
-
-#         if not user:
-#             return jsonify({
-#                 "status": False,
-#                 "message": "User not authenticated !!"
-#             }), 401
-
-#         requested_availability = data.get("is_available")
-#         user_location = (data.get("latitude"), data.get("longitude"))  # Retrieve user's location from request data
-#         max_distance = 300000
-
-#         events = Event.query.join(Event.vendor).join(Vendor.user).order_by(func.random()).limit(15).all()
-
-#         serialized_events = []
-#         for event in events:
-#             current_date_time = datetime.now()
-
-#             if requested_availability:
-#                 is_event_available = any(
-#                     BookingAvailability.check_availability(booking, current_date_time)
-#                     for booking in event.bookings
-#                     if not booking.all_day and not booking.cancelled
-#                     or (booking.start_date <= current_date_time.date() <= booking.end_date)
-#                 )
-
-#                 if not is_event_available:
-#                     continue
-
-#             if any(booking.all_day for booking in event.bookings):
-#                 continue
-
-#             total_bookings = sum(1 for booking in event.bookings)
-
-#             serialized_event = {
-#                 "event_id": event.id,
-#                 "vendor_id": event.vendor_id,
-#                 "event_type": event.event_type,
-#                 "event_rate": event.rate,
-#                 "event_address": event.address,
-#                 "event_latitude": event.latitude,
-#                 "event_longitude": event.longitude,
-#                 "event_ratings": Ratings.get_average_rating(event.id),
-#                 "total_bookings": total_bookings,
-#                 "location_name": event.location_name,  # assuming you have a location_name attribute
-#                 "fixed_price": event.fixed_price,  # assuming you have a fixed_price attribute
-#                 "thumbnail": event.thumbnail,  # assuming you have a thumbnail attribute
-#                 "vendor_details": {
-#                     "vendor_id": event.vendor.id,
-#                     "vendor_profile_image": event.vendor.user[0].profile_image,
-#                 }
-#             }
-#             serialized_events.append(serialized_event)
-        
-
-#         prefered_filter = data.get("prefered_filter")
-#         if prefered_filter:
-#             serialized_events = Filterations.apply_filters(serialized_events, prefered_filter, user_location, max_distance)
-
-#         unique_events = []
-#         seen_event_ids = set()
-#         for event in serialized_events:
-#             event_id = event["event_id"]
-#             if event_id not in seen_event_ids:
-#                 unique_events.append(event)
-#                 seen_event_ids.add(event_id)
-
-#         # Remove duplicate events if any
-#         serialized_events = [dict(t) for t in {tuple(d.items()) for d in serialized_events}]
-
-#         return jsonify({
-#             "status": True,
-#             "Events": unique_events,
-#             "Total_Events": len(unique_events)
-#         }), 200
-
-#     except Exception as e:
-#         return jsonify({
-#             "status": False,
-#             "message": str(e)
-#         }), 500
-
-
-
 
 
 
@@ -3284,7 +3019,123 @@ def refresh_token():
 # # Set up logging
 # logging.basicConfig(level=logging.DEBUG)
 
-# newlylllllllllll
+
+
+# # newlylllllllllll
+# @app.route("/home_events", methods=["POST"])
+# @jwt_required()
+# def home_events():
+#     try:
+#         data = request.get_json()
+#         user = get_current_user()
+
+#         if not user:
+#             return jsonify({
+#                 "status": False,
+#                 "message": "User not authenticated !!"
+#             }), 401
+
+#         requested_availability = data.get("is_available")
+#         user_location = (data.get("latitude"), data.get("longitude")) 
+#         max_distance = 9111
+
+#         page = int(data.get("page",1))  # ?page=1,2,3...
+#         per_page = 5
+#         offset = (page - 1) * per_page
+
+#         events = Event.query        \
+#         .join(Event.vendor)         \
+#         .join(Vendor.user)          \
+#         .order_by()                 \
+#         .offset(offset)             \
+#         .limit(per_page)            \
+#         .all()
+
+#         serialized_events = []
+#         for event in events:
+#             current_date_time = datetime.now()
+
+#             if requested_availability:
+#                 is_event_available = any(
+#                     BookingAvailability.check_availability(booking, current_date_time)
+#                     for booking in event.bookings
+#                     if not booking.all_day and not booking.cancelled
+#                     or (booking.start_date <= current_date_time.date() <= booking.end_date)
+#                 )
+
+#                 if not is_event_available:
+#                     continue
+
+#             if any(booking.all_day for booking in event.bookings):
+#                 continue
+
+#             total_bookings = sum(1 for booking in event.bookings)
+#             # print(total_bookings)
+
+#             # Calculate distance between event location and user location
+#             event_location = (event.latitude, event.longitude)
+#             distance_km = geodesic(user_location, event_location).kilometers
+#             print(distance_km)
+
+#             # Log the distance for each event
+#             # logging.debug(f"Event ID: {event.id}, Distance: {distance_km} km")
+
+#             if distance_km > max_distance:
+#                 continue
+#             # print(distance_km)
+
+#             serialized_event = {
+#                 "event_id": event.id,
+#                 "vendor_id": event.vendor_id,
+#                 "event_type": event.event_type,
+#                 "event_rate": event.rate,
+#                 "event_address": event.address,
+#                 "event_latitude": event.latitude,
+#                 "event_longitude": event.longitude,
+#                 "distance_km": distance_km,  # Include distance_km in the serialized event
+#                 "event_ratings": Ratings.get_average_rating(event.id),
+#                 "total_bookings": total_bookings,
+#                 "location_name": event.location_name,  # assuming you have a location_name attribute
+#                 "fixed_price": event.fixed_price,  # assuming you have a fixed_price attribute
+#                 "thumbnail": event.thumbnail,  # assuming you have a thumbnail attribute
+#                 # "favorite":is_favorite,
+#                 "vendor_details": {
+#                     "vendor_id": event.vendor.id,
+#                     "vendor_profile_image": event.vendor.user[0].profile_image,
+#                 }
+#             }
+#             serialized_events.append(serialized_event)
+
+#             fav_event_ids = [favorite.event_id for favorite in Favorites.query.filter_by(user_id=user.id).all()]
+#             is_favorite = event.id in fav_event_ids
+#             serialized_event["favorite"] = is_favorite
+
+#         prefered_filter = data.get("prefered_filter")
+#         if prefered_filter:
+#             serialized_events = Filterations.apply_filters(serialized_events, prefered_filter, user_location, max_distance)
+        
+#         unique_events = []
+#         already_had_event_ids = set()
+#         for event in serialized_events:
+#             event_id = event["event_id"]
+#             if event_id not in already_had_event_ids:
+#                 unique_events.append(event)
+#                 already_had_event_ids.add(event_id)
+
+#         return jsonify({
+#             "status": True,
+#             "Events": unique_events,
+#             "Total_Events": len(unique_events)
+#         }), 200
+
+#     except Exception as e:
+#         return jsonify({
+#             "status": False,
+#             "message": str(e)
+#         }), 500
+
+
+# latest
 @app.route("/home_events", methods=["POST"])
 @jwt_required()
 def home_events():
@@ -3300,9 +3151,24 @@ def home_events():
 
         requested_availability = data.get("is_available")
         user_location = (data.get("latitude"), data.get("longitude")) 
-        max_distance = 90
+        max_distance = 100
 
-        events = Event.query.join(Event.vendor).join(Vendor.user).order_by(func.random()).limit(15).all()
+        # Extract page number from request data, default to 1 if not provided
+        page = int(data.get("page", 1))
+        per_page = 15
+        offset = (page - 1) * per_page
+
+        # Query for total events count
+        total_events_count = Event.query.count()
+
+        # Query events for the current page
+        events = Event.query \
+            .join(Event.vendor) \
+            .join(Vendor.user) \
+            .order_by(func.random()) \
+            .offset(offset) \
+            .limit(per_page) \
+            .all()
 
         serialized_events = []
         for event in events:
@@ -3328,9 +3194,6 @@ def home_events():
             event_location = (event.latitude, event.longitude)
             distance_km = geodesic(user_location, event_location).kilometers
 
-            # Log the distance for each event
-            # logging.debug(f"Event ID: {event.id}, Distance: {distance_km} km")
-
             if distance_km > max_distance:
                 continue
 
@@ -3348,7 +3211,6 @@ def home_events():
                 "location_name": event.location_name,  # assuming you have a location_name attribute
                 "fixed_price": event.fixed_price,  # assuming you have a fixed_price attribute
                 "thumbnail": event.thumbnail,  # assuming you have a thumbnail attribute
-                # "favorite":is_favorite,
                 "vendor_details": {
                     "vendor_id": event.vendor.id,
                     "vendor_profile_image": event.vendor.user[0].profile_image,
@@ -3363,7 +3225,28 @@ def home_events():
         prefered_filter = data.get("prefered_filter")
         if prefered_filter:
             serialized_events = Filterations.apply_filters(serialized_events, prefered_filter, user_location, max_distance)
-        
+            if prefered_filter.lower() == "all" or "":
+                    serialized_events = sorted(serialized_events, key= lambda x: (x["event_ratings"], -x["distance_km"]))
+            else:
+                if prefered_filter.lower() == "trending":
+                    serialized_events = sorted(serialized_events, key= lambda x: (x["total_bookings"], -x["event_ratings"], -x["distance_km"]), reverse=True)
+                
+                elif prefered_filter.lower() == "cheapest":
+                    serialized_events = sorted(serialized_events, key= lambda x: (x["event_rate"], -x["event_ratings"], -x["distance_km"]))
+
+                elif prefered_filter.lower() == "least_rated":
+                    serialized_events = sorted(serialized_events, key= lambda x: (x["event_ratings"], -x["distance_km"]))
+
+                elif prefered_filter.lower() == "top_rated":
+                    serialized_events = sorted(serialized_events, key= lambda x: (x["event_ratings"], -x["distance_km"]), reverse=True)
+
+                elif prefered_filter.lower() == "my_location":
+                    serialized_events = sorted(serialized_events, key= lambda x: (x["distance_km"], -x["event_ratings"], -x["distance_km"]))
+                
+                else:
+                    serialized_events = sorted(serialized_events, key= lambda x: (x["event_ratings"], -x["distance_km"]))
+
+
         unique_events = []
         already_had_event_ids = set()
         for event in serialized_events:
@@ -3372,10 +3255,13 @@ def home_events():
                 unique_events.append(event)
                 already_had_event_ids.add(event_id)
 
+        # total_pages = ceil(total_events_count / per_page)
+
         return jsonify({
             "status": True,
             "Events": unique_events,
-            "Total_Events": len(unique_events)
+            "Total_Events": len(unique_events),
+            # "Total_Pages": total_pages
         }), 200
 
     except Exception as e:
@@ -3385,6 +3271,9 @@ def home_events():
         }), 500
 
 
+
+
+
 ###############################     Search Events API        ######################################
 
 @app.route("/top_venues/<int:vendor_id>", methods=["GET"])
@@ -3392,9 +3281,9 @@ def top_venues(vendor_id):
     try:
         # Get the total number of bookings for the vendor
         total_bookings = (db.session.query(func.count(Booking.id))
-                          .join(Event)
-                          .filter(Event.vendor_id == vendor_id)
-                          .scalar())
+                            .join(Event)
+                            .filter(Event.vendor_id == vendor_id)
+                            .scalar())
 
         # Get booking count per venue (using location_name as the venue identifier)
         # venue_bookings = (db.session.query(Event.location_name, func.count(Booking.id).label('booking_count'))
@@ -3452,7 +3341,7 @@ def bookings_today():
     except Exception as e:
         print(e)
         return jsonify({"status": False, "error": str(e)})
-
+    
 
 @app.route("/search_event", methods=["POST"])
 @jwt_required()
@@ -3464,7 +3353,7 @@ def search_event():
     location_name = data.get("location_name")
     latitude = data.get("latitude")
     longitude = data.get("longitude")
-    distance_limit = data.get("distance_km", 3)  # Default to 10km if distance_km is not provided
+    distance_km = data.get("distance_km", 3)  # Default to 10km if distance_km is not provided
 
     # Query based on event_type
     events_query = Event.query
@@ -3487,7 +3376,7 @@ def search_event():
             event_location = (event.latitude, event.longitude)
             distance = geodesic(event_location, user_location).kilometers
             # Ensure distance is less than or equal to the specified or default distance limit
-            if distance <= distance_limit:
+            if distance <= distance_km:
                 results_within_range.append((event, distance))
 
     # Sort events within range by event rating
@@ -3508,6 +3397,7 @@ def search_event():
     for result in paginated_results:
         event = result[0]
         within_radius = result[1]
+        print(within_radius)
 
         is_favorite = event.id in fav_event_ids
 
@@ -3524,7 +3414,7 @@ def search_event():
             "rate": event.rate,
             "event_rating": Ratings.get_average_rating(event.id),
             "fixed_price": event.fixed_price,
-            "distance_km": geodesic((event.latitude, event.longitude), user_location).kilometers,
+            "distance_km": within_radius,  # the distance for those events that needs to be here, from above logic
             "address": event.vendor.location,
             "location_name": event.location_name,
             "vendor_details": vendor_details,
@@ -3645,6 +3535,8 @@ def search_evettttt():
         "Total Events": total_events_found,
         "Events": event_list
     }), 200
+
+
 
 ################### Custom Event Search ###########################
 

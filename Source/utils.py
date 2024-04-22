@@ -1,5 +1,6 @@
 import re
 # import paypalrestsdk
+from geopy.distance import geodesic
 from flask import jsonify
 from geopy.distance import geodesic
 from sqlalchemy import func
@@ -112,6 +113,7 @@ class Ratings:
             return round(float(total_avg_rating), 2)
         
 class DateTimeConversions:
+
     @staticmethod
     def convert_to_datetime(date_str, time_str):
         return datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %H:%M:%S")
@@ -149,7 +151,6 @@ class BookingAvailability:
         else:
             return False
         
-from geopy.distance import geodesic
 
 class Filterations:
     @staticmethod
@@ -184,6 +185,7 @@ class Filterations:
     def filter_events_by_cheapest(events_data):
         filtered_events = sorted(events_data, key=lambda x: x.get("event_rate", float("inf")))
         return filtered_events
+    
     # Filteration based filter events by least rated
     @staticmethod
     def filter_events_by_least_rated(events_data):
@@ -233,7 +235,7 @@ class Filterations:
         else:
             filtered_events = events_data
             return filtered_events
-
+        
 
 class BookingCount:
     def count_booking(event_id):
