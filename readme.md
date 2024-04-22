@@ -1,5 +1,5 @@
 4/22/2024 4:29
-~ updated : search --- fixture for prefered_filters
+~ updated : search_event --- fixture for prefered_filters
 
 4/22/2024 3:32
 ~ updated : custom_event_search --- fix for ratings
