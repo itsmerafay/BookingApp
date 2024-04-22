@@ -1,11 +1,11 @@
 import random
+from paypalrestsdk import Payout
 from operator import itemgetter
 from sqlalchemy import func, or_
 from datetime import date
-from utils import Validations
 from app import app, db, mail
 from sqlalchemy.orm import joinedload
-from utils import Validations, Ratings, DateTimeConversions, Notificationpush, BookingAvailability, Filterations, Password
+from utils import Validations, Ratings, DateTimeConversions, Notificationpush, BookingAvailability, Filterations, Password, Paypal
 from flask import request, jsonify, url_for, current_app, send_file, send_from_directory
 from datetime import datetime, timedelta
 from model import User, PasswordResetToken, Vendor, Event, Booking , Review, eventtiming, Inquiry, ExtraFacility,Favorites, Transaction, Notification, BookingExtraFacility, Preferences         
@@ -1185,58 +1185,58 @@ def getmyevents():
 
 
 
-@app.route("/withdraw", methods = ["POST"])
-@jwt_required()
-def withdraw():
-    try:
-        user = get_current_user()
-        data = request.get_json()
+# @app.route("/withdraw", methods = ["POST"])
+# @jwt_required()
+# def withdraw():
+#     try:
+#         user = get_current_user()
+#         data = request.get_json()
 
-        if not user:
-            return jsonify({
-                "status":False,
-                "message": "User not authenticated !!"
-            }), 401
+#         if not user:
+#             return jsonify({
+#                 "status":False,
+#                 "message": "User not authenticated !!"
+#             }), 401
             
-        if user.role == "vendor":
-            vendor = Vendor.query.filter_by(id=user.vendor_id).first()
+#         if user.role == "vendor":
+#             vendor = Vendor.query.filter_by(id=user.vendor_id).first()
 
-            if vendor and vendor.wallet >= 30:
-                withdrawal_amount = data.get("withdrawal_amount")
-                if withdrawal_amount > 30:
-                    vendor.wallet -= withdrawal_amount
-                    transaction = Transaction(user_id = user.id , user_type = "vendor", transaction_amount = withdrawal_amount)
-                    db.session.add(transaction)
-                    db.session.commit()
+#             if vendor and vendor.wallet >= 30:
+#                 withdrawal_amount = data.get("withdrawal_amount")
+#                 if withdrawal_amount > 30:
+#                     vendor.wallet -= withdrawal_amount
+#                     transaction = Transaction(user_id = user.id , user_type = "vendor", transaction_amount = withdrawal_amount)
+#                     db.session.add(transaction)
+#                     db.session.commit()
 
-                    return jsonify({
-                        "status":True,
-                        "message": "Withdrawal success!!",
-                        "new_wallet_balance":vendor.wallet
-                    }), 200
+#                     return jsonify({
+#                         "status":True,
+#                         "message": "Withdrawal success!!",
+#                         "new_wallet_balance":vendor.wallet
+#                     }), 200
             
-                else:
-                    return jsonify({
-                    "status":False,
-                    "message": "Amount should be greater than 30!!"
-                }), 400
+#                 else:
+#                     return jsonify({
+#                     "status":False,
+#                     "message": "Amount should be greater than 30!!"
+#                 }), 400
 
-            else:
-                return jsonify({
-                    "status":False,
-                    "message":"The amount should be greater than 30 for making any withdrawal"
-                }), 404
-        else:
-            return jsonify({
-                    "status":False,
-                    "message":"Only vendors are allowed for making the withdrawal !!"
-                }), 404    
+#             else:
+#                 return jsonify({
+#                     "status":False,
+#                     "message":"The amount should be greater than 30 for making any withdrawal"
+#                 }), 404
+#         else:
+#             return jsonify({
+#                     "status":False,
+#                     "message":"Only vendors are allowed for making the withdrawal !!"
+#                 }), 404    
         
-    except Exception as e:
-        return jsonify({
-            "status":False,
-            "message": str(e)
-        }), 500
+#     except Exception as e:
+#         return jsonify({
+#             "status":False,
+#             "message": str(e)
+#         }), 500
 
 
 
@@ -3483,13 +3483,6 @@ def search_event():
         elif prefered_filter.lower() == "my_location":
             sorted_within_range = sorted(sorted_within_range, key=lambda x: (x[1], Ratings.get_average_rating(x[0].id)))
 
-                # elif prefered_filter.lower() == "my_location":
-                #     serialized_events = sorted(serialized_events, key= lambda x: (x["distance_km"], -x["event_ratings"], -x["distance_km"]))
-                
-                # else:
-                #     serialized_events = sorted(serialized_events, key= lambda x: (x["event_ratings"], -x["distance_km"]))
-
-
 
     total_events_found = len(sorted_within_range)
     events_per_page = 5
@@ -3538,108 +3531,108 @@ def search_event():
 
 
 
-@app.route('/search_eventtt', methods=["POST"])
-@jwt_required()
-def search_evettttt():
-    data = request.get_json()
-    event_type = data.get("event_type")
-    location_name = data.get("location_name")
-    latitude = data.get("latitude")
-    longitude = data.get("longitude")
+# @app.route('/search_eventtt', methods=["POST"])
+# @jwt_required()
+# def search_evettttt():
+#     data = request.get_json()
+#     event_type = data.get("event_type")
+#     location_name = data.get("location_name")
+#     latitude = data.get("latitude")
+#     longitude = data.get("longitude")
 
-    # Pagination setup
-    events_per_page = 5
-    page = int(request.args.get("page", 1))
-    offset = (page - 1) * events_per_page
+#     # Pagination setup
+#     events_per_page = 5
+#     page = int(request.args.get("page", 1))
+#     offset = (page - 1) * events_per_page
 
-    if event_type.lower() != "all":
-        # Query based on event_type and location_name
-        events = Event.query.filter_by(event_type=event_type).offset(offset).limit(events_per_page).all()
+#     if event_type.lower() != "all":
+#         # Query based on event_type and location_name
+#         events = Event.query.filter_by(event_type=event_type).offset(offset).limit(events_per_page).all()
 
-        if not events:
-            return jsonify({
-                "status": False,
-                "message": "Events Not Found !!"
-            })
-    else:
-        # Get all events if event_type is "all"
-        all_events = Event.query.all()
-        user_location = (latitude, longitude)
+#         if not events:
+#             return jsonify({
+#                 "status": False,
+#                 "message": "Events Not Found !!"
+#             })
+#     else:
+#         # Get all events if event_type is "all"
+#         all_events = Event.query.all()
+#         user_location = (latitude, longitude)
 
-        # Calculate distances for events with latitude and longitude
-        results_with_distance = [
-            (event, geodesic((event.latitude, event.longitude), user_location).kilometers)
-            for event in all_events 
-            if event.latitude is not None and event.longitude is not None
-        ]
+#         # Calculate distances for events with latitude and longitude
+#         results_with_distance = [
+#             (event, geodesic((event.latitude, event.longitude), user_location).kilometers)
+#             for event in all_events 
+#             if event.latitude is not None and event.longitude is not None
+#         ]
 
-        # Sort events based on distance in ascending order
-        sorted_results = sorted(results_with_distance, key=lambda x: x[1])
+#         # Sort events based on distance in ascending order
+#         sorted_results = sorted(results_with_distance, key=lambda x: x[1])
 
-        total_events_found = len(sorted_results)
+#         total_events_found = len(sorted_results)
 
-        # Paginate the sorted results
-        paginated_results = sorted_results[offset: offset + events_per_page]
+#         # Paginate the sorted results
+#         paginated_results = sorted_results[offset: offset + events_per_page]
 
-        event_list =[]
-        for event, _ in paginated_results:
-            vendor = event.vendor
+#         event_list =[]
+#         for event, _ in paginated_results:
+#             vendor = event.vendor
         
-            vendor_details=vendor.user[0].profile_image
-            #vendor.user[0].profile_image
-                # Ensure that vendor_details is a dictionary
-            #vendor_details = vendor_details.__dict__ if hasattr(vendor_details, '__dict__') else str(vendor_details)
+#             vendor_details=vendor.user[0].profile_image
+#             #vendor.user[0].profile_image
+#                 # Ensure that vendor_details is a dictionary
+#             #vendor_details = vendor_details.__dict__ if hasattr(vendor_details, '__dict__') else str(vendor_details)
 
-            print(vendor_details)
-            event_info = {
-                "id": event.id,
-                "thumbnail": event.thumbnail,
-                "event_type": event.event_type,
-                "custom_event_name": event.custom_event_name,
-                "rate": event.rate,
-                "fixed_price": event.fixed_price,
-                "address":event.address,
-                "location":event.location_name,
-                "vendor_details":  vendor_details  # Ensure vendor_details is a dictionary
-            }
-            event_list.append(event_info)
-            if not isinstance(vendor_details, dict):
-            # Handle the case where vendor_details is not a dictionary
-            # You can log a warning, raise an exception, or handle it as needed
-                print("Warning: vendor_details is not a dictionary!")
-        print(event_list,"ssdsdsdsdssds")
-        return jsonify({
-            "status": True,
-            "Total_Events": total_events_found,
-            "Events":event_list
-        }), 200
+#             print(vendor_details)
+#             event_info = {
+#                 "id": event.id,
+#                 "thumbnail": event.thumbnail,
+#                 "event_type": event.event_type,
+#                 "custom_event_name": event.custom_event_name,
+#                 "rate": event.rate,
+#                 "fixed_price": event.fixed_price,
+#                 "address":event.address,
+#                 "location":event.location_name,
+#                 "vendor_details":  vendor_details  # Ensure vendor_details is a dictionary
+#             }
+#             event_list.append(event_info)
+#             if not isinstance(vendor_details, dict):
+#             # Handle the case where vendor_details is not a dictionary
+#             # You can log a warning, raise an exception, or handle it as needed
+#                 print("Warning: vendor_details is not a dictionary!")
+#         print(event_list,"ssdsdsdsdssds")
+#         return jsonify({
+#             "status": True,
+#             "Total_Events": total_events_found,
+#             "Events":event_list
+#         }), 200
 
-    # If event_type is not "all", proceed with filtered events
-    total_events_found = len(events)
+#     # If event_type is not "all", proceed with filtered events
+#     total_events_found = len(events)
 
-    event_list = []
-    for event in events:
-        vendor_details = [
-            {"vendor_profile_image": vendor_user.profile_image}
-            for vendor_user in event.vendor.user
-        ]
+#     event_list = []
+#     for event in events:
+#         vendor_details = [
+#             {"vendor_profile_image": vendor_user.profile_image}
+#             for vendor_user in event.vendor.user
+#         ]
 
-        event_info = {
-            "id": event.id,
-            "thumbnail": event.thumbnail,
-            "event_type": event.event_type,
-            "custom event name": event.custom_event_name,
-            "rate": event.rate,
-            "fixed_price": event.fixed_price,
-            "vendor details": vendor_details
-        }
-        event_list.append(event_info)
+#         event_info = {
+#             "id": event.id,
+#             "thumbnail": event.thumbnail,
+#             "event_type": event.event_type,
+#             "custom event name": event.custom_event_name,
+#             "rate": event.rate,
+#             "fixed_price": event.fixed_price,
+#             "vendor details": vendor_details
+#         }
+#         event_list.append(event_info)
 
-    return jsonify({
-        "status": True,
-        "Total Events": total_events_found,
-        "Events": event_list
-    }), 200
+#     return jsonify({
+#         "status": True,
+#         "Total Events": total_events_found,
+#         "Events": event_list
+#     }), 200
 
 
 
@@ -6341,3 +6334,62 @@ def reset_password():
 if __name__ == '__main__':
     app.run(debug=False,use_reloader=False)
 
+
+
+
+
+
+
+
+
+@app.route("/withdraw", methods=["POST"])
+@jwt_required()
+def withdraw():
+    try:
+        user = get_current_user()
+        data = request.get_json()
+
+        if not user:
+            return jsonify({"status": False, "message": "User not authenticated !!"}), 401
+
+        if user.role == "vendor":
+            vendor = Vendor.query.filter_by(id=user.vendor_id).first()
+
+            if vendor and vendor.wallet >= 30:
+                withdrawal_amount = data.get("withdrawal_amount")
+                recipient_type = "EMAIL"
+                recipient_email = vendor.paypal_email
+
+                # Create PayPal Payout object
+                payout = Paypal.create_payout(withdrawal_amount, recipient_email)
+
+                # Initiate Payout
+                if payout.create():
+                    # PayPal Payout successful, update wallet balance
+                    vendor.wallet -= withdrawal_amount
+                    db.session.commit()
+
+                    return jsonify({
+                        "status": True,
+                        "message": "Withdrawal success!!",
+                        "new_wallet_balance": vendor.wallet
+                    }), 200
+                else:
+                    # PayPal Payout failed
+                    return jsonify({
+                        "status": False,
+                        "message": "PayPal Payout failed: " + str(payout.error)
+                    }), 400
+            else:
+                return jsonify({
+                    "status": False,
+                    "message": "The amount should be greater than 30 for making any withdrawal"
+                }), 404
+        else:
+            return jsonify({
+                "status": False,
+                "message": "Only vendors are allowed for making the withdrawal !!"
+            }), 404
+
+    except Exception as e:
+        return jsonify({"status": False, "message": str(e)}), 500
