@@ -3466,17 +3466,30 @@ def search_event():
     # Sort events within range by event rating
     # The result that comes with in the range make them in ascedning order with respect to event_ratings
     sorted_within_range = sorted(results_within_range, key=lambda x: Ratings.get_average_rating(x[0].id), reverse=True)
+    # print(sorted_within_range)
 
     prefered_filter = data.get("prefered_filter")
 
     if prefered_filter:
         if prefered_filter.lower() == "top_rated":
-            sorted_within_range = sorted(sorted_within_range, key=lambda x: x[0].rate, reverse=True)
+            sorted_within_range = sorted(sorted_within_range, key=lambda x: (-Ratings.get_average_rating(x[0].id) , x[1]))
         elif prefered_filter.lower() == "cheapest":
-            # sorted_within_range = sorted(sorted_within_range, key=lambda x: x[0].rate)
-            sorted_within_range = sorted(sorted_within_range, key= lambda x: (x[0].rate, -Ratings.get_average_rating(x[0].id), -x[1]))
+            # In a list of sorted_within_range we are getting (<Event 6>, 0.13491949403276454) so x[-1] access the distance and with - it can make the last filteration in each based on the shortest distance 
+            sorted_within_range = sorted(sorted_within_range, key= lambda x: (x[0].rate, -Ratings.get_average_rating(x[0].id), x[1]))
+        elif prefered_filter.lower() == "trending":
+            sorted_within_range = sorted(sorted_within_range, key= lambda x: (x[0].get_total_bookings(), Ratings.get_average_rating(x[0].id), -x[1]), reverse=True)
+        elif prefered_filter.lower() == "least_rated":
+            sorted_within_range = sorted(sorted_within_range, key=lambda x: (Ratings.get_average_rating(x[0].id) , x[1]))
+        elif prefered_filter.lower() == "my_location":
+            sorted_within_range = sorted(sorted_within_range, key=lambda x: (x[1], Ratings.get_average_rating(x[0].id)))
 
-        # Add more filter options as needed
+                # elif prefered_filter.lower() == "my_location":
+                #     serialized_events = sorted(serialized_events, key= lambda x: (x["distance_km"], -x["event_ratings"], -x["distance_km"]))
+                
+                # else:
+                #     serialized_events = sorted(serialized_events, key= lambda x: (x["event_ratings"], -x["distance_km"]))
+
+
 
     total_events_found = len(sorted_within_range)
     events_per_page = 5
@@ -3501,6 +3514,7 @@ def search_event():
 
         event_info = {
             "id": event.id,
+            "total_bookings":event.get_total_bookings(),
             "thumbnail": event.thumbnail,
             "event_type": event.event_type,
             "rate": event.rate,
