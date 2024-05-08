@@ -1,4 +1,7 @@
 5/8/2024 2:56
+~ updated : booking_history --- for upcoming and done filter 
+
+5/8/2024 2:56
 ~ updated : update_event_hours --- for timings to set their availability to true. 
 
 

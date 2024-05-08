@@ -2490,7 +2490,112 @@ def delete_event(event_id):
 
 ###############################   Booking History For User      ######################################
 
-@app.route("/booking_history", methods = ["POST"])
+# @app.route("/booking_history", methods = ["POST"])
+# @jwt_required()
+# def booking_history():
+#     try:
+#         data = request.get_json()
+#         user = get_current_user()
+
+#         if not user:
+#             return jsonify({
+#                 "status":False,
+#                 "message": "User not authenticated !!"
+#             })
+            
+#         if user.role != "user":
+#             return jsonify({
+#                 "status": False,
+#                 "message": "Unauthorized access: Only users can check booking history."
+#             })
+
+#         booking_type = data.get("booking_type")
+#         current_datetime = datetime.now()
+
+
+#         # if booking_type.lower() == "done":
+#         #     bookings = Booking.query.filter(
+#         #         (Booking.user_id == user.id) &
+#         #         ((Booking.end_date <= current_datetime.date()) |  # 5/8/2024 <= 5/8/2024
+#         #         ((Booking.end_date == current_datetime.date()) &  # 5/8/2024 == 5/8/2024
+#         #         (datetime.combine(datetime.min, Booking.end_time) < current_datetime)))
+#         #         ).all()
+
+#         if booking_type.lower() == "done":
+#             bookings = Booking.query.filter(
+#                 (Booking.user_id == user.id) &
+#                 ((Booking.end_date <= current_datetime.date()) |  # 5/8/2024 <= 5/8/2024
+#                 ((Booking.end_date == current_datetime.date()) &  # 5/8/2024 == 5/8/2024
+#                 (Booking.end_time < current_datetime)))
+#                 ).all()
+            
+#             print(f"{Booking.end_time} + '<'  + {current_datetime.time()}" )
+                    
+#         elif booking_type.lower() == "upcoming":
+#             bookings =  Booking.query.filter(
+#                 (Booking.user_id ==  user.id) &
+#                 ((Booking.start_date >= current_datetime.date()) |
+#                 ((Booking.start_date == current_datetime.date) & 
+#                 (Booking.start_time >= current_datetime.time())))
+#             ).all()
+
+
+#         elif booking_type.lower() == "cancelled":
+#             bookings = Booking.query.filter(
+#                 (Booking.user_id == user.id) &
+#                 (Booking.cancelled == True)
+#             ).all()
+        
+
+#         user_bookings = []
+#         for booking in bookings:
+#             vendor_image = None
+#             print(booking.id)
+#             if booking.event.vendor:
+#                 if isinstance(booking.event.vendor, Vendor):
+#                     vendor = booking.event.vendor
+#                     vendor_image = vendor.user.profile_image if hasattr(vendor.user, 'profile_image') else None
+#                     print(vendor_image)
+#                     # You can handle other vendor details here similarly
+#             else:
+#                 # If it's a list (unexpected), iterate through it
+#                 for vendor in booking.event.vendor:
+#                     vendor_image = vendor.user.profile_image if hasattr(vendor.user, 'profile_image') else None
+#                     print(vendor_image)
+    
+
+#             user_booking = {
+#                 "booking_id":booking.id,
+#                 "event_id":booking.event_id,
+#                 "event_vendor_id":booking.event.vendor_id,
+#                 "location_name": booking.event.location_name,
+#                 "event_address":booking.event.address,
+#                 "event_rate":booking.event.rate,
+#                 "booking_end_date": str(booking.end_date),
+#                 "booking_start_time": str(booking.start_time),
+#                 "booking_end_time":str(booking.end_time),
+#                 "vendor_image": vendor_image
+#             }
+
+#             user_bookings.append(user_booking)
+
+#         return jsonify({
+#             "status":True,
+#             "booking_details":user_bookings,
+#             "Total Bookings":len(user_bookings)
+#         })
+
+#     except Exception as e:
+#         return jsonify({
+#             "status":False,
+#             "message": str(e)
+#         }), 500
+
+
+
+from sqlalchemy import extract
+
+@app.route("/booking_history", methods=["POST"])
 @jwt_required()
 def booking_history():
     try:
@@ -2499,10 +2604,10 @@ def booking_history():
 
         if not user:
             return jsonify({
-                "status":False,
+                "status": False,
                 "message": "User not authenticated !!"
             })
-            
+
         if user.role != "user":
             return jsonify({
                 "status": False,
@@ -2512,74 +2617,69 @@ def booking_history():
         booking_type = data.get("booking_type")
         current_datetime = datetime.now()
 
-
         if booking_type.lower() == "done":
             bookings = Booking.query.filter(
                 (Booking.user_id == user.id) &
-                ((Booking.end_date < current_datetime.date()) |
-                ((Booking.end_date == current_datetime.date()) &
-                (Booking.end_time < current_datetime.time())))
-                ).all()
-                    
-        elif booking_type.lower() == "upcoming":
-            bookings =  Booking.query.filter(
-                (Booking.user_id ==  user.id) &
-                ((Booking.start_date > current_datetime.date()) |
-                ((Booking.start_date == current_datetime.date) & 
-                (Booking.start_time > current_datetime.time())))
+                ((Booking.end_date < current_datetime.date()) |  # End date is before today
+                 ((Booking.end_date == current_datetime.date()) &  # End date is today
+                  (extract('hour', Booking.end_time) < current_datetime.hour) &  # Hour is less than current hour
+                  (extract('minute', Booking.end_time) < current_datetime.minute)))  # Minute is less than current minute
             ).all()
 
+        elif booking_type.lower() == "upcoming":
+            bookings = Booking.query.filter(
+                (Booking.user_id == user.id) &
+                ((Booking.start_date > current_datetime.date()) |  # Start date is after today
+                 ((Booking.start_date == current_datetime.date()) &  # Start date is today
+                  (extract('hour', Booking.start_time) > current_datetime.hour) &  # Hour is greater than current hour
+                  (extract('minute', Booking.start_time) > current_datetime.minute)))  # Minute is greater than current minute
+            ).all()
 
         elif booking_type.lower() == "cancelled":
             bookings = Booking.query.filter(
                 (Booking.user_id == user.id) &
                 (Booking.cancelled == True)
             ).all()
-        
 
         user_bookings = []
         for booking in bookings:
             vendor_image = None
-            print(booking.id)
             if booking.event.vendor:
                 if isinstance(booking.event.vendor, Vendor):
                     vendor = booking.event.vendor
                     vendor_image = vendor.user.profile_image if hasattr(vendor.user, 'profile_image') else None
-                    print(vendor_image)
-                    # You can handle other vendor details here similarly
             else:
-                # If it's a list (unexpected), iterate through it
                 for vendor in booking.event.vendor:
                     vendor_image = vendor.user.profile_image if hasattr(vendor.user, 'profile_image') else None
-                    print(vendor_image)
-    
 
             user_booking = {
-                "booking_id":booking.id,
-                "event_id":booking.event_id,
-                "event_vendor_id":booking.event.vendor_id,
+                "booking_id": booking.id,
+                "event_id": booking.event_id,
+                "event_vendor_id": booking.event.vendor_id,
                 "location_name": booking.event.location_name,
-                "event_address":booking.event.address,
-                "event_rate":booking.event.rate,
+                "event_address": booking.event.address,
+                "event_rate": booking.event.rate,
                 "booking_end_date": str(booking.end_date),
                 "booking_start_time": str(booking.start_time),
-                "booking_end_time":str(booking.end_time),
+                "booking_end_time": str(booking.end_time),
                 "vendor_image": vendor_image
             }
 
             user_bookings.append(user_booking)
 
         return jsonify({
-            "status":True,
-            "booking_details":user_bookings,
-            "Total Bookings":len(user_bookings)
+            "status": True,
+            "booking_details": user_bookings,
+            "Total Bookings": len(user_bookings)
         })
 
     except Exception as e:
         return jsonify({
-            "status":False,
+            "status": False,
             "message": str(e)
         }), 500
+
+
 ###############################     Get Event     ######################################
 
 @app.route("/booking_details/<int:booking_id>", methods=["GET"])
