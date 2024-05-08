@@ -1,10 +1,13 @@
+5/8/2024 2:56
+~ updated : update_event_hours --- for timings to set their availability to true. 
+
+
 4/22/2024 4:29
 ~ updated : withdraw api --- for stripe_payout 
 
 
 4/22/2024 4:29
 ~ updated : search_event --- fixture for prefered_filters
-
 
 
 4/22/2024 3:32

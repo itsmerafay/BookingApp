@@ -758,6 +758,7 @@ def update_event_hours():
             start_time = timing_data.get("start_time")
             end_time = timing_data.get("end_time")
 
+
             # Check if eventtiming entry exists, if not create a new one
             event_timings = eventtiming.query.filter_by(event_id=event_id, day_of_week=day_of_week).first()
             if not event_timings:
@@ -768,6 +769,8 @@ def update_event_hours():
                 event_timings.start_time = datetime.strptime(start_time, "%H:%M:%S").time()
             if end_time is not None:
                 event_timings.end_time = datetime.strptime(end_time, "%H:%M:%S").time()
+            
+            event_timings.available = True
 
             db.session.add(event_timings)  # Add event_timings to the session for update
 
@@ -1141,7 +1144,7 @@ def create_event():
                         day_of_week=day_of_week,
                         start_time=start_time_obj if available else "00:00:00",
                         end_time=end_time_obj if available else "00:00:00",
-                        available=available,
+                        available=available, #
                         event=event
                     )
                     db.session.add(event_timing)
