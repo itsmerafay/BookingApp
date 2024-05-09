@@ -2621,18 +2621,18 @@ def booking_history():
             bookings = Booking.query.filter(
                 (Booking.user_id == user.id) &
                 ((Booking.end_date < current_datetime.date()) |  # End date is before today
-                 ((Booking.end_date == current_datetime.date()) &  # End date is today
-                  (extract('hour', Booking.end_time) < current_datetime.hour) &  # Hour is less than current hour
-                  (extract('minute', Booking.end_time) < current_datetime.minute)))  # Minute is less than current minute
+                ((Booking.end_date == current_datetime.date()) &  # End date is today
+                (extract('hour', Booking.end_time) < current_datetime.hour) &  # Hour is less than current hour
+                (extract('minute', Booking.end_time) < current_datetime.minute)))  # Minute is less than current minute
             ).all()
 
         elif booking_type.lower() == "upcoming":
             bookings = Booking.query.filter(
                 (Booking.user_id == user.id) &
-                ((Booking.start_date > current_datetime.date()) |  # Start date is after today
-                 ((Booking.start_date == current_datetime.date()) &  # Start date is today
-                  (extract('hour', Booking.start_time) > current_datetime.hour) &  # Hour is greater than current hour
-                  (extract('minute', Booking.start_time) > current_datetime.minute)))  # Minute is greater than current minute
+                ((Booking.start_date >= current_datetime.date()) |  # Start date is after today
+                ((Booking.start_date == current_datetime.date()) &  # Start date is today
+                (extract('hour', Booking.start_time) > current_datetime.hour) &  # Hour is greater than current hour
+                (extract('minute', Booking.start_time) > current_datetime.minute)))  # Minute is greater than current minute
             ).all()
 
         elif booking_type.lower() == "cancelled":
