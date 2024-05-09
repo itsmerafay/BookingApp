@@ -120,3 +120,5 @@ WTForms
 firebase-admin
 paypalrestsdk
 # paypalhttp
+sqlacodegen==2.3.0.post1
+
