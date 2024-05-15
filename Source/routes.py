@@ -2280,13 +2280,16 @@ def booking_history():
                 (extract('minute', Booking.end_time) < current_datetime.minute)))  # Minute is less than current minute
             ).all()
 
+
         elif booking_type.lower() == "upcoming":
             bookings = Booking.query.filter(
                 (Booking.user_id == user.id) &
                 ((Booking.start_date >= current_datetime.date()) |  # Start date is after today
                 ((Booking.start_date == current_datetime.date()) &  # Start date is today
                 (extract('hour', Booking.start_time) > current_datetime.hour) &  # Hour is greater than current hour
-                (extract('minute', Booking.start_time) > current_datetime.minute)))  # Minute is greater than current minute
+                (extract('minute', Booking.start_time) > current_datetime.minute))) & # Minute is greater than current minute
+                (Booking.cancelled == False)
+
             ).all()
 
         elif booking_type.lower() == "cancelled":
