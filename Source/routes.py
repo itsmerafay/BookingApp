@@ -398,6 +398,7 @@ def update_event(event_id):
         event.video_showcase = data.get("video_showcase", event.video_showcase)
         event.location_name = data.get("location_name", event.location_name)
         event.address = data.get("address", event.address)
+        event.custom_event_name = data.get("custom_event_name", event.custom_event_name)
         event.rate = float(data.get("rate", event.rate))
         event.fixed_price = data.get("fixed_price", event.fixed_price)
         event.details = data.get("details", event.details)
@@ -445,6 +446,9 @@ def update_event(event_id):
             "status":False,
             "message": str(e)
         }), 500
+
+
+
 
 
 
@@ -675,6 +679,7 @@ def signin():
     user.access_token = access_token
     # user.device_token = device_token
     db.session.commit()
+    print("Vendor Id : ",user.vendor.id)
 
     return jsonify({
         "status":True,
@@ -2365,24 +2370,24 @@ def get_event(event_id):
         is_favorite = event.id in fav_event_ids
         event_details = {
             "id": event.id,
-            "thumbnail": event.thumbnail,
-            "other_images": event.other_images,
-            "video_showcase": event.video_showcase,
-            "location_name": event.location_name,
-            "address": event.address,
-            "rate": event.rate,
-            "fixed_price": event.fixed_price,
-            "details": event.details,
-            "services": event.services,
-            "facilities": event.facilities,
-            "description": event.description,
-            "event_type": event.event_type,
+            "thumbnail": event.thumbnail or "",
+            "other_images": event.other_images or [],
+            "video_showcase": event.video_showcase or "",
+            "location_name": event.location_name or "",
+            "address": event.address or "",
+            "rate": event.rate or 0,
+            "fixed_price": event.fixed_price or 0,
+            "details": event.details or "",
+            "services": event.services or "",
+            "facilities": event.facilities or "",
+            "description": event.description or "",
+            "event_type": event.event_type or "",
             "vendor_id": event.vendor_id,  # You can include vendor details if needed
-            "custom event name":event.custom_event_name,
-            "longitude":event.longitude,
-            "latitude":event.latitude,
-            "guest_capacity":event.guest_capacity,
-            "favorite":is_favorite
+            "custom event name":event.custom_event_name or "",
+            "longitude":event.longitude or 0.0,
+            "latitude":event.latitude or 0.0,
+            "guest_capacity":event.guest_capacity or 0,
+            "favorite":is_favorite 
         }
         # Fetch vendor details
         event_timings = event.event_timing
@@ -2400,22 +2405,22 @@ def get_event(event_id):
         if event.vendor:
             vendor = event.vendor
             vendor_details = {
-                "id": vendor.id,
-                "full_name": vendor.full_name,
-                "phone_number": vendor.phone_number,
-                "location": vendor.location,
-                "biography": vendor.biography,
-                "email":vendor.user[0].email,
-                  "profile_image": vendor.user[0].profile_image
+                "id": vendor.id or "",
+                "full_name": vendor.full_name or "",
+                "phone_number": vendor.phone_number or "",
+                "location": vendor.location or "",
+                "biography": vendor.biography or "",
+                "email":vendor.user[0].email or "",
+                "profile_image": vendor.user[0].profile_image or ""
             }
 
             event_details['vendor_details'] = vendor_details
         extra_facility_list = [{
-                "id":extra_fac.id,
-                "name":extra_fac.name,
-                "image":extra_fac.image,
-                "rate":extra_fac.rate,
-                "unit":extra_fac.unit,
+                "id":extra_fac.id or "",
+                "name":extra_fac.name or "",
+                "image":extra_fac.image or "",
+                "rate":extra_fac.rate or 0,
+                "unit":extra_fac.unit or "",
             } for extra_fac in event.extra_facilities] # extra facility as bidirectional relationship is defined in the model class for Event
 
         event_details['extra_facility_list'] = extra_facility_list

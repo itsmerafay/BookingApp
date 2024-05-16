@@ -1,5 +1,12 @@
 5/9/2024 3:15
+~ updated get_event/int api for the fixure of  null val
+~ updated db 
+~ added custom_event_name in update_event
+
+5/9/2024 3:15
 ~ updated booking_history api for upcoming. 
+
+
 
 5/9/2024 3:15
 ~ Removed unncessary commented code
