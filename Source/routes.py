@@ -1170,11 +1170,12 @@ def update_event_extra_facility(event_id):
                     facility.rate = facility_rate or facility.rate
 
                     uuid_format = all(image.endswith(".png") and "-" in image for image in images)
-                    
-                    if not uuid_format :
-    
-                        images_filenames = save_multiple_images_from_base64(images)
-                        facility.image = images_filenames
+                    if images==[]:
+                        facility.image = []
+                    else:                    
+                        if not uuid_format :
+                            images_filenames = save_multiple_images_from_base64(images)
+                            facility.image = images_filenames
 
                 else:
                     return jsonify({
@@ -1189,14 +1190,16 @@ def update_event_extra_facility(event_id):
                         rate=facility_rate,
                         event_id=event_id
                     )
-                uuid_format = all(image.endswith(".png") and "-" in image for image in images )
-                if not uuid_format:
-                        images_filenames = save_multiple_images_from_base64(images)
-                        new_facility.image = images_filenames
+                if images == []:
+                    new_facility.image = []
+                else:
+                    uuid_format = all(image.endswith(".png") and "-" in image for image in images )
+                    if not uuid_format:
+                            images_filenames = save_multiple_images_from_base64(images)
+                            new_facility.image = images_filenames
 
                 db.session.add(new_facility)
                     # print(new_facil)
-
 
             db.session.commit()
 
@@ -1212,9 +1215,6 @@ def update_event_extra_facility(event_id):
             "status": False,
             "message": str(e)
         }), 500
-
-
-
 
 
 

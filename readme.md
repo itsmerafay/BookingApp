@@ -1,3 +1,6 @@
+5/17/2024 3:15
+~ updated update_event_extra_facility for handling null .
+
 5/9/2024 3:15
 ~ updated get_event/int api for the fixure of  null val
 ~ updated db 
@@ -5,7 +8,6 @@
 
 5/9/2024 3:15
 ~ updated booking_history api for upcoming. 
-
 
 
 5/9/2024 3:15
